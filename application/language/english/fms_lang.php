@@ -111,3 +111,9 @@ $lang['LABEL_HOTEL_BILL'] = 'Hotel';
 $lang['LABEL_TRANSPORT_BILL'] = 'Transport';
 $lang['LABEL_LOCAL_TRANSPORT_BILL'] = 'Local Conveyance';
 $lang['LABEL_OTHER_BILL'] = 'MISC';
+
+// Setup Menu
+$lang['LABEL_FILE_CATEGORY']='File Category';
+$lang['LABEL_FILE_CLASS']='File Class';
+$lang['LABEL_FILE_TYPE']='File Type';
+$lang['LABEL_FILE_NAME']='File Name';

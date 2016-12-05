@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Setup_file_category extends Root_Controller
+class Setup_file_type extends Root_Controller
 {
     private $message;
     public $permissions;
@@ -10,8 +10,8 @@ class Setup_file_category extends Root_Controller
     {
         parent::__construct();
         $this->message='';
-        $this->permissions=User_helper::get_permission('Setup_file_category');
-        $this->controller_url='setup_file_category';
+        $this->permissions=User_helper::get_permission('Setup_file_type');
+        $this->controller_url='setup_file_type';
     }
     public function index($action='list',$id=0)
     {
@@ -44,7 +44,7 @@ class Setup_file_category extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']='File Category List';
+            $data['title']='File Type List';
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
             {
@@ -65,14 +65,18 @@ class Setup_file_category extends Root_Controller
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
-            $data['title']='Create New File Category';
+            $data['title']='Create New File Type';
             $data['items']=array
             (
                 'id'=>0,
                 'name'=>'',
+                'id_category'=>'',
+                'id_class'=>'',
                 'ordering'=>99,
                 'status'=>$this->config->item('system_status_active')
             );
+            $data['file_categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
+            $data['file_class']=array();
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
@@ -101,8 +105,9 @@ class Setup_file_category extends Root_Controller
             {
                 $item_id=$id;
             }
-            $data['items']=Query_helper::get_info($this->config->item('table_setup_file_category'),'*',array('id ='.$item_id),1);
-            $data['title']='Edit File Category ('.$data['items']['name'].')';
+            $data['items']=Query_helper::get_info($this->config->item('table_setup_file_class'),'*',array('id ='.$item_id),1);
+            $data['title']='Edit File Class ('.$data['items']['name'].')';
+            $data['file_categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
@@ -157,13 +162,13 @@ class Setup_file_category extends Root_Controller
             {
                 $data['user_updated']=$user->user_id;
                 $data['date_updated']=time();
-                Query_helper::update($this->config->item('table_setup_file_category'),$data,array('id='.$id));
+                Query_helper::update($this->config->item('table_setup_file_class'),$data,array('id='.$id));
             }
             else
             {
                 $data['user_created']=$user->user_id;
                 $data['date_created']=time();
-                Query_helper::add($this->config->item('table_setup_file_category'),$data);
+                Query_helper::add($this->config->item('table_setup_file_class'),$data);
             }
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
@@ -191,6 +196,7 @@ class Setup_file_category extends Root_Controller
     {
         $this->load->library('form_validation');
         $this->form_validation->set_rules('items[name]',$this->lang->line('LABEL_NAME'),'required');
+        $this->form_validation->set_rules('items[id_category]',$this->lang->line('LABEL_FILE_CATEGORY'),'required');
         if($this->form_validation->run()==false)
         {
             $this->message=validation_errors();
@@ -200,7 +206,10 @@ class Setup_file_category extends Root_Controller
     }
     private function system_get_items()
     {
-        $items=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
-        $this->json_return($items);
+        $this->db->select('cls.id,cls.name class_name,cls.id_category,cls.status,cls.ordering,ctg.name category_name');
+        $this->db->from($this->config->item('table_setup_file_class').' cls');
+        $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->order_by('cls.ordering');
+        $this->json_return($this->db->get()->result_array());
     }
 }

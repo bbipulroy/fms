@@ -38,6 +38,12 @@ abstract class Root_Controller extends CI_Controller
         echo json_encode($array);
         exit();
     }
+    public function json_return($array)
+    {
+        header('Content-type: application/json');
+        echo json_encode($array);
+        exit();
+    }
     public function is_site_offline()
     {
         $info=Query_helper::get_info($this->config->item('table_system_site_offline'),'*',array(),1,0,array('id DESC'));

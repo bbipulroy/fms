@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Setup_file_category extends Root_Controller
+class Setup_file_hc_location extends Root_Controller
 {
     private $message;
     public $permissions;
@@ -10,8 +10,8 @@ class Setup_file_category extends Root_Controller
     {
         parent::__construct();
         $this->message='';
-        $this->permissions=User_helper::get_permission('Setup_file_category');
-        $this->controller_url='setup_file_category';
+        $this->permissions=User_helper::get_permission('Setup_file_hc_location');
+        $this->controller_url='setup_file_hc_location';
     }
     public function index($action='list',$id=0)
     {
@@ -44,7 +44,7 @@ class Setup_file_category extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']='File Category List';
+            $data['title']='Hardcopy Location List';
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
             {
@@ -65,7 +65,7 @@ class Setup_file_category extends Root_Controller
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
-            $data['title']='Create New File Category';
+            $data['title']='Create New Hardcopy Location';
             $data['items']=array
             (
                 'id'=>0,
@@ -101,8 +101,8 @@ class Setup_file_category extends Root_Controller
             {
                 $item_id=$id;
             }
-            $data['items']=Query_helper::get_info($this->config->item('table_setup_file_category'),'*',array('id ='.$item_id),1);
-            $data['title']='Edit File Category ('.$data['items']['name'].')';
+            $data['items']=Query_helper::get_info($this->config->item('table_setup_file_hc_location'),'*',array('id ='.$item_id),1);
+            $data['title']='Edit Hardcopy Location ('.$data['items']['name'].')';
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
@@ -157,13 +157,13 @@ class Setup_file_category extends Root_Controller
             {
                 $data['user_updated']=$user->user_id;
                 $data['date_updated']=time();
-                Query_helper::update($this->config->item('table_setup_file_category'),$data,array('id='.$id));
+                Query_helper::update($this->config->item('table_setup_file_hc_location'),$data,array('id='.$id));
             }
             else
             {
                 $data['user_created']=$user->user_id;
                 $data['date_created']=time();
-                Query_helper::add($this->config->item('table_setup_file_category'),$data);
+                Query_helper::add($this->config->item('table_setup_file_hc_location'),$data);
             }
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
@@ -200,7 +200,7 @@ class Setup_file_category extends Root_Controller
     }
     private function system_get_items()
     {
-        $items=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
+        $items=Query_helper::get_info($this->config->item('table_setup_file_hc_location'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
         $this->json_return($items);
     }
 }
