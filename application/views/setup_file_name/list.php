@@ -38,9 +38,10 @@ $CI->load->view('action_buttons',$action_data);
             dataType: "json",
             dataFields: [
                 { name: 'id', type: 'int' },
-                { name: 'type_name', type: 'string' },
-                { name: 'category_name', type: 'string' },
+                { name: 'name', type: 'string' },
                 { name: 'class_name', type: 'string' },
+                { name: 'category_name', type: 'string' },
+                { name: 'type_name', type: 'string' },
                 { name: 'ordering', type: 'int' },
                 { name: 'status', type: 'string' }
             ],
@@ -65,9 +66,10 @@ $CI->load->view('action_buttons',$action_data);
                 altrows: true,
                 autoheight: true,
                 columns: [
-                    { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'type_name'},
+                    { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name'},
                     { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',filtertype: 'list',width:'250'},
                     { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',filtertype: 'list',width:'250'},
+                    { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',filtertype: 'list',width:'250'},
                     { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'150',cellsalign: 'right'},
                     { text: '<?php echo $CI->lang->line('STATUS'); ?>', dataField: 'status',filtertype: 'list',width:'150',cellsalign: 'right'}
                 ]

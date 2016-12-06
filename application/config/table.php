@@ -12,7 +12,7 @@ $config['table_setup_department'] = 'login_setup_department';
 $config['table_setup_company'] = 'login_setup_company';
 $config['table_setup_users_company'] = 'login_setup_users_company';
 
-//fms system setup tables
+//fms system_settings tables
 $config['table_system_assigned_group'] = 'fms_system_assigned_group';
 $config['table_system_user_group'] = 'fms_system_user_group';
 $config['table_system_task'] = 'fms_system_task';

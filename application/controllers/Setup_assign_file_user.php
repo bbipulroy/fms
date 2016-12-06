@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Setup_file_type extends Root_Controller
+class Setup_assign_file_user extends Root_Controller
 {
     private $message;
     public $permissions;
@@ -10,8 +10,8 @@ class Setup_file_type extends Root_Controller
     {
         parent::__construct();
         $this->message='';
-        $this->permissions=User_helper::get_permission('Setup_file_type');
-        $this->controller_url='setup_file_type';
+        $this->permissions=User_helper::get_permission('Setup_assign_file_user');
+        $this->controller_url='setup_assign_file_user';
     }
     public function index($action='list',$id=0)
     {
@@ -23,9 +23,9 @@ class Setup_file_type extends Root_Controller
         {
             $this->system_get_items();
         }
-        elseif($action=='add')
+        elseif($action=='details')
         {
-            $this->system_add();
+            $this->system_details();
         }
         elseif($action=='edit')
         {
@@ -44,7 +44,7 @@ class Setup_file_type extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']='File Type List';
+            $data['title']='List of Users to Assign Files';
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
             {
@@ -61,22 +61,18 @@ class Setup_file_type extends Root_Controller
             $this->json_return($ajax);
         }
     }
-    private function system_add()
+    private function system_details()
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
-            $data['title']='Create New File Type';
+            $data['title']='Create New File Category';
             $data['items']=array
             (
                 'id'=>0,
                 'name'=>'',
-                'id_category'=>'',
-                'id_class'=>'',
                 'ordering'=>99,
                 'status'=>$this->config->item('system_status_active')
             );
-            $data['file_categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
-            $data['file_classes']=array();
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
@@ -105,14 +101,8 @@ class Setup_file_type extends Root_Controller
             {
                 $item_id=$id;
             }
-            $this->db->select('t.*,cls.id_category');
-            $this->db->from($this->config->item('table_setup_file_type').' t');
-            $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
-            $this->db->where('t.id',$item_id);
-            $data['items']=$this->db->get()->row_array();
-            $data['title']='Edit File Type ('.$data['items']['name'].')';
-            $data['file_categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
-            $data['file_classes']=Query_helper::get_info($this->config->item('table_setup_file_class'),array('id value','name text'),array('id_category='.$data['items']['id_category']));
+            $data['items']=Query_helper::get_info($this->config->item('table_setup_file_category'),'*',array('id ='.$item_id),1);
+            $data['title']='Edit File Category ('.$data['items']['name'].')';
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
@@ -167,13 +157,13 @@ class Setup_file_type extends Root_Controller
             {
                 $data['user_updated']=$user->user_id;
                 $data['date_updated']=time();
-                Query_helper::update($this->config->item('table_setup_file_type'),$data,array('id='.$id));
+                Query_helper::update($this->config->item('table_setup_file_category'),$data,array('id='.$id));
             }
             else
             {
                 $data['user_created']=$user->user_id;
                 $data['date_created']=time();
-                Query_helper::add($this->config->item('table_setup_file_type'),$data);
+                Query_helper::add($this->config->item('table_setup_file_category'),$data);
             }
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
@@ -201,7 +191,6 @@ class Setup_file_type extends Root_Controller
     {
         $this->load->library('form_validation');
         $this->form_validation->set_rules('items[name]',$this->lang->line('LABEL_NAME'),'required');
-        $this->form_validation->set_rules('items[id_class]',$this->lang->line('LABEL_FILE_CLASS'),'required');
         if($this->form_validation->run()==false)
         {
             $this->message=validation_errors();
@@ -211,11 +200,57 @@ class Setup_file_type extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('t.id,t.name type_name,t.status,t.ordering,ctg.name category_name,cls.name class_name');
-        $this->db->from($this->config->item('table_setup_file_type').' t');
-        $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
-        $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
-        $this->db->order_by('t.ordering');
-        $this->json_return($this->db->get()->result_array());
+        $user=User_helper::get_user();
+        $db_login=$this->load->database('armalik_login',true);
+        $db_login->from($this->config->item('table_setup_user').' user');
+        $db_login->select('user.id,user.employee_id,user.user_name,user.status');
+        $db_login->select('user_info.name,user_info.ordering');
+        $db_login->select('designation.name designation_name');
+        //$db_login->select('ug.name group_name');
+        $db_login->join($this->config->item('table_setup_user_info').' user_info','user.id = user_info.user_id','INNER');
+        $db_login->join($this->config->item('table_setup_users_other_sites').' uos','uos.user_id = user.id','INNER');
+        $db_login->join($this->config->item('table_system_other_sites').' os','os.id = uos.site_id','INNER');
+
+        $db_login->join($this->config->item('table_setup_designation').' designation','designation.id = user_info.designation','LEFT');
+
+        $db_login->where('user_info.revision',1);
+        $db_login->where('uos.revision',1);
+        $db_login->where('os.short_name',$this->config->item('system_site_short_name'));
+        $db_login->order_by('user_info.ordering','ASC');
+        if($user->user_group!=1)
+        {
+            $db_login->where('user_info.user_group !=',1);
+        }
+        $items=$db_login->get()->result_array();
+
+
+        $this->db->from($this->config->item('table_system_assigned_group').' ag');
+        $this->db->select('ag.user_id');
+        $this->db->select('ug.name group_name');
+        $this->db->join($this->config->item('table_system_user_group').' ug','ug.id = ag.user_group','INNER');
+        $this->db->where('ag.revision',1);
+        $results=$this->db->get()->result_array();
+        $groups=array();
+        foreach($results as $result)
+        {
+            $groups[$result['user_id']]['group_name']=$result['group_name'];
+        }
+        foreach($items as &$item)
+        {
+            if(isset($groups[$item['id']]['group_name']))
+            {
+                $item['group_name']=$groups[$item['id']]['group_name'];
+            }
+            else
+            {
+                $item['group_name']='Not Assigned';
+            }
+        }
+
+
+
+
+        //$items=Query_helper::get_info($this->config->item('table_setup_user'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'));
+        $this->jsonReturn($items);
     }
 }

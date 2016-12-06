@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Setup_file_type extends Root_Controller
+class Setup_file_name extends Root_Controller
 {
     private $message;
     public $permissions;
@@ -10,8 +10,8 @@ class Setup_file_type extends Root_Controller
     {
         parent::__construct();
         $this->message='';
-        $this->permissions=User_helper::get_permission('Setup_file_type');
-        $this->controller_url='setup_file_type';
+        $this->permissions=User_helper::get_permission('Setup_file_name');
+        $this->controller_url='setup_file_name';
     }
     public function index($action='list',$id=0)
     {
@@ -44,7 +44,7 @@ class Setup_file_type extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']='File Type List';
+            $data['title']='File Name List';
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
             {
@@ -65,18 +65,20 @@ class Setup_file_type extends Root_Controller
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
-            $data['title']='Create New File Type';
+            $data['title']='Create New File Name';
             $data['items']=array
             (
                 'id'=>0,
                 'name'=>'',
                 'id_category'=>'',
                 'id_class'=>'',
+                'id_type'=>'',
                 'ordering'=>99,
                 'status'=>$this->config->item('system_status_active')
             );
             $data['file_categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
             $data['file_classes']=array();
+            $data['file_types']=array();
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
@@ -105,14 +107,16 @@ class Setup_file_type extends Root_Controller
             {
                 $item_id=$id;
             }
-            $this->db->select('t.*,cls.id_category');
-            $this->db->from($this->config->item('table_setup_file_type').' t');
+            $this->db->select('n.*,t.id_class,cls.id_category');
+            $this->db->from($this->config->item('table_setup_file_name').' n');
+            $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
             $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
-            $this->db->where('t.id',$item_id);
+            $this->db->where('n.id',$item_id);
             $data['items']=$this->db->get()->row_array();
-            $data['title']='Edit File Type ('.$data['items']['name'].')';
+            $data['title']='Edit File Name ('.$data['items']['name'].')';
             $data['file_categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
             $data['file_classes']=Query_helper::get_info($this->config->item('table_setup_file_class'),array('id value','name text'),array('id_category='.$data['items']['id_category']));
+            $data['file_types']=Query_helper::get_info($this->config->item('table_setup_file_type'),array('id value','name text'),array('id_class='.$data['items']['id_class']));
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
@@ -167,13 +171,13 @@ class Setup_file_type extends Root_Controller
             {
                 $data['user_updated']=$user->user_id;
                 $data['date_updated']=time();
-                Query_helper::update($this->config->item('table_setup_file_type'),$data,array('id='.$id));
+                Query_helper::update($this->config->item('table_setup_file_name'),$data,array('id='.$id));
             }
             else
             {
                 $data['user_created']=$user->user_id;
                 $data['date_created']=time();
-                Query_helper::add($this->config->item('table_setup_file_type'),$data);
+                Query_helper::add($this->config->item('table_setup_file_name'),$data);
             }
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
@@ -201,7 +205,7 @@ class Setup_file_type extends Root_Controller
     {
         $this->load->library('form_validation');
         $this->form_validation->set_rules('items[name]',$this->lang->line('LABEL_NAME'),'required');
-        $this->form_validation->set_rules('items[id_class]',$this->lang->line('LABEL_FILE_CLASS'),'required');
+        $this->form_validation->set_rules('items[id_type]',$this->lang->line('LABEL_FILE_TYPE'),'required');
         if($this->form_validation->run()==false)
         {
             $this->message=validation_errors();
@@ -211,11 +215,12 @@ class Setup_file_type extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('t.id,t.name type_name,t.status,t.ordering,ctg.name category_name,cls.name class_name');
-        $this->db->from($this->config->item('table_setup_file_type').' t');
+        $this->db->select('n.id,n.name,n.status,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name');
+        $this->db->from($this->config->item('table_setup_file_name').' n');
+        $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
         $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
-        $this->db->order_by('t.ordering');
+        $this->db->order_by('n.ordering');
         $this->json_return($this->db->get()->result_array());
     }
 }

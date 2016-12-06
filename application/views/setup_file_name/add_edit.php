@@ -42,12 +42,30 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CLASS');?><span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_class" name="items[id_class]" class="form-control">
+                <select id="id_class" class="form-control" tabindex="-1">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
                     foreach($file_classes as $f_class)
                     {?>
-                        <option value="<?php echo $f_class['value']?>" <?php if($f_class['value']==$items['id_class']){echo "selected";}?>><?php echo $f_class['text'];?></option>
+                        <option value="<?php echo $f_class['value']?>" <?php if($f_class['value']==$items['id_class']){ echo 'selected';}?>><?php echo $f_class['text'];?></option>
+                    <?php
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+
+        <div style="<?php if(!($items['id_type']>0)){echo 'display:none';} ?>" class="row show-grid" id="id_type_container">
+            <div class="col-xs-4">
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_TYPE');?><span style="color:#FF0000">*</span></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <select id="id_type" name="items[id_type]" class="form-control">
+                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
+                    <?php
+                    foreach($file_types as $type)
+                    {?>
+                        <option value="<?php echo $type['value']?>" <?php if($type['value']==$items['id_type']){echo "selected";}?>><?php echo $type['text'];?></option>
                     <?php
                     }
                     ?>
@@ -82,10 +100,12 @@ $CI->load->view('action_buttons',$action_data);
         $(document).on("change","#id_category",function()
         {
             $("#id_class").val("");
+            $("#id_type").val("");
             var id_category=$('#id_category').val();
             if(id_category>0)
             {
                 $('#id_class_container').show();
+                $('#id_type_container').hide();
                 $.ajax(
                 {
                     url: base_url+"common_controller/get_dropdown_with_select",
@@ -111,6 +131,41 @@ $CI->load->view('action_buttons',$action_data);
             else
             {
                 $('#id_class_container').hide();
+                $('#id_type_container').hide();
+            }
+        });
+        $(document).on("change","#id_class",function()
+        {
+            $("#id_type").val("");
+            var id_class=$('#id_class').val();
+            if(id_class>0)
+            {
+                $('#id_type_container').show();
+                $.ajax(
+                    {
+                        url: base_url+"common_controller/get_dropdown_with_select",
+                        type: 'POST',
+                        datatype: "JSON",
+                        data:
+                        {
+                            html_container_id:'#id_type',
+                            table:'<?php echo $CI->config->item('table_setup_file_type'); ?>',
+                            table_column:'id_class',
+                            table_column_value:id_class
+                        },
+                        success: function (data, status)
+                        {
+
+                        },
+                        error: function (xhr, desc, err)
+                        {
+                            console.log("error");
+                        }
+                    });
+            }
+            else
+            {
+                $('#id_type_container').hide();
             }
         });
     });
