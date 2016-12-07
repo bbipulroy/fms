@@ -25,7 +25,7 @@ class Setup_assign_file_user extends Root_Controller
         }
         elseif($action=='details')
         {
-            $this->system_details();
+            $this->system_details($id);
         }
         elseif($action=='edit')
         {
@@ -61,32 +61,65 @@ class Setup_assign_file_user extends Root_Controller
             $this->json_return($ajax);
         }
     }
-    private function system_details()
+    private function system_details($id)
     {
-        if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
+        if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']='Create New File Category';
-            $data['items']=array
-            (
-                'id'=>0,
-                'name'=>'',
-                'ordering'=>99,
-                'status'=>$this->config->item('system_status_active')
-            );
-            $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
+            if(($this->input->post('id')))
+            {
+                $item_id=$this->input->post('id');
+            }
+            else
+            {
+                $item_id=$id;
+            } //$stock_id
+            $this->db->from($this->config->item('table_stockin_varieties').' stv');
+            $this->db->select('stv.*');
+            $this->db->select('v.crop_type_id crop_type_id');
+            $this->db->select('type.crop_id crop_id');
+
+            $this->db->join($this->config->item('table_setup_classification_varieties').' v','v.id = stv.variety_id','INNER');
+            $this->db->join($this->config->item('table_setup_classification_crop_types').' type','type.id = v.crop_type_id','INNER');
+            $this->db->where('stv.id',$item_id);
+            $this->db->where('stv.status',$this->config->item('system_status_active'));
+
+            $data['stock_in']=$this->db->get()->row_array();
+            if(!$data['stock_in'])
+            {
+                $ajax['status']=false;
+                $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+                $this->jsonReturn($ajax);
+                die();
+            }
+            if($data['stock_in']['date_exp']==0)
+            {
+                $data['stock_in']['date_exp']='';
+            }
+            if($data['stock_in']['date_mfg']==0)
+            {
+                $data['stock_in']['date_mfg']='';
+            }
+            $data['title']="Detail of Purchase";
+            $data['warehouses']=Query_helper::get_info($this->config->item('table_basic_setup_warehouse'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
+            $data['crops']=Query_helper::get_info($this->config->item('table_setup_classification_crops'),array('id value','name text'),array());
+            $data['crop_types']=Query_helper::get_info($this->config->item('table_setup_classification_crop_types'),array('id value','name text'),array('crop_id ='.$data['stock_in']['crop_id']));
+            $data['varieties']=Query_helper::get_info($this->config->item('table_setup_classification_varieties'),array('id value','name text'),array('crop_type_id ='.$data['stock_in']['crop_type_id']));
+            $data['pack_sizes']=Query_helper::get_info($this->config->item('table_setup_classification_vpack_size'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('name ASC'));
+
+            $ajax['status']=true;
+            $ajax['system_content'][]=array("id"=>"#system_content","html"=>$this->load->view("stockin_variety/details",$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
             }
-            $ajax['status']=true;
-            $this->json_return($ajax);
+            $ajax['system_page_url']=site_url($this->controller_url.'/index/details/'.$item_id);
+            $this->jsonReturn($ajax);
         }
         else
         {
             $ajax['status']=false;
-            $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
-            $this->json_return($ajax);
+            $ajax['system_message']=$this->lang->line("YOU_DONT_HAVE_ACCESS");
+            $this->jsonReturn($ajax);
         }
     }
     private function system_edit($id)
@@ -203,15 +236,17 @@ class Setup_assign_file_user extends Root_Controller
         $user=User_helper::get_user();
         $db_login=$this->load->database('armalik_login',true);
         $db_login->from($this->config->item('table_setup_user').' user');
-        $db_login->select('user.id,user.employee_id,user.user_name,user.status');
-        $db_login->select('user_info.name,user_info.ordering');
+        $db_login->select('user.id,user.employee_id,user.user_name');
+        $db_login->select('user_info.name');
         $db_login->select('designation.name designation_name');
-        //$db_login->select('ug.name group_name');
-        $db_login->join($this->config->item('table_setup_user_info').' user_info','user.id = user_info.user_id','INNER');
-        $db_login->join($this->config->item('table_setup_users_other_sites').' uos','uos.user_id = user.id','INNER');
-        $db_login->join($this->config->item('table_system_other_sites').' os','os.id = uos.site_id','INNER');
-
-        $db_login->join($this->config->item('table_setup_designation').' designation','designation.id = user_info.designation','LEFT');
+        $db_login->select('department.name department_name');
+        $db_login->select('office.name office_name');
+        $db_login->join($this->config->item('table_setup_user_info').' user_info','user.id=user_info.user_id','INNER');
+        $db_login->join($this->config->item('table_setup_users_other_sites').' uos','uos.user_id=user.id','INNER');
+        $db_login->join($this->config->item('table_system_other_sites').' os','os.id=uos.site_id','INNER');
+        $db_login->join($this->config->item('table_setup_designation').' designation','designation.id=user_info.designation','LEFT');
+        $db_login->join($this->config->item('table_setup_department').' department','department.id=user_info.department_id','LEFT');
+        $db_login->join($this->config->item('table_setup_office').' office','office.id=user_info.office_id','LEFT');
 
         $db_login->where('user_info.revision',1);
         $db_login->where('uos.revision',1);
@@ -223,13 +258,13 @@ class Setup_assign_file_user extends Root_Controller
         }
         $items=$db_login->get()->result_array();
 
-
         $this->db->from($this->config->item('table_system_assigned_group').' ag');
         $this->db->select('ag.user_id');
         $this->db->select('ug.name group_name');
         $this->db->join($this->config->item('table_system_user_group').' ug','ug.id = ag.user_group','INNER');
         $this->db->where('ag.revision',1);
         $results=$this->db->get()->result_array();
+
         $groups=array();
         foreach($results as $result)
         {
@@ -246,11 +281,6 @@ class Setup_assign_file_user extends Root_Controller
                 $item['group_name']='Not Assigned';
             }
         }
-
-
-
-
-        //$items=Query_helper::get_info($this->config->item('table_setup_user'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'));
-        $this->jsonReturn($items);
+        $this->json_return($items);
     }
 }

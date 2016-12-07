@@ -9,8 +9,7 @@ $config['table_system_other_sites'] = 'system_other_sites';
 $config['table_other_sites_visit'] = 'other_sites_visit';
 $config['table_setup_designation'] = 'setup_designation';
 $config['table_setup_department'] = 'login_setup_department';
-$config['table_setup_company'] = 'login_setup_company';
-$config['table_setup_users_company'] = 'login_setup_users_company';
+$config['table_setup_office'] = 'setup_offices';
 
 //fms system_settings tables
 $config['table_system_assigned_group'] = 'fms_system_assigned_group';
@@ -27,3 +26,4 @@ $config['table_setup_file_class'] = 'fms_setup_file_class';
 $config['table_setup_file_type'] = 'fms_setup_file_type';
 $config['table_setup_file_name'] = 'fms_setup_file_name';
 $config['table_setup_file_hc_location'] = 'fms_setup_file_hc_location';
+$config['table_setup_assign_user_file'] = 'fms_setup_assign_user_file';

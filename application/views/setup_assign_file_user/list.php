@@ -6,6 +6,8 @@ if(isset($CI->permissions['action2'])&&($CI->permissions['action2']==1))
 {
     $action_data["action_edit"]=base_url($CI->controller_url."/index/edit");
 }
+$action_data["action_details"]=base_url($CI->controller_url."/index/details");
+$action_data["action_refresh"]=base_url($CI->controller_url."/index/list");
 if(isset($CI->permissions['action4'])&&($CI->permissions['action4']==1))
 {
     $action_data["action_print"]='print';
@@ -14,7 +16,6 @@ if(isset($CI->permissions['action5'])&&($CI->permissions['action5']==1))
 {
     $action_data["action_download"]='download';
 }
-$action_data["action_refresh"]=base_url($CI->controller_url."/index/list");
 $CI->load->view("action_buttons",$action_data);
 ?>
 
@@ -43,11 +44,12 @@ $CI->load->view("action_buttons",$action_data);
             dataFields: [
                 { name: 'id', type: 'int' },
                 { name: 'employee_id', type: 'string' },
-                { name: 'designation_name', type: 'string' },
                 { name: 'user_name', type: 'string' },
-                { name: 'group_name', type: 'string' },
                 { name: 'name', type: 'string' },
-                { name: 'ordering', type: 'int' }
+                { name: 'group_name', type: 'string' },
+                { name: 'designation_name', type: 'string' },
+                { name: 'department_name', type: 'string' },
+                { name: 'office_name', type: 'string' }
             ],
             id: 'id',
             url: url
@@ -73,9 +75,10 @@ $CI->load->view("action_buttons",$action_data);
                     { text: '<?php echo $CI->lang->line('LABEL_EMPLOYEE_ID'); ?>', dataField: 'employee_id',width:'100'},
                     { text: '<?php echo $CI->lang->line('LABEL_USERNAME'); ?>', dataField: 'user_name',width:'150'},
                     { text: '<?php echo $CI->lang->line('LABEL_NAME'); ?>', dataField: 'name',width:'300'},
+                    { text: '<?php echo $CI->lang->line('LABEL_USER_GROUP'); ?>', dataField: 'group_name',filtertype: 'list'},
                     { text: '<?php echo $CI->lang->line('LABEL_DESIGNATION_NAME'); ?>', dataField: 'designation_name',width:'200'},
-                    { text: '<?php echo $CI->lang->line('LABEL_USER_GROUP'); ?>', dataField: 'group_name'},
-                    { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'150',cellsalign: 'right'}
+                    { text: '<?php echo $CI->lang->line('LABEL_DEPARTMENT_NAME'); ?>', dataField: 'department_name',width:'200'},
+                    { text: '<?php echo $CI->lang->line('LABEL_OFFICE_NAME'); ?>', dataField: 'office_name',width:'200',filtertype:'list'}
                 ]
             });
     });

@@ -234,7 +234,6 @@ $(document).ready(function()
                     return;
                 }
             }
-            //var selectedRowData = $(jqxgrid_id).jqxGrid('getrowdata', selected_row_indexes[0]);//only first selected
             var selectedRowData = $(jqxgrid_id).jqxGrid('getrowdata', selected_row_indexes[selected_row_indexes.length-1]);//only last selected
 
             $.ajax({

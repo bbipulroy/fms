@@ -61,7 +61,6 @@ $lang['MSG_FILE_TYPE_ERROR']='File Type Error';
 $lang['LABEL_YES'] = 'Yes';
 $lang['LABEL_NO'] = 'No';
 
-
 $lang['LABEL_ID'] = 'id';
 $lang['LABEL_YEAR'] = 'Year';
 $lang['LABEL_NAME'] = 'Name';
@@ -92,6 +91,7 @@ $lang['LABEL_RECEIVED_BY'] = 'Received By';
 $lang['LABEL_USERNAME'] = 'User name';
 $lang['LABEL_EMPLOYEE_ID'] = 'Employee id';
 $lang['LABEL_USER_GROUP'] = 'User Group';
+$lang['LABEL_OFFICE_NAME'] = 'Office';
 $lang['LABEL_DEPARTMENT_NAME'] = 'Department';
 $lang['LABEL_DESIGNATION_NAME'] = 'Designation';
 $lang['LABEL_CATEGORY_NAME'] = 'Category';

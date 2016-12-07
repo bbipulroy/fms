@@ -89,8 +89,6 @@ $CI->load->view("action_buttons",$action_data);
                 </tbody>
             </table>
         </div>
-
-
     </div>
     <div class="clearfix"></div>
 </form>
