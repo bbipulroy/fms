@@ -26,4 +26,4 @@ $config['table_setup_file_class'] = 'fms_setup_file_class';
 $config['table_setup_file_type'] = 'fms_setup_file_type';
 $config['table_setup_file_name'] = 'fms_setup_file_name';
 $config['table_setup_file_hc_location'] = 'fms_setup_file_hc_location';
-$config['table_setup_assign_user_file'] = 'fms_setup_assign_user_file';
+$config['table_setup_assign_user_group_file'] = 'fms_setup_assign_user_group_file';

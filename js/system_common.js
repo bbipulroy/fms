@@ -171,9 +171,7 @@ $(document).ready(function()
     });
     $(document).on("click", "#button_action_clear", function(event)
     {
-
         $($(this).attr('data-form')).trigger('reset');
-
     });
     $(document).on("click", "#button_action_report", function(event)
     {
