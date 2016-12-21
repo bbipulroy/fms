@@ -10,13 +10,13 @@ class Setup_assign_file_user_group extends Root_Controller
     public $permission_all_body='permission_all_body';
     public $permission_all_child='permission_all_child';
     public $permission_all='permission_all';
-    public $file_type_1_name_array=array();
-    public $file_type_2_name_array=array();
-    public $file_type_2_parent_array=array();
-    public $file_type_3_name_array=array();
-    public $file_type_3_parent_array=array();
-    public $file_type_4_name_array=array();
-    public $file_type_4_parent_array=array();
+    private $file_type_1_name_array=array();
+    private $file_type_2_name_array=array();
+    private $file_type_2_parent_array=array();
+    private $file_type_3_name_array=array();
+    private $file_type_3_parent_array=array();
+    private $file_type_4_name_array=array();
+    private $file_type_4_parent_array=array();
     public $selected_array=array();
     public $selected_process_check;
     public $selected_array_all=array();
@@ -66,108 +66,6 @@ class Setup_assign_file_user_group extends Root_Controller
                 $ajax['system_message']=$this->message;
             }
             $ajax['system_page_url']=site_url($this->controller_url);
-            $ajax['status']=true;
-            $this->json_return($ajax);
-        }
-        else
-        {
-            $ajax['status']=false;
-            $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
-            $this->json_return($ajax);
-        }
-    }
-    private function system_details($id)
-    {
-        $file_type_1_permission_array=array();
-        $file_type_2_permission_array=array();
-        $file_type_3_permission_array=array();
-        $file_type_4_permission_array=array();
-        if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
-        {
-            if(($this->input->post('id')))
-            {
-                $item_id=$this->input->post('id');
-            }
-            else
-            {
-                $item_id=$id;
-            }
-
-            $this->db->select('name');
-            $this->db->from($this->config->item('table_system_user_group'));
-            $this->db->where('id',$item_id);
-            $user_group_name=$this->db->get()->row_array();
-            $data['item_id']=$item_id;
-            $data['title']='Details File Permission for ('.$user_group_name['name'].')';
-
-            $this->db->select('id_file,type');
-            $this->db->from($this->config->item('table_setup_assign_user_group_file'));
-            $this->db->where('user_group_id',$item_id);
-            $this->db->where('revision',1);
-            $selected_files=$this->db->get()->result_array();
-            if(sizeof($selected_files)<1)
-            {
-                $this->selected_process_check=false;
-            }
-            else
-            {
-                if($selected_files[0]['type']==$this->config->item('system_blank_permission'))
-                {
-                    $this->selected_process_check=false;
-                }
-                elseif($selected_files[0]['type']==$this->config->item('system_file_permission_all') && $selected_files[0]['id_file']==$this->config->item('system_all_and_blank_fp_id'))
-                {
-                    $this->selected_array='permission_all';
-                    $this->selected_process_check=false;
-                }
-                else
-                {
-                    $this->selected_process_check=true;
-                    foreach($selected_files as $sf)
-                    {
-                        if($sf['type']==$this->config->item('system_file_type_1'))
-                        {
-                            $file_type_1_permission_array[$sf['id_file']]=true;
-                        }
-                        elseif($sf['type']==$this->config->item('system_file_type_2'))
-                        {
-                            $file_type_2_permission_array[$sf['id_file']]=true;
-                        }
-                        elseif($sf['type']==$this->config->item('system_file_type_3'))
-                        {
-                            $file_type_3_permission_array[$sf['id_file']]=true;
-                        }
-                        elseif($sf['type']==$this->config->item('system_file_type_4'))
-                        {
-                            $file_type_4_permission_array[$sf['id_file']]=true;
-                        }
-                    }
-                }
-            }
-
-            $this->file_type_1_name_array=$this->get_id_name_array($this->get_data('id,name',$this->config->item('table_setup_file_type_1')));
-
-            $file_type_2_array=$this->get_data('id,name,id_file_type_1',$this->config->item('table_setup_file_type_2'));
-            $this->file_type_2_name_array=$this->get_id_name_array($file_type_2_array);
-            $this->file_type_2_parent_array=$this->get_parent_array($file_type_2_array,'id_file_type_1');
-            unset($file_type_2_array);
-
-            $file_type_3_array=$this->get_data('id,name,id_file_type_2',$this->config->item('table_setup_file_type_3'));
-            $this->file_type_3_name_array=$this->get_id_name_array($file_type_3_array);
-            $this->file_type_3_parent_array=$this->get_parent_array($file_type_3_array,'id_file_type_2');
-            unset($file_type_3_array);
-
-            $file_type_4_array=$this->get_data('id,name,id_file_type_3',$this->config->item('table_setup_file_type_4'));
-            $this->file_type_4_name_array=$this->get_id_name_array($file_type_4_array);
-            $this->file_type_4_parent_array=$this->get_parent_array($file_type_4_array,'id_file_type_3');
-            unset($file_type_4_array);
-
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
-            if($this->message)
-            {
-                $ajax['system_message']=$this->message;
-            }
-            $ajax['system_page_url']=site_url($this->controller_url.'/index/edit/'.$item_id);
             $ajax['status']=true;
             $this->json_return($ajax);
         }

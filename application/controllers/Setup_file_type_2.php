@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Setup_file_class extends Root_Controller
+class Setup_file_type_2 extends Root_Controller
 {
     private $message;
     public $permissions;
@@ -10,8 +10,8 @@ class Setup_file_class extends Root_Controller
     {
         parent::__construct();
         $this->message='';
-        $this->permissions=User_helper::get_permission('Setup_file_class');
-        $this->controller_url='setup_file_class';
+        $this->permissions=User_helper::get_permission('Setup_file_type_2');
+        $this->controller_url='setup_file_type_2';
     }
     public function index($action='list',$id=0)
     {
@@ -44,7 +44,7 @@ class Setup_file_class extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']='File Class List';
+            $data['title']=$this->lang->line('LABEL_FILE_TYPE_2').' List';
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
             {
@@ -65,7 +65,7 @@ class Setup_file_class extends Root_Controller
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
-            $data['title']='Create New File Class';
+            $data['title']='Create New '.$this->lang->line('LABEL_FILE_TYPE_2');;
             $data['items']=array
             (
                 'id'=>0,
@@ -104,7 +104,7 @@ class Setup_file_class extends Root_Controller
                 $item_id=$id;
             }
             $data['items']=Query_helper::get_info($this->config->item('table_setup_file_type_2'),'*',array('id ='.$item_id),1);
-            $data['title']='Edit File Class ('.$data['items']['name'].')';
+            $data['title']='Edit '.$this->lang->line('LABEL_FILE_TYPE_2').' ('.$data['items']['name'].')';
             $data['file_type_1s']=Query_helper::get_info($this->config->item('table_setup_file_type_1'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
@@ -194,7 +194,7 @@ class Setup_file_class extends Root_Controller
     {
         $this->load->library('form_validation');
         $this->form_validation->set_rules('items[name]',$this->lang->line('LABEL_NAME'),'required');
-        $this->form_validation->set_rules('items[id_file_type_1]',$this->lang->line('LABEL_FILE_CATEGORY'),'required');
+        $this->form_validation->set_rules('items[id_file_type_1]',$this->lang->line('LABEL_FILE_TYPE_1'),'required');
         if($this->form_validation->run()==false)
         {
             $this->message=validation_errors();
@@ -204,10 +204,10 @@ class Setup_file_class extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('cls.id,cls.name class_name,cls.id_file_type_1,cls.status,cls.ordering,ctg.name category_name');
-        $this->db->from($this->config->item('table_setup_file_type_2').' cls');
-        $this->db->join($this->config->item('table_setup_file_type_1').' ctg','cls.id_file_type_1=ctg.id');
-        $this->db->order_by('cls.ordering');
+        $this->db->select('ft2.id,ft2.name file_type_2_name,ft2.id_file_type_1,ft2.status,ft2.ordering,ft1.name file_type_1_name');
+        $this->db->from($this->config->item('table_setup_file_type_2').' ft2');
+        $this->db->join($this->config->item('table_setup_file_type_1').' ft1','ft2.id_file_type_1=ft1.id');
+        $this->db->order_by('ft2.ordering');
         $this->json_return($this->db->get()->result_array());
     }
 }

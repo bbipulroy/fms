@@ -21,15 +21,18 @@ $CI->load->view('action_buttons',$action_data);
 
         <div style="" class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CATEGORY');?><span style="color:#FF0000">*</span></label>
+                <label for="id_file_type_1" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_FILE_TYPE_1');?>
+                    <span style="color:#FF0000">*</span>
+                </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_category" name="items[id_file_type_1]" class="form-control" tabindex="-1">
+                <select id="id_file_type_1" name="items[id_file_type_1]" class="form-control" tabindex="-1">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
-                    foreach($file_type_1s as $category)
+                    foreach($file_type_1s as $file_type_1)
                     {?>
-                        <option value="<?php echo $category['value']?>" <?php if($category['value']==$items['id_file_type_1']){ echo 'selected';}?>><?php echo $category['text'];?></option>
+                        <option value="<?php echo $file_type_1['value']?>" <?php if($file_type_1['value']==$items['id_file_type_1']){ echo 'selected';}?>><?php echo $file_type_1['text'];?></option>
                     <?php
                     }
                     ?>
@@ -39,7 +42,10 @@ $CI->load->view('action_buttons',$action_data);
 
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right"><?php echo $this->lang->line('LABEL_NAME');?><span style="color:#FF0000">*</span></label>
+                <label for="name" class="control-label pull-right">
+                    <?php echo $this->lang->line('LABEL_NAME');?>
+                    <span style="color:#FF0000">*</span>
+                </label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <input type="text" name="items[name]" id="name" class="form-control" value="<?php echo $items['name'];?>"/>
@@ -48,7 +54,10 @@ $CI->load->view('action_buttons',$action_data);
 
         <div style="" class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_ORDER');?><span style="color:#FF0000">*</span></label>
+                <label for="ordering" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_ORDER');?>
+                    <span style="color:#FF0000">*</span>
+                </label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <input type="text" name="items[ordering]" id="ordering" class="form-control" value="<?php echo $items['ordering'] ?>" >
@@ -57,9 +66,3 @@ $CI->load->view('action_buttons',$action_data);
     </div>
     <div class="clearfix"></div>
 </form>
-<script type="text/javascript">
-    jQuery(document).ready(function()
-    {
-        turn_off_triggers();
-    });
-</script>

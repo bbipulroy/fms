@@ -262,3 +262,7 @@ footer a{
     width: 8.27in;
     margin: .5in;
 }
+.panel-collapse
+{
+    margin-left: 50px;
+}

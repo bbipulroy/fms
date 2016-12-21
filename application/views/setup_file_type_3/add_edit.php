@@ -21,15 +21,18 @@ $CI->load->view('action_buttons',$action_data);
 
         <div style="" class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CATEGORY');?><span style="color:#FF0000">*</span></label>
+                <label for="id_file_type_1" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_FILE_TYPE_1');?>
+                    <span style="color:#FF0000">*</span>
+                </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_category" class="form-control" tabindex="-1">
+                <select id="id_file_type_1" name="items[id_file_type_1]" class="form-control" tabindex="-1">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
-                    foreach($file_type_1s as $category)
+                    foreach($file_type_1s as $file_type_1)
                     {?>
-                        <option value="<?php echo $category['value']?>" <?php if($category['value']==$items['id_file_type_1']){ echo 'selected';}?>><?php echo $category['text'];?></option>
+                        <option value="<?php echo $file_type_1['value']?>" <?php if($file_type_1['value']==$items['id_file_type_1']){ echo 'selected';}?>><?php echo $file_type_1['text'];?></option>
                     <?php
                     }
                     ?>
@@ -37,17 +40,20 @@ $CI->load->view('action_buttons',$action_data);
             </div>
         </div>
 
-        <div style="<?php if(!($items['id_file_type_2']>0)){echo 'display:none';} ?>" class="row show-grid" id="id_class_container">
+        <div style="<?php if(!($items['id_file_type_2']>0)){echo 'display:none';} ?>" class="row show-grid" id="id_file_type_2_container">
             <div class="col-xs-4">
-                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CLASS');?><span style="color:#FF0000">*</span></label>
+                <label for="id_file_type_2" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_FILE_TYPE_2');?>
+                    <span style="color:#FF0000">*</span>
+                </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_class" name="items[id_file_type_2]" class="form-control">
+                <select id="id_file_type_2" name="items[id_file_type_2]" class="form-control">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
-                    foreach($file_type_2s as $f_class)
+                    foreach($file_type_2s as $file_type_2)
                     {?>
-                        <option value="<?php echo $f_class['value']?>" <?php if($f_class['value']==$items['id_file_type_2']){echo "selected";}?>><?php echo $f_class['text'];?></option>
+                        <option value="<?php echo $file_type_2['value']?>" <?php if($file_type_2['value']==$items['id_file_type_2']){echo "selected";}?>><?php echo $file_type_2['text'];?></option>
                     <?php
                     }
                     ?>
@@ -57,7 +63,10 @@ $CI->load->view('action_buttons',$action_data);
 
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right"><?php echo $this->lang->line('LABEL_NAME');?><span style="color:#FF0000">*</span></label>
+                <label for="name" class="control-label pull-right">
+                    <?php echo $this->lang->line('LABEL_NAME');?>
+                    <span style="color:#FF0000">*</span>
+                </label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <input type="text" name="items[name]" id="name" class="form-control" value="<?php echo $items['name'];?>"/>
@@ -66,7 +75,10 @@ $CI->load->view('action_buttons',$action_data);
 
         <div style="" class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_ORDER');?><span style="color:#FF0000">*</span></label>
+                <label for="ordering" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_ORDER');?>
+                    <span style="color:#FF0000">*</span>
+                </label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <input type="text" name="items[ordering]" id="ordering" class="form-control" value="<?php echo $items['ordering'] ?>" >
@@ -79,13 +91,13 @@ $CI->load->view('action_buttons',$action_data);
     jQuery(document).ready(function()
     {
         turn_off_triggers();
-        $(document).on("change","#id_category",function()
+        $(document).on("change","#id_file_type_1",function()
         {
-            $("#id_class").val("");
-            var id_category=$('#id_category').val();
-            if(id_category>0)
+            $("#id_file_type_2").val("");
+            var id_file_type_1=$('#id_file_type_1').val();
+            if(id_file_type_1>0)
             {
-                $('#id_class_container').show();
+                $('#id_file_type_2_container').show();
                 $.ajax(
                 {
                     url: base_url+"common_controller/get_dropdown_with_select",
@@ -93,10 +105,10 @@ $CI->load->view('action_buttons',$action_data);
                     datatype: "JSON",
                     data:
                     {
-                        html_container_id:'#id_class',
+                        html_container_id:'#id_file_type_2',
                         table:'<?php echo $CI->config->item('table_setup_file_type_2'); ?>',
                         table_column:'id_file_type_1',
-                        table_column_value:id_category
+                        table_column_value:id_file_type_1
                     },
                     success: function (data, status)
                     {
@@ -110,7 +122,7 @@ $CI->load->view('action_buttons',$action_data);
             }
             else
             {
-                $('#id_class_container').hide();
+                $('#id_file_type_2_container').hide();
             }
         });
     });
