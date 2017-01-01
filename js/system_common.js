@@ -43,7 +43,6 @@ function number_format(number, decimals, dec_point, thousands_sep)
 
 $(document).ready(function()
 {
-
     $(document).ajaxStart(function()
     {
         $("#system_loading").show();
@@ -121,11 +120,22 @@ $(document).ready(function()
             return true;
         }
         event.preventDefault();
-        $.ajax({
+        var form_data=new FormData(this); // created this line
+        var form_obj=$('#save_form');
+        if(form_obj.data('form_data_append')!=undefined)
+        {
+            form_data.append('file_old',form_obj.data('file_old'));
+            form_data.append('file_delete',form_obj.data('file_delete'));
+            form_data.append('file_new',form_obj.data('file_new'));
+            form_data.append('file_camera',form_obj.data('file_camera'));
+            form_data.append('file_drag_drop',form_obj.data('file_drag_drop'));
+        }
+        $.ajax(
+        {
             url: $(this).attr("action"),
             type: $(this).attr("method"),
             dataType: "JSON",
-            data: new FormData(this),
+            data: form_data, // changed it (data: new FormData(this);)
             processData: false,
             contentType: false,
             success: function (data, status)
@@ -134,7 +144,6 @@ $(document).ready(function()
             },
             error: function (xhr, desc, err)
             {
-
 
             }
         });
@@ -309,9 +318,68 @@ $(document).ready(function()
     // binds form submission and fields to the validation engine
     $(document).on("change", ":file", function(event)
     {
+        var form_obj=$('#save_form');
         if(($(this).is('[class*="file_external"]')))
         {
             return;
+        }
+        //my for check
+        if(($(this).is('[class*="file_new"]')))
+        {
+            alert('file_new change');
+            if(($(this).is('[class*="newed"]')))
+            {
+                //
+                alert('newed change');
+            }
+            else
+            {
+                alert('file_new add newed');
+                $(this).addClass("newed");
+                var file_new=form_obj.data('file_new');
+                var id=$(this).attr('data-current-id');
+                if(file_new.length==0)
+                {
+                    file_new=id;
+                }
+                else
+                {
+                    file_new+=","+id;
+                }
+                form_obj.data('file_new',file_new);
+            }
+        }
+        else if(($(this).is('[class*="file_old"]')))
+        {
+            alert('file_old change');
+            $(this).removeClass("file_old");
+            $(this).addClass("file_new newed");
+
+            var file_delete=form_obj.data('file_delete');
+            var file_new=form_obj.data('file_new');
+            var id=$(this).attr('data-current-id');
+            if(file_delete.length==0)
+            {
+                file_delete=id;
+            }
+            else
+            {
+                file_delete+=","+id;
+            }
+            form_obj.data('file_delete',file_delete);
+            if(file_new.length==0)
+            {
+                file_new=id;
+            }
+            else
+            {
+                file_new+=","+id;
+            }
+            form_obj.data('file_new',file_new);
+        }
+        else
+        {
+            //
         }
         var container=$(this).attr('data-preview-container');
         if(container)
@@ -345,7 +413,9 @@ $(document).ready(function()
         {
             console.log('no container');
         }
-
+        console.log(form_obj.data('file_old')+'=>old');
+        console.log(form_obj.data('file_new')+'=>new');
+        console.log(form_obj.data('file_delete')+'=>delete');
     });
     $(document).on("click", "#button_action_print", function(event)
     {

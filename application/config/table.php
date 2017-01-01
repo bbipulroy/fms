@@ -27,3 +27,5 @@ $config['table_setup_file_type_3'] = 'fms_setup_file_type_3'; //type
 $config['table_setup_file_type_4'] = 'fms_setup_file_type_4'; //name
 $config['table_setup_file_hc_location'] = 'fms_setup_file_hc_location';
 $config['table_setup_assign_user_group_file'] = 'fms_setup_assign_user_group_file';
+$config['table_tasks_file_entry'] = 'fms_tasks_file_entry';
+$config['table_tasks_digital_file'] = 'fms_tasks_digital_file';

@@ -35,14 +35,13 @@ class System_helper
             return $time;
         }
     }
-
     public static function upload_file($save_dir="images")
     {
         $CI = & get_instance();
         $CI->load->library('upload');
         $config=array();
         $config['upload_path'] = FCPATH.$save_dir;
-        $config['allowed_types'] = 'gif|jpg|png';
+        $config['allowed_types'] = 'gif|jpg|png|pdf|doc|docx|xls|xlsx|ppt|pptx|txt';
         $config['max_size'] = $CI->config->item("max_file_size");
         $config['overwrite'] = false;
         $config['remove_spaces'] = true;
@@ -61,10 +60,8 @@ class System_helper
                 {
                     $uploaded_files[$key]=array("status"=>true,"info"=>$CI->upload->data());
                 }
-
             }
         }
-
         return $uploaded_files;
     }
     public static function invalid_try($action='',$action_id='',$other_info='')
@@ -127,5 +124,4 @@ class System_helper
         $results=$db_login->get()->result_array();
         return $results;
     }
-
 }
