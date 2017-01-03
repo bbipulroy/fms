@@ -21,7 +21,7 @@ $CI->load->view('action_buttons',$action_data);
 
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right"><?php echo $this->lang->line('LABEL_NAME');?><span style="color:#FF0000">*</span></label>
+                <label for="name" class="control-label pull-right"><?php echo $this->lang->line('LABEL_NAME');?><span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <input type="text" name="items[name]" id="name" class="form-control" value="<?php echo $items['name'];?>"/>
@@ -30,7 +30,7 @@ $CI->load->view('action_buttons',$action_data);
 
         <div style="" class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_ORDER');?><span style="color:#FF0000">*</span></label>
+                <label for="ordering" class="control-label pull-right"><?php echo $CI->lang->line('LABEL_ORDER');?><span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <input type="text" name="items[ordering]" id="ordering" class="form-control" value="<?php echo $items['ordering'] ?>" >

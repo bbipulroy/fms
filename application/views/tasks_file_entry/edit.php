@@ -4,7 +4,7 @@
     $old_files='';
     foreach($stored_files as $index=>$file)
     {
-        $old_files.=($index+1).'_'.$file['id'].',';
+        $old_files.=$file['id'].',';
         $file_url=$CI->config->item('system_upload_folder').'/'.$file['id_file_entry'].'/'.$file['name_after_upload'];
         ?>
         <tr>
@@ -25,12 +25,18 @@
                 </div>
             </td>
             <td>
-                <input type="file" id="file_<?php echo $index+1; ?>" name="file_<?php echo $index+1; ?>" data-current-id="<?php echo $index+1; ?>" data-preview-container="#preview_container_file_<?php echo $index+1;?>" class="browse_button file_old"><br>
+                <input type="file" id="file_<?php echo $index+1; ?>" name="file_<?php echo $index+1; ?>" data-current-id="<?php echo $index+1; ?>" data-preview-container="#preview_container_file_<?php echo $index+1;?>" class="browse_button"><br>
+                <input id="file-<?php echo $index+1; ?>" type="hidden" name="files[<?php echo $file['id']; ?>]" value="">
                 <button type="button" class="btn btn-danger system_button_delete file_old" data-current-id="<?php echo $index+1; ?>"><?php echo $CI->lang->line('DELETE'); ?></button>
             </td>
         </tr>
         <?php
     }
+    if(strlen($old_files)>0)
+    {
+        $old_files=substr($old_files,0,-1);
+    }
+    $CI->session->set_userdata('active_files',$old_files);
 ?>
 <script>
     jQuery(document).ready(function()
@@ -39,18 +45,12 @@
             if(strlen($old_files)>0)
             {
                 ?>
-                $('#save_form').data('file_old',"<?php echo substr($old_files,0,-1); ?>");
-                $('#save_form').data('file_new',"");
-                $('#save_form').data('file_delete',"");
                 $('.system_button_add').attr("data-current-id","<?php echo sizeof($stored_files); ?>");
                 <?php
             }
             else
             {
                 ?>
-                $('#save_form').data('file_old',"");
-                $('#save_form').data('file_new',"");
-                $('#save_form').data('file_delete',"");
                 $('.system_button_add').attr("data-current-id","0");
                 <?php
             }

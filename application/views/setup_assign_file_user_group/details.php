@@ -31,9 +31,9 @@ $CI->load->view("action_buttons",$action_data);
             dataFields: [
                 { name: 'id', type: 'int' },
                 { name: 'name', type: 'string' },
-                { name: 'ft1_name', type: 'string' },
-                { name: 'ft2_name', type: 'string' },
-                { name: 'ft3_name', type: 'string' }
+                { name: 'category_name', type: 'string' },
+                { name: 'class_name', type: 'string' },
+                { name: 'type_name', type: 'string' }
             ],
             id: 'id',
             url: url
@@ -56,10 +56,10 @@ $CI->load->view("action_buttons",$action_data);
                 altrows: true,
                 autoheight: true,
                 columns: [
-                    { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE_4'); ?>', dataField: 'name'},
-                    { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE_3'); ?>', dataField: 'ft3_name',filtertype: 'list',width:'200'},
-                    { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE_2'); ?>', dataField: 'ft2_name',filtertype: 'list',width:'200'},
-                    { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE_1'); ?>', dataField: 'ft1_name',filtertype: 'list',width:'200'}
+                    { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'name'},
+                    { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',filtertype: 'list',width:'200'},
+                    { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',filtertype: 'list',width:'200'},
+                    { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',filtertype: 'list',width:'200'}
                 ]
             });
     });

@@ -42,6 +42,7 @@ class Tasks_file_entry extends Root_Controller
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
+            $this->session->set_userdata('active_files','');
             $user_group_id=User_helper::get_user()->user_group;
             $data['title']='Entry New File';
             $data['items']=array
@@ -76,51 +77,6 @@ class Tasks_file_entry extends Root_Controller
             $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
             $this->json_return($ajax);
         }
-    }
-    private function get_desire_file_type_by_user_group_id($user_group_id,$table,$column,$where='',$value='')
-    {
-        $this->db->select('ftd.name text,ftd.id value');
-        $this->db->from($this->config->item('table_setup_file_type_4').' ft4');
-        $this->db->join($table.' ftd','ft4.'.$column.'=ftd.id','inner');
-        $this->db->join($this->config->item('table_setup_assign_user_group_file').' ugf','ft4.id=ugf.id_file','inner');
-        if(strlen(trim($where))>0)
-        {
-            $this->db->where('ftd.'.$where,$value);
-        }
-        $this->db->where('ugf.user_group_id',$user_group_id);
-        $this->db->where('ugf.revision',1);
-        $this->db->group_by('value');
-        return $this->db->get()->result_array();
-    }
-    private function get_file_type_4_by_user_group_id($user_group_id)
-    {
-        $this->db->select('ft4.name text,ft4.id value');
-        $this->db->from($this->config->item('table_setup_file_type_4').' ft4');
-        $this->db->join($this->config->item('table_setup_assign_user_group_file').' ugf','ft4.id=ugf.id_file','inner');
-        $this->db->where('ugf.user_group_id',$user_group_id);
-        $this->db->where('ugf.revision',1);
-        return $this->db->get()->result_array();
-    }
-    private function system_get_drop_down_with_select()
-    {
-        $user_group_id=User_helper::get_user()->user_group;
-        $table=$this->input->post('table');
-        if($table==$this->config->item('table_setup_file_type_4'))
-        {
-            $data['items']=$this->get_file_type_4_by_user_group_id($user_group_id);
-        }
-        else
-        {
-            $table_column=$this->input->post('table_column');
-            $table_column_check=$this->input->post('table_column_check');
-            $table_column_value=$this->input->post('table_column_value');
-            $data['items']=$this->get_desire_file_type_by_user_group_id($user_group_id,$table,$table_column,$table_column_check,$table_column_value);
-        }
-        $html_container_id=$this->input->post('html_container_id');
-
-        $ajax['system_content'][]=array('id'=>$html_container_id,'html'=>$this->load->view('dropdown_with_select',$data,true));
-        $ajax['status']=true;
-        $this->json_return($ajax);
     }
     private function system_edit($id)
     {
@@ -176,8 +132,11 @@ class Tasks_file_entry extends Root_Controller
     }
     private function system_save_new()
     {
-        print_r($_FILES);
-        print_r($_POST);
+        foreach($this->input->post('files') as $file_id=>$v)
+        {
+            echo $file_id.'<br/>';
+        }
+        echo $this->session->userdata('active_files');
     }
     private function system_save()
     {
@@ -249,26 +208,22 @@ class Tasks_file_entry extends Root_Controller
                     }
                     if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
                     {
-                        $file_olds=$this->input->post('file_old');
-                        $file_deletes=$this->input->post('file_delete');
-                        if(strlen($file_deletes)>0)
+                        if(strlen($this->session->userdata('active_files'))>0)
                         {
-                            $file_olds=explode(',',$file_olds);
-                            $file_deletes=explode(',',$file_deletes);
-                            foreach($file_olds as $old_array_false)
+                            $active_files=explode(',',$this->session->userdata('active_files'));
+                            foreach($active_files as $af)
                             {
-                                $old_array_false=explode('_',$old_array_false);
-                                if(in_array($old_array_false[0],$file_deletes))
+                                if(!array_key_exists($af,$this->input->post('files')))
                                 {
                                     $this->db->select('name_after_upload,extension');
                                     $this->db->from($this->config->item('table_tasks_digital_file'));
-                                    $this->db->where('id',$old_array_false[1]);
+                                    $this->db->where('id',$af);
                                     $file_delete=$this->db->get()->row_array();
                                     $update_delete_data['name_after_deleted']=$this->move_deleted_file($folder,$file_delete['name_after_upload'],$file_delete['extension']);
                                     $update_delete_data['user_deleted']=$user_id;
                                     $update_delete_data['time_deleted']=$time;
                                     $update_delete_data['status']=$this->config->item('system_status_delete');
-                                    $this->db->where('id',$old_array_false[1]);
+                                    $this->db->where('id',$af);
                                     $this->db->update($this->config->item('table_tasks_digital_file'),$update_delete_data);
                                 }
                             }
@@ -408,5 +363,50 @@ class Tasks_file_entry extends Root_Controller
             return false;
         }
         return true;
+    }
+    private function get_desire_file_type_by_user_group_id($user_group_id,$table,$column,$where='',$value='')
+    {
+        $this->db->select('ftd.name text,ftd.id value');
+        $this->db->from($this->config->item('table_setup_file_type_4').' ft4');
+        $this->db->join($table.' ftd','ft4.'.$column.'=ftd.id','inner');
+        $this->db->join($this->config->item('table_setup_assign_user_group_file').' ugf','ft4.id=ugf.id_file','inner');
+        if(strlen(trim($where))>0)
+        {
+            $this->db->where('ftd.'.$where,$value);
+        }
+        $this->db->where('ugf.user_group_id',$user_group_id);
+        $this->db->where('ugf.revision',1);
+        $this->db->group_by('value');
+        return $this->db->get()->result_array();
+    }
+    private function get_file_type_4_by_user_group_id($user_group_id)
+    {
+        $this->db->select('ft4.name text,ft4.id value');
+        $this->db->from($this->config->item('table_setup_file_type_4').' ft4');
+        $this->db->join($this->config->item('table_setup_assign_user_group_file').' ugf','ft4.id=ugf.id_file','inner');
+        $this->db->where('ugf.user_group_id',$user_group_id);
+        $this->db->where('ugf.revision',1);
+        return $this->db->get()->result_array();
+    }
+    private function system_get_drop_down_with_select()
+    {
+        $user_group_id=User_helper::get_user()->user_group;
+        $table=$this->input->post('table');
+        if($table==$this->config->item('table_setup_file_type_4'))
+        {
+            $data['items']=$this->get_file_type_4_by_user_group_id($user_group_id);
+        }
+        else
+        {
+            $table_column=$this->input->post('table_column');
+            $table_column_check=$this->input->post('table_column_check');
+            $table_column_value=$this->input->post('table_column_value');
+            $data['items']=$this->get_desire_file_type_by_user_group_id($user_group_id,$table,$table_column,$table_column_check,$table_column_value);
+        }
+        $html_container_id=$this->input->post('html_container_id');
+
+        $ajax['system_content'][]=array('id'=>$html_container_id,'html'=>$this->load->view('dropdown_with_select',$data,true));
+        $ajax['status']=true;
+        $this->json_return($ajax);
     }
 }

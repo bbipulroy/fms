@@ -236,15 +236,13 @@ $CI->load->view('action_buttons',$action_data);
         camera.data('check',false);
         camera.data('counter',0);
         take_photo.hide();
+
         var files_container=$('#files_container tbody');
         $(".datepicker").datepicker({dateFormat : display_date_format});
         $('#date_entry_text').data('predefined_date',$('#date_entry_text').val());
 
         var form_obj=$('#save_form');
         form_obj.data('form_data_append',true);
-        form_obj.data('file_old',"");
-        form_obj.data('file_delete',"");
-        form_obj.data('file_new',"");
         form_obj.data('file_camera',"");
         form_obj.data('file_drag_drop',"");
 
@@ -399,11 +397,7 @@ $CI->load->view('action_buttons',$action_data);
             {
                 files_container.empty();
                 set_current_id("0");
-                $('#save_form').data('file_old',"");
-                $('#save_form').data('file_new',"");
-                $('#save_form').data('file_delete',"");
                 $('#save_form').data('file_camera',"");
-                $('#save_form').data('file_drag_drop',"");
                 $('#id_hc_location').val("");
                 $('#date_entry_text').val($('#date_entry_text').data('predefined_date'));
                 $('#remarks').val("");
@@ -434,36 +428,7 @@ $CI->load->view('action_buttons',$action_data);
         });
         $(document).on("click", ".system_button_delete", function(event)
         {
-            var id=$(this).attr('data-current-id');
-            if(($(this).is('[class*="file_new"]')))
-            {
-                var file_new=form_obj.data('file_new');
-                var find1=","+id;
-                var find2=id+",";
-                file_new=file_new.replace(find1,"");
-                file_new=file_new.replace(find2,"");
-                file_new=file_new.replace(id,"");
-                form_obj.data('file_new',file_new);
-                alert('file_new delete');
-            }
-            else if(($(this).is('[class*="file_old"]')))
-            {
-                var file_delete=form_obj.data('file_delete');
-                if(file_delete.length==0)
-                {
-                    file_delete=id;
-                }
-                else
-                {
-                    file_delete+=","+id;
-                }
-                form_obj.data('file_delete',file_delete);
-                alert('file_old delete')
-            }
             $(this).closest('tr').remove();
-            console.log(form_obj.data('file_old')+'=>old');
-            console.log(form_obj.data('file_new')+'=>new');
-            console.log(form_obj.data('file_delete')+'=>delete');
         });
         $(document).on('click','#camera',function()
         {

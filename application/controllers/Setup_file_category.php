@@ -101,7 +101,7 @@ class Setup_file_category extends Root_Controller
             {
                 $item_id=$id;
             }
-            $data['items']=Query_helper::get_info($this->config->item('table_setup_file_type_1'),'*',array('id ='.$item_id),1);
+            $data['items']=Query_helper::get_info($this->config->item('table_setup_file_category'),'*',array('id ='.$item_id),1);
             $data['title']='Edit File Category ('.$data['items']['name'].')';
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
@@ -157,13 +157,13 @@ class Setup_file_category extends Root_Controller
             {
                 $data['user_updated']=$user->user_id;
                 $data['date_updated']=time();
-                Query_helper::update($this->config->item('table_setup_file_type_1'),$data,array('id='.$id));
+                Query_helper::update($this->config->item('table_setup_file_category'),$data,array('id='.$id));
             }
             else
             {
                 $data['user_created']=$user->user_id;
                 $data['date_created']=time();
-                Query_helper::add($this->config->item('table_setup_file_type_1'),$data);
+                Query_helper::add($this->config->item('table_setup_file_category'),$data);
             }
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
@@ -200,7 +200,7 @@ class Setup_file_category extends Root_Controller
     }
     private function system_get_items()
     {
-        $items=Query_helper::get_info($this->config->item('table_setup_file_type_1'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
+        $items=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
         $this->json_return($items);
     }
 }

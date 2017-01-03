@@ -9,7 +9,6 @@ $CI->load->view('action_buttons',$action_data);
 ?>
 <form class="form_valid" id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
     <input type="hidden" id="id" name="id" value="<?php echo $item_id; ?>">
-    <input type="hidden" id="system_save_new_status" name="system_save_new_status" value="0">
 
     <div class="row widget">
         <div class="widget-header">
@@ -32,7 +31,7 @@ $CI->load->view('action_buttons',$action_data);
                 <div id="<?php echo $CI->permission_all_body; ?>" class="panel-collapse collapse">
                     <div class="panel-body">
                         <?php
-                            $CI->file_type_1s();
+                            $CI->categories();
                         ?>
                     </div>
                 </div>
@@ -46,9 +45,6 @@ $CI->load->view('action_buttons',$action_data);
 <script type="text/javascript">
     jQuery(document).ready(function()
     {
-        var file_type_1='<?php echo $CI->config->item('system_file_type_1'); ?>';
-        var file_type_2='<?php echo $CI->config->item('system_file_type_2'); ?>';
-        
         $('.panel-collapse').collapse("show");
         $(document).on('click','input[type="checkbox"]',function()
         {
@@ -72,7 +68,7 @@ $CI->load->view('action_buttons',$action_data);
 
             if(check)
             {
-                if(this_class==file_type_1 || this_class==file_type_2)
+                if(this_class=='category' || this_class=='class')
                 {
                     check_all_level_child(child_class);
                 }

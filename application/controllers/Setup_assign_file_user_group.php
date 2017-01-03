@@ -9,13 +9,13 @@ class Setup_assign_file_user_group extends Root_Controller
 
     public $permission_all_body='permission_all_body';
     public $permission_all_child='permission_all_child';
-    public $file_type_1_name_array=array();
-    public $file_type_2_name_array=array();
-    public $file_type_2_parent_array=array();
-    public $file_type_3_name_array=array();
-    public $file_type_3_parent_array=array();
-    public $file_type_4_name_array=array();
-    public $file_type_4_parent_array=array();
+    public $category_name_array=array();
+    public $class_name_array=array();
+    public $class_parent_array=array();
+    public $type_name_array=array();
+    public $type_parent_array=array();
+    public $name_name_array=array();
+    public $name_parent_array=array();
     public $selected_array=array();
 
     public function __construct()
@@ -116,14 +116,13 @@ class Setup_assign_file_user_group extends Root_Controller
     }
     private function system_get_file_permission_list($id)
     {
-        $this->db->select('ft4.*,ft1.name ft1_name,ft2.name ft2_name,ft3.name ft3_name');
-        $this->db->from($this->config->item('table_setup_assign_user_group_file').' ugf');
-        $this->db->join($this->config->item('table_setup_file_type_4').' ft4','ft4.id=ugf.id_file');
-        $this->db->join($this->config->item('table_setup_file_type_3').' ft3','ft3.id=ft4.id_file_type_3');
-        $this->db->join($this->config->item('table_setup_file_type_2').' ft2','ft2.id=ft4.id_file_type_2');
-        $this->db->join($this->config->item('table_setup_file_type_1').' ft1','ft1.id=ft4.id_file_type_1');
-        $this->db->where('ugf.user_group_id',$id);
-        $this->db->where('ugf.revision',1);
+        $this->db->select('n.*,ctg.name category_name,cls.name class_name,t.name type_name');
+        $this->db->from($this->config->item('table_setup_assign_file_user_group').' fug');
+        $this->db->join($this->config->item('table_setup_file_name').' n','n.id=fug.id_file');
+        $this->db->join($this->config->item('table_setup_file_type').' t','t.id=n.id_type');
+        $this->db->join($this->config->item('table_setup_file_class').' cls','cls.id=t.id_class');
+        $this->db->join($this->config->item('table_setup_file_category').' ctg','ctg.id=cls.id_category');
+        $this->db->where('fug.user_group_id',$id);
         $this->json_return($this->db->get()->result_array());
     }
     private function system_edit($id)
@@ -147,31 +146,30 @@ class Setup_assign_file_user_group extends Root_Controller
             $data['title']='Edit File Permission to ('.$user_group_name['name'].')';
 
             $this->db->select('id_file');
-            $this->db->from($this->config->item('table_setup_assign_user_group_file'));
+            $this->db->from($this->config->item('table_setup_assign_file_user_group'));
             $this->db->where('user_group_id',$item_id);
-            $this->db->where('revision',1);
             $selected_files=$this->db->get()->result_array();
             foreach($selected_files as $sf)
             {
                 $this->selected_array[]=$sf['id_file'];
             }
 
-            $this->file_type_1_name_array=$this->get_id_name_array($this->get_data('id,name',$this->config->item('table_setup_file_type_1')));
+            $this->category_name_array=$this->get_id_name_array($this->get_data('id,name',$this->config->item('table_setup_file_category')));
 
-            $file_type_2_array=$this->get_data('id,name,id_file_type_1',$this->config->item('table_setup_file_type_2'));
-            $this->file_type_2_name_array=$this->get_id_name_array($file_type_2_array);
-            $this->file_type_2_parent_array=$this->get_parent_array($file_type_2_array,'id_file_type_1');
-            unset($file_type_2_array);
+            $class_array=$this->get_data('id,name,id_category',$this->config->item('table_setup_file_class'));
+            $this->class_name_array=$this->get_id_name_array($class_array);
+            $this->class_parent_array=$this->get_parent_array($class_array,'id_category');
+            unset($class_array);
 
-            $file_type_3_array=$this->get_data('id,name,id_file_type_2',$this->config->item('table_setup_file_type_3'));
-            $this->file_type_3_name_array=$this->get_id_name_array($file_type_3_array);
-            $this->file_type_3_parent_array=$this->get_parent_array($file_type_3_array,'id_file_type_2');
-            unset($file_type_3_array);
+            $type_array=$this->get_data('id,name,id_class',$this->config->item('table_setup_file_type'));
+            $this->type_name_array=$this->get_id_name_array($type_array);
+            $this->type_parent_array=$this->get_parent_array($type_array,'id_class');
+            unset($type_array);
 
-            $file_type_4_array=$this->get_data('id,name,id_file_type_3',$this->config->item('table_setup_file_type_4'));
-            $this->file_type_4_name_array=$this->get_id_name_array($file_type_4_array);
-            $this->file_type_4_parent_array=$this->get_parent_array($file_type_4_array,'id_file_type_3');
-            unset($file_type_4_array);
+            $name_array=$this->get_data('id,name,id_type',$this->config->item('table_setup_file_name'));
+            $this->name_name_array=$this->get_id_name_array($name_array);
+            $this->name_parent_array=$this->get_parent_array($name_array,'id_type');
+            unset($name_array);
 
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
@@ -207,30 +205,27 @@ class Setup_assign_file_user_group extends Root_Controller
         if($id==0)
         {
             $ajax['status']=false;
-            $ajax['system_message']='You violate our rules.';
+            $ajax['system_message']='You violate your rules.';
             $this->json_return($ajax);
         }
         else
         {
             unset($data['id']);
-            unset($data['system_save_new_status']);
             $this->db->trans_start(); //DB Transaction Handle START
 
-            $this->db->set('revision','revision+1',false);
             $this->db->where('user_group_id',$id);
-            $this->db->update($this->config->item('table_setup_assign_user_group_file'));
+            $this->db->delete($this->config->item('table_setup_assign_file_user_group'));
 
             $data_new=array();
             $data_new['user_group_id']=$id;
             $data_new['user_updated']=$user->user_id;
             $data_new['date_updated']=time();
-            $data_new['revision']=1;
             $temp=array();
             foreach($data as $d=>$v)
             {
                 $temp=explode('_',$d);
                 $data_new['id_file']=end($temp);
-                Query_helper::add($this->config->item('table_setup_assign_user_group_file'),$data_new);
+                Query_helper::add($this->config->item('table_setup_assign_file_user_group'),$data_new);
             }
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
@@ -283,23 +278,22 @@ class Setup_assign_file_user_group extends Root_Controller
         $this->db->from($table);
         return $this->db->get()->result_array();
     }
-    public function file_type_1s()
+    public function categories()
     {
-        $file_type_1_html='';
-        $file_type=$this->config->item('system_file_type_1');
-        foreach($this->file_type_1_name_array as $id=>$name)
+        $categoriy_html='';
+        foreach($this->category_name_array as $id=>$name)
         {
-            $input_name=$file_type.'_'.$id;
-            $input_class=$file_type.' '.$this->permission_all_child;
-            $input_child_class=$this->config->item('system_file_type_2').'_'.$id;
+            $input_name='category_'.$id;
+            $input_class='category'.' '.$this->permission_all_child;
+            $input_child_class='class_'.$id;
             $href='#'.$input_name;
             $child_panel='';
-            if(array_key_exists($id,$this->file_type_2_parent_array))
+            if(array_key_exists($id,$this->class_parent_array))
             {
-                $file_type_2s=$this->file_type_2s($id,$input_child_class);
+                $classes=$this->classes($id,$input_child_class);
                 $child_panel='<div id="'.$input_name.'" class="panel-collapse collapse">
                                     <div class="panel-body">
-                                        '.$file_type_2s.'
+                                        '.$classes.'
                                     </div>
                                 </div>';
             }
@@ -313,29 +307,28 @@ class Setup_assign_file_user_group extends Root_Controller
                        </h4>
                    </div>'.$child_panel.'
                </div>';
-            $file_type_1_html.=$text;
+            $categoriy_html.=$text;
         }
-        echo $file_type_1_html;
+        echo $categoriy_html;
     }
-    private function file_type_2s($file_type_1_id,$fixed_class)
+    private function classes($category_id,$fixed_class)
     {
-        $file_type_2_html='';
-        $file_type=$this->config->item('system_file_type_2');
-        $file_type_2_array=$this->file_type_2_parent_array[$file_type_1_id];
-        foreach($file_type_2_array as $id)
+        $class_html='';
+        $class_array=$this->class_parent_array[$category_id];
+        foreach($class_array as $id)
         {
-            $name=$this->file_type_2_name_array[$id];
+            $name=$this->class_name_array[$id];
             $input_name=$fixed_class.'_'.$id;
-            $input_class=$file_type.' '.$fixed_class.' '.$this->permission_all_child;
-            $input_child_class=str_replace($file_type,$this->config->item('system_file_type_3'),$input_name);
+            $input_class='class '.$fixed_class.' '.$this->permission_all_child;
+            $input_child_class=str_replace('class','type',$input_name);
             $href='#'.$input_name;
             $child_panel='';
-            if(array_key_exists($id,$this->file_type_3_parent_array))
+            if(array_key_exists($id,$this->type_parent_array))
             {
-                $file_type_3s=$this->file_type_3s($id,$input_child_class);
+                $types=$this->types($id,$input_child_class);
                 $child_panel='<div id="'.$input_name.'" class="panel-collapse collapse">
                                     <div class="panel-body">
-                                        '.$file_type_3s.'
+                                        '.$types.'
                                     </div>
                                 </div>';
             }
@@ -349,29 +342,28 @@ class Setup_assign_file_user_group extends Root_Controller
                        </h4>
                    </div>'.$child_panel.'
                </div>';
-            $file_type_2_html.=$text;
+            $class_html.=$text;
         }
-        return $file_type_2_html;
+        return $class_html;
     }
-    private function file_type_3s($file_type_2_id,$fixed_class)
+    private function types($class_id,$fixed_class)
     {
-        $file_type_3_html='';
-        $file_type=$this->config->item('system_file_type_3');
-        $file_type_3_array=$this->file_type_3_parent_array[$file_type_2_id];
-        foreach($file_type_3_array as $id)
+        $type_html='';
+        $type_array=$this->type_parent_array[$class_id];
+        foreach($type_array as $id)
         {
-            $name=$this->file_type_3_name_array[$id];
+            $name=$this->type_name_array[$id];
             $input_name=$fixed_class.'_'.$id;
-            $input_class=$file_type.' '.$fixed_class.' '.$this->permission_all_child;
-            $input_child_class=str_replace($file_type,$this->config->item('system_file_type_4'),$input_name);
+            $input_class='type '.$fixed_class.' '.$this->permission_all_child;
+            $input_child_class=str_replace('type','name',$input_name);
             $href='#'.$input_name;
             $child_panel='';
-            if(array_key_exists($id,$this->file_type_4_parent_array))
+            if(array_key_exists($id,$this->name_parent_array))
             {
-                $file_type_4s=$this->file_type_4s($id,$input_child_class);
+                $names=$this->names($id,$input_child_class);
                 $child_panel='<div id="'.$input_name.'" class="panel-collapse collapse">
                                     <div class="panel-body">
-                                        '.$file_type_4s.'
+                                        '.$names.'
                                     </div>
                                 </div>';
             }
@@ -385,22 +377,21 @@ class Setup_assign_file_user_group extends Root_Controller
                        </h4>
                    </div>'.$child_panel.'
                </div>';
-            $file_type_3_html.=$text;
+            $type_html.=$text;
         }
-        return $file_type_3_html;
+        return $type_html;
     }
-    private function file_type_4s($file_type_3_id,$fixed_class)
+    private function names($type_id,$fixed_class)
     {
-        $file_type_4_html='';
-        $file_type=$this->config->item('system_file_type_4');
-        $file_type_4_array=$this->file_type_4_parent_array[$file_type_3_id];
+        $name_html='';
+        $name_array=$this->name_parent_array[$type_id];
         $checked='';
-        foreach($file_type_4_array as $id)
+        foreach($name_array as $id)
         {
-            $name=$this->file_type_4_name_array[$id];
+            $name=$this->name_name_array[$id];
             $input_name=$fixed_class.'_'.$id;
             $input_id=$fixed_class.'-'.$id;
-            $input_class=$file_type.' '.$fixed_class.' '.$this->permission_all_child;
+            $input_class='name '.$fixed_class.' '.$this->permission_all_child;
             $checked='';
             if(in_array($id,$this->selected_array))
             {
@@ -410,8 +401,8 @@ class Setup_assign_file_user_group extends Root_Controller
                         <input type="checkbox" name="'.$input_name.'" id="'.$input_id.'" class="'.$input_class.'"'.$checked.'>
                         <label for="'.$input_id.'">'.$name.'</label>
                    </div>';
-            $file_type_4_html.=$text;
+            $name_html.=$text;
         }
-        return $file_type_4_html;
+        return $name_html;
     }
 }
