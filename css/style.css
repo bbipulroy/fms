@@ -262,7 +262,19 @@ footer a{
     width: 8.27in;
     margin: .5in;
 }
-.panel-collapse
+
+/* Bipul Roy - start */
+table
 {
-    margin-left: 50px;
+    border-collapse: collapse;
 }
+td,th
+{
+    border: 1px solid Black;
+    padding: 5px 15px;
+}
+th
+{
+    font-size: 18px;
+}
+/* Bipul Roy - end */

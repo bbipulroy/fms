@@ -7,9 +7,6 @@ class Setup_assign_file_user_group extends Root_Controller
     public $permissions;
     public $controller_url;
 
-    public $permission_all_body='permission_all_body';
-    public $permission_all_child='permission_all_child';
-    public $category_name_array=array();
     public $class_name_array=array();
     public $class_parent_array=array();
     public $type_name_array=array();
@@ -123,6 +120,7 @@ class Setup_assign_file_user_group extends Root_Controller
         $this->db->join($this->config->item('table_setup_file_class').' cls','cls.id=t.id_class');
         $this->db->join($this->config->item('table_setup_file_category').' ctg','ctg.id=cls.id_category');
         $this->db->where('fug.user_group_id',$id);
+        $this->db->where('fug.status',$this->config->item('system_status_active'));
         $this->json_return($this->db->get()->result_array());
     }
     private function system_edit($id)
@@ -148,6 +146,7 @@ class Setup_assign_file_user_group extends Root_Controller
             $this->db->select('id_file');
             $this->db->from($this->config->item('table_setup_assign_file_user_group'));
             $this->db->where('user_group_id',$item_id);
+            $this->db->where('status',$this->config->item('system_status_active'));
             $selected_files=$this->db->get()->result_array();
             foreach($selected_files as $sf)
             {
@@ -189,8 +188,8 @@ class Setup_assign_file_user_group extends Root_Controller
     }
     private function system_save()
     {
-        $data=$this->input->post();
-        $id=$data['id'];
+        $id=$this->input->post('id');
+        $data=$this->input->post('items');
         $user=User_helper::get_user();
         if($id>0)
         {
@@ -210,22 +209,42 @@ class Setup_assign_file_user_group extends Root_Controller
         }
         else
         {
-            unset($data['id']);
             $this->db->trans_start(); //DB Transaction Handle START
 
+            $this->db->set('status',$this->config->item('system_status_delete'));
             $this->db->where('user_group_id',$id);
-            $this->db->delete($this->config->item('table_setup_assign_file_user_group'));
+            $this->db->update($this->config->item('table_setup_assign_file_user_group'));
 
-            $data_new=array();
-            $data_new['user_group_id']=$id;
-            $data_new['user_updated']=$user->user_id;
-            $data_new['date_updated']=time();
-            $temp=array();
+            $this->db->select('id_file');
+            $this->db->from($this->config->item('table_setup_assign_file_user_group'));
+            $this->db->where('user_group_id',$id);
+            $permitted_files_for_process=$this->db->get()->result_array();
+            #$permitted_files_for_process=Query_helper::get_info($this->config->item('table_setup_assign_file_user_group'),'id_file',array('user_group_id'=>$id),0,0);
+            $permitted_files=array();
+            foreach($permitted_files_for_process as $pf)
+            {
+                $permitted_files[]=$pf['id_file'];
+            }
+            $data_add=array();
+            $data_edit=array();
+            $data_add['user_group_id']=$id;
+            $data_add['user_created']=$user->user_id;
+            $data_add['date_created']=time();
+            $data_edit['user_updated']=$user->user_id;
+            $data_edit['date_updated']=$data_add['date_created'];
+            $data_edit['status']=$this->config->item('system_status_active');
             foreach($data as $d=>$v)
             {
-                $temp=explode('_',$d);
-                $data_new['id_file']=end($temp);
-                Query_helper::add($this->config->item('table_setup_assign_file_user_group'),$data_new);
+                $id_file=substr($d,1);
+                if(in_array($id_file,$permitted_files))
+                {
+                    Query_helper::update($this->config->item('table_setup_assign_file_user_group'),$data_edit,array('user_group_id='.$id,'id_file='.$id_file));
+                }
+                else
+                {
+                    $data_add['id_file']=$id_file;
+                    Query_helper::add($this->config->item('table_setup_assign_file_user_group'),$data_add);
+                }
             }
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
@@ -278,131 +297,73 @@ class Setup_assign_file_user_group extends Root_Controller
         $this->db->from($table);
         return $this->db->get()->result_array();
     }
-    public function categories()
+    public function table_cells($cat_id,$cat_name,$class_id,$class_name,$type_id,$type_name,$name_id,$name_name,&$check_array,$selected_array)
     {
-        $categoriy_html='';
-        foreach($this->category_name_array as $id=>$name)
+        $is_first_category=false;
+        $is_first_class=false;
+        $is_first_type=false;
+        if(isset($check_array['category'][$cat_id]))
         {
-            $input_name='category_'.$id;
-            $input_class='category'.' '.$this->permission_all_child;
-            $input_child_class='class_'.$id;
-            $href='#'.$input_name;
-            $child_panel='';
-            if(array_key_exists($id,$this->class_parent_array))
-            {
-                $classes=$this->classes($id,$input_child_class);
-                $child_panel='<div id="'.$input_name.'" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        '.$classes.'
-                                    </div>
-                                </div>';
-            }
-            $text='<div class="panel panel-default">
-                   <div class="panel-heading">
-                       <h4 class="panel-title">
-                           <input type="checkbox" class="'.$input_class.'" child-class="'.$input_child_class.'">
-                           <a class="external" data-toggle="collapse" href="'.$href.'">
-                               '.$name.'
-                           </a>
-                       </h4>
-                   </div>'.$child_panel.'
-               </div>';
-            $categoriy_html.=$text;
+            $is_first_category=false;
+            $check_array['category'][$cat_id]+=1;
         }
-        echo $categoriy_html;
-    }
-    private function classes($category_id,$fixed_class)
-    {
-        $class_html='';
-        $class_array=$this->class_parent_array[$category_id];
-        foreach($class_array as $id)
+        else
         {
-            $name=$this->class_name_array[$id];
-            $input_name=$fixed_class.'_'.$id;
-            $input_class='class '.$fixed_class.' '.$this->permission_all_child;
-            $input_child_class=str_replace('class','type',$input_name);
-            $href='#'.$input_name;
-            $child_panel='';
-            if(array_key_exists($id,$this->type_parent_array))
-            {
-                $types=$this->types($id,$input_child_class);
-                $child_panel='<div id="'.$input_name.'" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        '.$types.'
-                                    </div>
-                                </div>';
-            }
-            $text='<div class="panel panel-default">
-                   <div class="panel-heading">
-                       <h4 class="panel-title">
-                           <input type="checkbox" class="'.$input_class.'" child-class="'.$input_child_class.'">
-                           <a class="external" data-toggle="collapse" href="'.$href.'">
-                               '.$name.'
-                           </a>
-                       </h4>
-                   </div>'.$child_panel.'
-               </div>';
-            $class_html.=$text;
+            $is_first_category='_first';
+            $check_array['category'][$cat_id]=1;
         }
-        return $class_html;
-    }
-    private function types($class_id,$fixed_class)
-    {
-        $type_html='';
-        $type_array=$this->type_parent_array[$class_id];
-        foreach($type_array as $id)
+        if(isset($check_array['class'][$class_id]))
         {
-            $name=$this->type_name_array[$id];
-            $input_name=$fixed_class.'_'.$id;
-            $input_class='type '.$fixed_class.' '.$this->permission_all_child;
-            $input_child_class=str_replace('type','name',$input_name);
-            $href='#'.$input_name;
-            $child_panel='';
-            if(array_key_exists($id,$this->name_parent_array))
-            {
-                $names=$this->names($id,$input_child_class);
-                $child_panel='<div id="'.$input_name.'" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        '.$names.'
-                                    </div>
-                                </div>';
-            }
-            $text='<div class="panel panel-default">
-                   <div class="panel-heading">
-                       <h4 class="panel-title">
-                           <input type="checkbox" class="'.$input_class.'" child-class="'.$input_child_class.'">
-                           <a class="external" data-toggle="collapse" href="'.$href.'">
-                               '.$name.'
-                           </a>
-                       </h4>
-                   </div>'.$child_panel.'
-               </div>';
-            $type_html.=$text;
+            $is_first_class=false;
+            $check_array['class'][$class_id]+=1;
         }
-        return $type_html;
-    }
-    private function names($type_id,$fixed_class)
-    {
-        $name_html='';
-        $name_array=$this->name_parent_array[$type_id];
+        else
+        {
+            $is_first_class='_first';
+            $check_array['class'][$class_id]=1;
+        }
+        if(isset($check_array['type'][$type_id]))
+        {
+            $is_first_type=false;
+            $check_array['type'][$type_id]+=1;
+        }
+        else
+        {
+            $is_first_type='_first';
+            $check_array['type'][$type_id]=1;
+        }
         $checked='';
-        foreach($name_array as $id)
+        if(in_array($name_id,$selected_array))
         {
-            $name=$this->name_name_array[$id];
-            $input_name=$fixed_class.'_'.$id;
-            $input_id=$fixed_class.'-'.$id;
-            $input_class='name '.$fixed_class.' '.$this->permission_all_child;
-            $checked='';
-            if(in_array($id,$this->selected_array))
-            {
-                $checked=' checked';
-            }
-            $text='<div class="form-group">
-                        <input type="checkbox" name="'.$input_name.'" id="'.$input_id.'" class="'.$input_class.'"'.$checked.'>
-                        <label for="'.$input_id.'">'.$name.'</label>
-                   </div>';
-            $name_html.=$text;
+            $checked=' checked';
         }
-        return $name_html;
+        echo "
+                <tr>
+                    <td class='category-$cat_id$is_first_category'>
+                    <input id='category-$cat_id' type='checkbox' data-id='$cat_id' data-type='category' class='all category'>
+                    <label for='category-$cat_id'>$cat_name</label>
+                    </td>
+                    <td class='class-$class_id$is_first_class'>
+                    <input id='class-$class_id' type='checkbox' data-id='$class_id' data-type='class' class='all class category_$cat_id'>
+                    <label for='class-$class_id'>$class_name</label>
+                    </td>
+                    <td class='type-$type_id$is_first_type'>
+                    <input id='type-$type_id' type='checkbox' data-id='$type_id' data-type='type' class='all type category_$cat_id class_$class_id'>
+                    <label for='type-$type_id'>$type_name</label>
+                    </td>
+                    <td>
+                    <input id='name-$name_id' type='checkbox' name='items[n$name_id]' class='all name category_$cat_id class_$class_id type_$type_id'$checked>
+                    <label for='name-$name_id'>$name_name</label>
+                    </td>
+                </tr>
+             ";
+    }
+    public function javascript_code_gen($array,$type)
+    {
+        foreach($array as $id=>$rowspan)
+        {
+            echo '$(".'.$type.'-'.$id.'").remove();';
+            echo '$(".'.$type.'-'.$id.'_first").attr("rowspan","'.$rowspan.'");';
+        }
     }
 }

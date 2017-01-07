@@ -42,6 +42,18 @@ $CI->load->view('action_buttons',$action_data);
                 <input type="text" name="items[ordering]" id="ordering" class="form-control" value="<?php echo $items['ordering'] ?>" >
             </div>
         </div>
+
+        <div style="" class="row show-grid">
+            <div class="col-xs-4">
+                <label for="remarks" class="control-label pull-right">
+                    Remarks
+                    <span style="color:#FF0000">*</span>
+                </label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <textarea name="items[remarks]" id="remarks" class="form-control"><?php echo $items['remarks'] ?></textarea>
+            </div>
+        </div>
     </div>
     <div class="clearfix"></div>
 </form>

@@ -71,7 +71,8 @@ class Setup_file_category extends Root_Controller
                 'id'=>0,
                 'name'=>'',
                 'ordering'=>99,
-                'status'=>$this->config->item('system_status_active')
+                'status'=>$this->config->item('system_status_active'),
+                'remarks'=>''
             );
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));

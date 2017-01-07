@@ -73,7 +73,8 @@ class Setup_file_type extends Root_Controller
                 'id_category'=>'',
                 'id_class'=>'',
                 'ordering'=>99,
-                'status'=>$this->config->item('system_status_active')
+                'status'=>$this->config->item('system_status_active'),
+                'remarks'=>''
             );
             $data['categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
             $data['classes']=array();

@@ -21,6 +21,67 @@ $CI->load->view('action_buttons',$action_data);
 
         <div style="" class="row show-grid">
             <div class="col-xs-4">
+                <label for="id_office" class="control-label pull-right">
+                    Office
+                    <span style="color:#FF0000">*</span>
+                </label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <select id="id_office" name="items[id_office]" class="form-control" tabindex="-1">
+                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
+                    <?php
+                    foreach($offices as $office)
+                    {?>
+                        <option value="<?php echo $office['value']?>" <?php if($office['value']==$items['id_office']){ echo 'selected';}?>><?php echo $office['text'];?></option>
+                    <?php
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+
+        <div style="<?php if(!($items['id_department']>0)){echo 'display:none';} ?>" class="row show-grid" id="department_container">
+            <div class="col-xs-4">
+                <label for="id_department" class="control-label pull-right">
+                    Department
+                    <span style="color:#FF0000">*</span></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <select id="id_department" name="items[id_department]" class="form-control" tabindex="-1">
+                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
+                    <?php
+                    foreach($departments as $department)
+                    {?>
+                        <option value="<?php echo $department['value']?>" <?php if($department['value']==$items['id_department']){ echo 'selected';}?>><?php echo $department['text'];?></option>
+                    <?php
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+
+        <div style="<?php if(!($items['employee_responsible']>0)){echo 'display: none';} ?>" class="row show-grid" id="employee_responsible_container">
+            <div class="col-xs-4">
+                <label for="employee_responsible" class="control-label pull-right">
+                    Responsible Employee
+                    <span style="color:#FF0000">*</span></label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <select id="employee_responsible" name="items[employee_responsible]" class="form-control" tabindex="-1">
+                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
+                    <?php
+                    foreach($employees as $employee)
+                    {?>
+                        <option value="<?php echo $employee['value']?>" <?php if($employee['value']==$items['employee_responsible']){ echo 'selected';}?>><?php echo $employee['text'];?></option>
+                    <?php
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+
+        <div style="" class="row show-grid">
+            <div class="col-xs-4">
                 <label for="id_category" class="control-label pull-right">
                     <?php echo $CI->lang->line('LABEL_FILE_CATEGORY');?>
                     <span style="color:#FF0000">*</span>
@@ -136,6 +197,18 @@ $CI->load->view('action_buttons',$action_data);
                 <input type="text" name="items[date_start]" id="date_start" class="form-control datepicker" value="<?php echo $items['date_start'] ?>" >
             </div>
         </div>
+
+        <div style="" class="row show-grid">
+            <div class="col-xs-4">
+                <label for="remarks" class="control-label pull-right">
+                    Remarks
+                    <span style="color:#FF0000">*</span>
+                </label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <textarea name="items[remarks]" id="remarks" class="form-control"><?php echo $items['remarks'] ?></textarea>
+            </div>
+        </div>
     </div>
     <div class="clearfix"></div>
 </form>
@@ -144,6 +217,54 @@ $CI->load->view('action_buttons',$action_data);
     {
         turn_off_triggers();
         $(".datepicker").datepicker({dateFormat : display_date_format});
+        $(document).on("change","#id_office",function()
+        {
+            $("#id_department").val("");
+            $("#employee_responsible").val("");
+            var id_office=$('#id_office').val();
+            if(id_office>0)
+            {
+                $('#department_container').show();
+                $('#employee_responsible_container').hide();
+            }
+            else
+            {
+                $('#department_container').hide();
+                $('#employee_responsible_container').hide();
+            }
+        });
+        $(document).on("change","#id_department",function()
+        {
+            $("#employee_responsible").val("");
+            var id_department=$('#id_department').val();
+            if(id_department>0)
+            {
+                $('#employee_responsible_container').show();
+                $.ajax(
+                    {
+                        url: base_url+"common_controller/get_employees",
+                        type: 'POST',
+                        datatype: "JSON",
+                        data:
+                        {
+                            html_container_id:'#employee_responsible',
+                            id_department:id_department
+                        },
+                        success: function (data, status)
+                        {
+
+                        },
+                        error: function (xhr, desc, err)
+                        {
+                            console.log("error");
+                        }
+                    });
+            }
+            else
+            {
+                $('#employee_responsible_container').hide();
+            }
+        });
         $(document).on("change","#id_category",function()
         {
             $("#id_class").val("");

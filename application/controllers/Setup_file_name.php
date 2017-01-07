@@ -76,12 +76,27 @@ class Setup_file_name extends Root_Controller
                 'id_hc_location'=>'',
                 'date_start'=>System_helper::display_date(time()),
                 'ordering'=>99,
-                'status'=>$this->config->item('system_status_active')
+                'status'=>$this->config->item('system_status_active'),
+                'remarks'=>'',
+                'id_office'=>'',
+                'id_department'=>'',
+                'employee_responsible'=>''
             );
             $data['categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
             $data['classes']=array();
             $data['types']=array();
             $data['hc_locations']=Query_helper::get_info($this->config->item('table_setup_file_hc_location'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
+
+            $LOGIN=$this->load->database('armalik_login',true);
+            $LOGIN->select('id value,name text');
+            $LOGIN->from($this->config->item('table_setup_office'));
+            $data['offices']=$LOGIN->get()->result_array();
+
+            $LOGIN->select('id value,name text');
+            $LOGIN->from($this->config->item('table_setup_department'));
+            $data['departments']=$LOGIN->get()->result_array();
+
+            $data['employees']=array();
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
@@ -122,6 +137,24 @@ class Setup_file_name extends Root_Controller
             $data['classes']=Query_helper::get_info($this->config->item('table_setup_file_class'),array('id value','name text'),array('id_category='.$data['items']['id_category']));
             $data['types']=Query_helper::get_info($this->config->item('table_setup_file_type'),array('id value','name text'),array('id_class='.$data['items']['id_class']));
             $data['hc_locations']=Query_helper::get_info($this->config->item('table_setup_file_hc_location'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
+
+            $LOGIN=$this->load->database('armalik_login',true);
+            $LOGIN->select('id value,name text');
+            $LOGIN->from($this->config->item('table_setup_office'));
+            $data['offices']=$LOGIN->get()->result_array();
+
+            $LOGIN->select('id value,name text');
+            $LOGIN->from($this->config->item('table_setup_department'));
+            $data['departments']=$LOGIN->get()->result_array();
+
+            $LOGIN->select("u.id value,CONCAT('[',u.employee_id,'] ',ui.name) AS text");
+            $LOGIN->from($this->config->item('table_setup_user').' u');
+            $LOGIN->join($this->config->item('table_setup_user_info').' ui','u.id=ui.user_id');
+            $LOGIN->where('u.status',$this->config->item('system_status_active'));
+            $LOGIN->where('ui.revision',1);
+            $LOGIN->where('ui.department_id',$data['items']['id_department']);
+            $data['employees']=$LOGIN->get()->result_array();
+            #print_r($data['employees']);die();
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
@@ -214,6 +247,7 @@ class Setup_file_name extends Root_Controller
         $this->form_validation->set_rules('items[id_type]',$this->lang->line('LABEL_FILE_TYPE'),'required');
         $this->form_validation->set_rules('items[id_hc_location]',$this->lang->line('LABEL_HC_LOCATION'),'required');
         $this->form_validation->set_rules('items[date_start]','Start Date','required');
+        $this->form_validation->set_rules('items[employee_responsible]','Responsible Employee','required');
         if($this->form_validation->run()==false)
         {
             $this->message=validation_errors();

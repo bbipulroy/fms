@@ -20,7 +20,6 @@ $config['table_history'] = 'fms_history';
 $config['table_history_hack'] = 'fms_history_hack';
 $config['table_system_site_offline'] = 'fms_system_site_offline';
 
-
 //Bipul Roy||start
 //fms setup tables
 $config['table_setup_file_category'] = 'fms_setup_file_category';
@@ -29,3 +28,4 @@ $config['table_setup_file_type'] = 'fms_setup_file_type';
 $config['table_setup_file_name'] = 'fms_setup_file_name';
 $config['table_setup_file_hc_location'] = 'fms_setup_file_hc_location';
 $config['table_setup_assign_file_user_group'] = 'fms_setup_assign_file_user_group';
+$config['table_tasks_digital_file'] = 'fms_tasks_digital_file';

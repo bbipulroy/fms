@@ -485,8 +485,13 @@ function turn_off_triggers()
     $(document).off("click", ".task_action_all");
     $(document).off("click", ".task_header_all");
 
-    //expense
-    $(document).off("change", "#category_id");
-    $(document).off("change", "#type_id");
-    $(document).off("change", "#expense_id");
+    //Setup && Tasks
+    $(document).off("change", "#id_category");
+    $(document).off("change", "#id_class");
+    $(document).off("change", "#id_type");
+    $(document).off("change", "#id_name");
+    $(document).off("change", "#id_hc_location");
+    $(document).off("change", "#id_office");
+    $(document).off("change", "#id_department");
+    $(document).off("change", "#employee_responsible");
 }

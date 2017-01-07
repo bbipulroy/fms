@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $CI = & get_instance();
 $action_data=array();
 $action_data['action_back']=site_url($CI->controller_url);
-$action_data["action_refresh"]=site_url($CI->controller_url.'/index/get_file_permission_list/'.$item_id);
+$action_data["action_refresh"]=site_url($CI->controller_url.'/index/details/'.$item_id);
 $CI->load->view("action_buttons",$action_data);
 ?>
 

@@ -72,7 +72,8 @@ class Setup_file_class extends Root_Controller
                 'name'=>'',
                 'id_category'=>'',
                 'ordering'=>99,
-                'status'=>$this->config->item('system_status_active')
+                'status'=>$this->config->item('system_status_active'),
+                'remarks'=>''
             );
             $data['categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');

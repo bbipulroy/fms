@@ -19,32 +19,20 @@ $CI->load->view('action_buttons',$action_data);
             <div class="clearfix"></div>
         </div>
 
-        <div class="row show-grid">
-            <div class="col-xs-4">
-                <label for="date_entry_text" class="control-label pull-right">
-                    Entry Date
-                    <span style="color:#FF0000">*</span>
-                </label>
-            </div>
-            <div class="col-sm-4 col-xs-8">
-                <input type="text" name="items[date_entry_text]" id="date_entry_text" class="form-control datepicker" value="<?php echo $items['date_entry_text'] ?>"/>
-            </div>
-        </div>
-
         <div style="" class="row show-grid">
             <div class="col-xs-4">
-                <label for="id_file_type_1" class="control-label pull-right">
-                    <?php echo $CI->lang->line('LABEL_FILE_TYPE_1');?>
+                <label for="id_category" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_FILE_CATEGORY');?>
                     <span style="color:#FF0000">*</span>
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_file_type_1" name="items[id_file_type_1]" class="form-control" tabindex="-1">
+                <select id="id_category" name="items[id_category]" class="form-control" tabindex="-1">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
-                    foreach($file_type_1s as $file_type_1)
+                    foreach($categories as $category)
                     {?>
-                        <option value="<?php echo $file_type_1['value']?>" <?php if($file_type_1['value']==$items['id_file_type_1']){ echo 'selected';}?>><?php echo $file_type_1['text'];?></option>
+                        <option value="<?php echo $category['value']?>" <?php if($category['value']==$items['id_category']){ echo 'selected';}?>><?php echo $category['text'];?></option>
                     <?php
                     }
                     ?>
@@ -52,19 +40,19 @@ $CI->load->view('action_buttons',$action_data);
             </div>
         </div>
 
-        <div style="<?php if(!($items['id_file_type_2']>0)){echo 'display:none';} ?>" class="row show-grid" id="id_file_type_2_container">
+        <div style="<?php if(!($items['id_class']>0)){echo 'display:none';} ?>" class="row show-grid" id="class_container">
             <div class="col-xs-4">
-                <label for="id_file_type_2" class="control-label pull-right">
-                    <?php echo $CI->lang->line('LABEL_FILE_TYPE_2');?>
+                <label for="id_class" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_FILE_CLASS');?>
                     <span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_file_type_2" name="items[id_file_type_2]" class="form-control" tabindex="-1">
+                <select id="id_class" name="items[id_class]" class="form-control" tabindex="-1">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
-                    foreach($file_type_2s as $file_type_2)
+                    foreach($classes as $class)
                     {?>
-                        <option value="<?php echo $file_type_2['value']?>" <?php if($file_type_2['value']==$items['id_file_type_2']){ echo 'selected';}?>><?php echo $file_type_2['text'];?></option>
+                        <option value="<?php echo $class['value']?>" <?php if($class['value']==$items['id_class']){ echo 'selected';}?>><?php echo $class['text'];?></option>
                     <?php
                     }
                     ?>
@@ -72,20 +60,20 @@ $CI->load->view('action_buttons',$action_data);
             </div>
         </div>
 
-        <div style="<?php if(!($items['id_file_type_3']>0)){echo 'display:none';} ?>" class="row show-grid" id="id_file_type_3_container">
+        <div style="<?php if(!($items['id_type']>0)){echo 'display:none';} ?>" class="row show-grid" id="type_container">
             <div class="col-xs-4">
-                <label for="id_file_type_3" class="control-label pull-right">
-                    <?php echo $CI->lang->line('LABEL_FILE_TYPE_3');?>
+                <label for="id_type" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_FILE_TYPE');?>
                     <span style="color:#FF0000">*</span>
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_file_type_3" name="items[id_file_type_3]" class="form-control">
+                <select id="id_type" name="items[id_type]" class="form-control">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
-                    foreach($file_type_3s as $file_type_3)
+                    foreach($types as $type)
                     {?>
-                        <option value="<?php echo $file_type_3['value']?>" <?php if($file_type_3['value']==$items['id_file_type_3']){echo "selected";}?>><?php echo $file_type_3['text'];?></option>
+                        <option value="<?php echo $type['value']?>" <?php if($type['value']==$items['id_type']){echo "selected";}?>><?php echo $type['text'];?></option>
                     <?php
                     }
                     ?>
@@ -93,58 +81,24 @@ $CI->load->view('action_buttons',$action_data);
             </div>
         </div>
 
-        <div style="<?php if(!($items['id_file_type_4']>0)){echo 'display:none';} ?>" class="row show-grid" id="id_file_type_4_container">
+        <div style="<?php if(!($items['id_name']>0)){echo 'display:none';} ?>" class="row show-grid" id="name_container">
             <div class="col-xs-4">
-                <label for="id_file_type_4" class="control-label pull-right">
-                    <?php echo $CI->lang->line('LABEL_FILE_TYPE_4');?>
+                <label for="id_name" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_FILE_NAME');?>
                     <span style="color:#FF0000">*</span>
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_file_type_4" name="items[id_file_type_4]" class="form-control">
+                <select id="id_name" name="items[id_name]" class="form-control">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
-                    foreach($file_type_4s as $file_type_4)
+                    foreach($names as $name)
                     {?>
-                        <option value="<?php echo $file_type_4['value']?>" <?php if($file_type_4['value']==$items['id_file_type_4']){echo "selected";}?>><?php echo $file_type_4['text'];?></option>
+                        <option value="<?php echo $name['value']?>" <?php if($name['value']==$items['id_name']){echo "selected";}?>><?php echo $name['text'];?></option>
                     <?php
                     }
                     ?>
                 </select>
-            </div>
-        </div>
-
-        <div style="" class="row show-grid">
-            <div class="col-xs-4">
-                <label for="id_hc_location" class="control-label pull-right">
-                    Hardcopy Location
-                    <span style="color:#FF0000">*</span>
-                </label>
-            </div>
-            <div class="col-sm-4 col-xs-8">
-                <select id="id_hc_location" name="items[id_hc_location]" class="form-control" tabindex="-1">
-                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
-                    <?php
-                    foreach($hc_locations as $hc_location)
-                    {?>
-                        <option value="<?php echo $hc_location['value']?>"><?php echo $hc_location['text'];?></option>
-                    <?php
-                    }
-                    ?>
-                </select>
-            </div>
-        </div>
-
-
-        <div style="" class="row show-grid">
-            <div class="col-xs-4">
-                <label for="remarks" class="control-label pull-right">
-                    Remarks
-                    <span style="color:#FF0000">*</span>
-                </label>
-            </div>
-            <div class="col-sm-4 col-xs-8">
-                <textarea name="items[remarks]" id="remarks" class="form-control"><?php echo $items['remarks'] ?></textarea>
             </div>
         </div>
 
@@ -230,6 +184,7 @@ $CI->load->view('action_buttons',$action_data);
     }
     jQuery(document).ready(function()
     {
+        turn_off_triggers();
         $('video').hide();
         var camera=$('#camera');
         var take_photo=$('#take-photo');
@@ -238,25 +193,22 @@ $CI->load->view('action_buttons',$action_data);
         take_photo.hide();
 
         var files_container=$('#files_container tbody');
-        $(".datepicker").datepicker({dateFormat : display_date_format});
-        $('#date_entry_text').data('predefined_date',$('#date_entry_text').val());
-
         var form_obj=$('#save_form');
         form_obj.data('form_data_append',true);
         form_obj.data('file_camera',"");
         form_obj.data('file_drag_drop',"");
 
-        $(document).on("change","#id_file_type_1",function()
+        $(document).on("change","#id_category",function()
         {
-            $("#id_file_type_2").val("");
-            $("#id_file_type_3").val("");
-            $("#id_file_type_4").val("");
-            var id_file_type_1=$('#id_file_type_1').val();
-            if(id_file_type_1>0)
+            $("#id_class").val("");
+            $("#id_type").val("");
+            $("#id_name").val("");
+            var id_category=$('#id_category').val();
+            if(id_category>0)
             {
-                $('#id_file_type_2_container').show();
-                $('#id_file_type_3_container').hide();
-                $('#id_file_type_4_container').hide();
+                $('#class_container').show();
+                $('#type_container').hide();
+                $('#name_container').hide();
                 $.ajax(
                 {
                     url: "<?php echo site_url($CI->controller_url.'/index/get_drop_down'); ?>",
@@ -264,11 +216,9 @@ $CI->load->view('action_buttons',$action_data);
                     datatype: "JSON",
                     data:
                     {
-                        html_container_id:'#id_file_type_2',
-                        table:'<?php echo $CI->config->item('table_setup_file_type_2'); ?>',
-                        table_column:'id_file_type_2',
-                        table_column_check:'id_file_type_1',
-                        table_column_value:id_file_type_1
+                        html_container_id:'#id_class',
+                        file_type:'class',
+                        id:id_category
                     },
                     success: function (data, status)
                     {
@@ -282,33 +232,30 @@ $CI->load->view('action_buttons',$action_data);
             }
             else
             {
-                $('#id_file_type_2_container').hide();
-                $('#id_file_type_3_container').hide();
-                $('#id_file_type_4_container').hide();
+                $('#class_container').hide();
+                $('#type_container').hide();
+                $('#name_container').hide();
             }
         });
-        $(document).on("change","#id_file_type_2",function()
+        $(document).on("change","#id_class",function()
         {
-            $("#id_file_type_3").val("");
-            $("#id_file_type_4").val("");
-            var id_file_type_2=$('#id_file_type_2').val();
-            if(id_file_type_2>0)
+            $("#id_type").val("");
+            $("#id_name").val("");
+            var id_class=$('#id_class').val();
+            if(id_class>0)
             {
-                $('#id_file_type_3_container').show();
-                $('#id_file_type_4_container').hide();
+                $('#type_container').show();
+                $('#name_container').hide();
                 $.ajax(
                     {
-                        //url: base_url+"common_controller/get_dropdown_with_select",
                         url: "<?php echo site_url($CI->controller_url.'/index/get_drop_down'); ?>",
                         type: 'POST',
                         datatype: "JSON",
                         data:
                         {
-                            html_container_id:'#id_file_type_3',
-                            table:'<?php echo $CI->config->item('table_setup_file_type_3'); ?>',
-                            table_column: 'id_file_type_3',
-                            table_column_check:'id_file_type_2',
-                            table_column_value:id_file_type_2
+                            html_container_id:'#id_type',
+                            file_type:'type',
+                            id:id_class
                         },
                         success: function (data, status)
                         {
@@ -322,30 +269,27 @@ $CI->load->view('action_buttons',$action_data);
             }
             else
             {
-                $('#id_file_type_3_container').hide();
-                $('#id_file_type_4_container').hide();
+                $('#type_container').hide();
+                $('#name_container').hide();
             }
         });
-        $(document).on("change","#id_file_type_3",function()
+        $(document).on("change","#id_type",function()
         {
-            $("#id_file_type_4").val("");
-            var id_file_type_3=$('#id_file_type_3').val();
-            if(id_file_type_3>0)
+            $("#id_name").val("");
+            var id_type=$('#id_type').val();
+            if(id_type>0)
             {
-                $('#id_file_type_4_container').show();
+                $('#name_container').show();
                 $.ajax(
                     {
-                        //url: base_url+"common_controller/get_dropdown_with_select",
                         url: "<?php echo site_url($CI->controller_url.'/index/get_drop_down'); ?>",
                         type: 'POST',
                         datatype: "JSON",
                         data:
                         {
-                            html_container_id:'#id_file_type_4',
-                            table:'<?php echo $CI->config->item('table_setup_file_type_4'); ?>',
-                            table_column:'id_file_type_4',
-                            table_column_check:'id_file_type_3',
-                            table_column_value:id_file_type_3
+                            html_container_id:'#id_name',
+                            file_type:'name',
+                            id:id_type
                         },
                         success: function (data, status)
                         {
@@ -359,18 +303,18 @@ $CI->load->view('action_buttons',$action_data);
             }
             else
             {
-                $('#id_file_type_4_container').hide();
+                $('#name_container').hide();
             }
         });
-        $(document).on("change","#id_file_type_4",function()
+        $(document).on("change","#id_name",function()
         {
-            var id_file_type_4=$('#id_file_type_4').val();
-            $('input[name="id"]').val(id_file_type_4);
-            if(id_file_type_4>0)
+            var id_name=$('#id_name').val();
+            $('input[name="id"]').val(id_name);
+            if(id_name>0)
             {
                 $.ajax(
                     {
-                        url: base_url+"<?php echo $CI->controller_url.'/index/edit/'; ?>"+id_file_type_4,
+                        url: base_url+"<?php echo $CI->controller_url.'/index/edit/'; ?>"+id_name,
                         type: 'POST',
                         datatype: "JSON",
                         data:
@@ -383,7 +327,7 @@ $CI->load->view('action_buttons',$action_data);
                             {
                                 if(data.status==false)
                                 {
-                                    $('#id_file_type_4').val("");
+                                    $('#id_name').val("");
                                 }
                             }
                         },
@@ -397,10 +341,6 @@ $CI->load->view('action_buttons',$action_data);
             {
                 files_container.empty();
                 set_current_id("0");
-                $('#save_form').data('file_camera',"");
-                $('#id_hc_location').val("");
-                $('#date_entry_text').val($('#date_entry_text').data('predefined_date'));
-                $('#remarks').val("");
             }
         });
         $(document).on("click", ".system_button_add", function(event)

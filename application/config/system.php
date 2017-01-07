@@ -9,4 +9,5 @@ $config['system_status_delete']='Deleted';
 //Bipul Roy||start
 $config['system_div_id']='#system_content';
 $config['system_upload_folder']='file-manager';
+$config['system_upload_delete_folder']='deleted-files';
 //Bipul Roy||end

@@ -5,13 +5,18 @@
     foreach($stored_files as $index=>$file)
     {
         $old_files.=$file['id'].',';
-        $file_url=$CI->config->item('system_upload_folder').'/'.$file['id_file_entry'].'/'.$file['name_after_upload'];
+        $file_url=$CI->config->item('system_upload_folder').'/'.$id.'/'.$file['name'];
+        $is_image=false;
+        if(substr($file['mime_type'],0,5)=='image')
+        {
+            $is_image=true;
+        }
         ?>
         <tr>
             <td>
                 <div class="preview_container_file" id="preview_container_file_<?php echo $index+1;?>">
                     <?php
-                    if($file['is_image'])
+                    if($is_image)
                     {
                         ?>
                         <img style="max-width: 250px;" src="<?php echo base_url($file_url); ?>">
@@ -19,7 +24,7 @@
                     }
                     else
                     {
-                        echo $file['name_after_upload'];
+                        echo $file['name'];
                     }
                     ?>
                 </div>
@@ -41,36 +46,8 @@
 <script>
     jQuery(document).ready(function()
     {
-        <?php
-            if(strlen($old_files)>0)
-            {
-                ?>
-                $('.system_button_add').attr("data-current-id","<?php echo sizeof($stored_files); ?>");
-                <?php
-            }
-            else
-            {
-                ?>
-                $('.system_button_add').attr("data-current-id","0");
-                <?php
-            }
-            if($file_entry_info['id_hc_location']>0)
-            {
-                ?>
-                $('#id_hc_location').val("<?php echo $file_entry_info['id_hc_location']; ?>");
-                $('#date_entry_text').val("<?php echo $file_entry_info['date_entry_text']; ?>");
-                $('#remarks').val("<?php echo $file_entry_info['remarks']; ?>");
-                <?php
-            }
-            else
-            {
-                ?>
-                $('#id_hc_location').val("");
-                $('#date_entry_text').val($('#date_entry_text').data('predefined_date'));
-                $('#remarks').val("");
-                <?php
-            }
-        ?>
+        turn_off_triggers();
+        $('.system_button_add').attr("data-current-id","<?php echo sizeof($stored_files); ?>");
         $('.browse_button').filestyle({input: false,icon: false,buttonText: "Edit",buttonName: "btn-primary"});
     });
 </script>
