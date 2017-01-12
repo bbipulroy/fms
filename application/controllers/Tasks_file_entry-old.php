@@ -19,17 +19,9 @@ class Tasks_file_entry extends Root_Controller
         $this->permissions=User_helper::get_permission('Tasks_file_entry');
         $this->controller_url='tasks_file_entry';
     }
-    public function index($action='list',$id=0)
+    public function index($action='edit',$id=0,$table='',$column='')
     {
-        if($action=='list')
-        {
-            $this->system_list();
-        }
-        elseif($action='get_items')
-        {
-            $this->system_get_items();
-        }
-        elseif($action=='edit')
+       if($action=='edit')
         {
             $this->system_edit();
         }
@@ -47,28 +39,7 @@ class Tasks_file_entry extends Root_Controller
         }
         else
         {
-            $this->system_list();
-        }
-    }
-    private function system_list()
-    {
-        if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
-        {
-            $data['title']='Permitted Files List';
-            $ajax['system_page_url']=site_url($this->controller_url.'/index/list');
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/list',$data,true));
-            if($this->message)
-            {
-                $ajax['system_message']=$this->message;
-            }
-            $ajax['status']=true;
-            $this->json_return($ajax);
-        }
-        else
-        {
-            $ajax['status']=false;
-            $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
-            $this->json_return($ajax);
+            $this->system_edit();
         }
     }
     private function system_edit()
@@ -389,24 +360,5 @@ class Tasks_file_entry extends Root_Controller
         $ajax['system_content'][]=array('id'=>$html_container_id,'html'=>$this->load->view('dropdown_with_select',$data,true));
         $ajax['status']=true;
         $this->json_return($ajax);
-    }
-    private function system_get_items()
-    {
-        $this->db->select('n.id,n.name,n.date_start,t.name type_name,cls.name class_name,ctg.name category_name,COUNT(df.id_file_name) number_of_file');
-        $this->db->from($this->config->item('table_setup_file_name').' n');
-        $this->db->join($this->config->item('table_setup_assign_file_user_group').' fug','n.id=fug.id_file');
-        $this->db->join($this->config->item('table_setup_file_type').' t','t.id=n.id_type');
-        $this->db->join($this->config->item('table_setup_file_class').' cls','cls.id=t.id_class');
-        $this->db->join($this->config->item('table_setup_file_category').' ctg','ctg.id=cls.id_category');
-        $this->db->join($this->config->item('table_tasks_digital_file').' df','df.id_file_name=n.id','left');
-        $this->db->group_by('n.id');
-        $this->db->where('fug.user_group_id',$this->user_group);
-        $this->db->where('fug.status',$this->config->item('system_status_active'));
-        $temp=$this->db->get()->result_array();
-        foreach($temp as &$val)
-        {
-            $val['date_start']=System_helper::display_date($val['date_start']);
-        }
-        $this->json_return($temp);
     }
 }

@@ -176,7 +176,6 @@ $(document).ready(function()
     {
         $('#system_report_container').html('');
         $($(this).attr('data-form')).submit();
-
     });
     $(document).on("click", "#button_action_save", function(event)
     {
@@ -232,12 +231,13 @@ $(document).ready(function()
                 }
             }
             var selectedRowData = $(jqxgrid_id).jqxGrid('getrowdata', selected_row_indexes[selected_row_indexes.length-1]);//only last selected
-
+            alert(selectedRowData);
+            console.log(selectedRowData);
             $.ajax({
                 url: $(this).attr('data-action-link'),
                 type: 'POST',
                 dataType: "JSON",
-                data:{'id':selectedRowData.id},
+                data:{'id':selectedRowData.id,'details':selectedRowData},
                 success: function (data, status)
                 {
 
@@ -347,6 +347,8 @@ $(document).ready(function()
         //Bipul Roy||start|| for old file delete
         var html_id="#file-"+$(this).attr('data-current-id');
         $(html_id).remove();
+        var remarks_obj=$(this).closest('tr').find('td').eq(2).find('.remarks');
+        remarks_obj.attr("name","remarks["+$(this).attr('data-current-id')+"]");
         //Bipul Roy||end
     });
     $(document).on("click", "#button_action_print", function(event)
@@ -478,20 +480,9 @@ function animate_message(message)
     $("#system_message").html(message);
     $('#system_message').slideToggle("slow").delay(3000).slideToggle("slow");
 }
-
 function turn_off_triggers()
 {
     $(document).off("click", "#button_action_save_jqx");
     $(document).off("click", ".task_action_all");
     $(document).off("click", ".task_header_all");
-
-    //Setup && Tasks
-    $(document).off("change", "#id_category");
-    $(document).off("change", "#id_class");
-    $(document).off("change", "#id_type");
-    $(document).off("change", "#id_name");
-    $(document).off("change", "#id_hc_location");
-    $(document).off("change", "#id_office");
-    $(document).off("change", "#id_department");
-    $(document).off("change", "#employee_responsible");
 }

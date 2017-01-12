@@ -103,61 +103,13 @@ $CI->load->view('action_buttons',$action_data);
         </div>
 
         <div id="files_container">
-            <div style="overflow-x: auto;" class="row show-grid">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th style="min-width: 250px;">File/Picture</th>
-                            <th style="min-width: 50px;">UPLOAD</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <!-- php codes -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="row show-grid">
-            <div class="col-xs-4">
 
-            </div>
-            <div class="col-xs-4">
-                <button type="button" class="btn btn-warning system_button_add" data-current-id="0">
-                    <?php echo $CI->lang->line('LABEL_ADD_MORE'); ?>
-                </button>
-                <button id="camera" type="button" class="btn btn-warning">
-                    Camera
-                </button>
-                <button id="take-photo" type="button" class="btn btn-warning">
-                    Take Photo
-                </button>
-                <button id="camera-close" type="button" class="btn btn-warning">
-                    Camera Off
-                </button>
-            </div>
-            <div class="col-xs-4">
-
-            </div>
         </div>
+
     </div>
     <div class="clearfix"></div>
 </form>
-<div id="system_content_add" style="display: none;">
-    <table>
-        <tbody>
-            <tr>
-                <td>
-                    <div class="preview_container_file">
-                    </div>
-                </td>
-                <td>
-                    <input type="file" class="browse_button_new file_new"><br>
-                    <button type="button" class="btn btn-danger system_button_delete file_new"><?php echo $CI->lang->line('DELETE'); ?></button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+
 <div class="row show-grid">
     <div class="col-xs-12">
         <video id="video" width="1000" height="600" controls autoplay></video>
@@ -184,25 +136,14 @@ $CI->load->view('action_buttons',$action_data);
     }
     jQuery(document).ready(function()
     {
-        turn_off_triggers();
         $('video').hide();
-        var camera=$('#camera');
-        var take_photo=$('#take-photo');
-        camera.data('check',false);
-        camera.data('counter',0);
-        take_photo.hide();
-
-        var files_container=$('#files_container tbody');
-        var form_obj=$('#save_form');
-        form_obj.data('form_data_append',true);
-        form_obj.data('file_camera',"");
-        form_obj.data('file_drag_drop',"");
-
+        $(document).off("change", "#id_category");
         $(document).on("change","#id_category",function()
         {
             $("#id_class").val("");
             $("#id_type").val("");
             $("#id_name").val("");
+            $("#files_container").html('');
             var id_category=$('#id_category').val();
             if(id_category>0)
             {
@@ -237,10 +178,12 @@ $CI->load->view('action_buttons',$action_data);
                 $('#name_container').hide();
             }
         });
+        $(document).off("change", "#id_class");
         $(document).on("change","#id_class",function()
         {
             $("#id_type").val("");
             $("#id_name").val("");
+            $("#files_container").html('');
             var id_class=$('#id_class').val();
             if(id_class>0)
             {
@@ -273,9 +216,11 @@ $CI->load->view('action_buttons',$action_data);
                 $('#name_container').hide();
             }
         });
+        $(document).off("change", "#id_type");
         $(document).on("change","#id_type",function()
         {
             $("#id_name").val("");
+            $("#files_container").html('');
             var id_type=$('#id_type').val();
             if(id_type>0)
             {
@@ -306,15 +251,17 @@ $CI->load->view('action_buttons',$action_data);
                 $('#name_container').hide();
             }
         });
+        $(document).off("change", "#id_name");
         $(document).on("change","#id_name",function()
         {
+            $("#files_container").html('');
             var id_name=$('#id_name').val();
             $('input[name="id"]').val(id_name);
             if(id_name>0)
             {
                 $.ajax(
                     {
-                        url: base_url+"<?php echo $CI->controller_url.'/index/edit/'; ?>"+id_name,
+                        url: "<?php echo site_url($CI->controller_url.'/index/details/'); ?>"+'/'+id_name,
                         type: 'POST',
                         datatype: "JSON",
                         data:
@@ -337,39 +284,8 @@ $CI->load->view('action_buttons',$action_data);
                         }
                     });
             }
-            else
-            {
-                files_container.empty();
-                set_current_id("0");
-            }
         });
-        $(document).on("click", ".system_button_add", function(event)
-        {
-            var current_id=get_current_id()+1;
-            set_current_id(current_id);
-            var content_id='#system_content_add table tbody';
 
-            $(content_id+' .browse_button_new').attr('data-preview-container','#preview_container_file_'+current_id);
-            $(content_id+' .browse_button_new').attr('name','file_'+current_id);
-            $(content_id+' .browse_button_new').attr('id','file_'+current_id);
-            $(content_id+' .file_new').attr('data-current-id',current_id);
-            $(content_id+' .preview_container_file').attr('id','preview_container_file_'+current_id);
-            
-            var html=$(content_id).html();
-            files_container.append(html);
-
-            $(content_id+' .browse_button_new').removeAttr('name');
-            $(content_id+' .browse_button_new').removeAttr('data-preview-container');
-            $(content_id+' .browse_button_new').removeAttr('id');
-            $(content_id+' .file_new').removeAttr('data-current-id');
-            $(content_id+' .preview_container_file').removeAttr('id');
-            
-            set_filestyle('#file_'+current_id);
-        });
-        $(document).on("click", ".system_button_delete", function(event)
-        {
-            $(this).closest('tr').remove();
-        });
         $(document).on('click','#camera',function()
         {
             if(camera.data('check'))
@@ -419,17 +335,6 @@ $CI->load->view('action_buttons',$action_data);
             $('video').show();
             video.play();
         }
-        function get_current_id()
-        {
-            return parseInt($('.system_button_add').attr('data-current-id'));
-        }
-        function set_current_id(id)
-        {
-            $('.system_button_add').attr('data-current-id',id);
-        }
-        function set_filestyle(where)
-        {
-            $(where).filestyle({input: false,icon: false,buttonText: "Upload",buttonName: "btn-primary"});
-        }
     });
 </script>
+<div id="upload-complete-info"></div>

@@ -190,6 +190,10 @@ class Setup_assign_file_user_group extends Root_Controller
     {
         $id=$this->input->post('id');
         $data=$this->input->post('items');
+        if(!is_array($data))
+        {
+            $data=array();
+        }
         $user=User_helper::get_user();
         if($id>0)
         {
