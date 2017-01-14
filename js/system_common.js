@@ -231,13 +231,11 @@ $(document).ready(function()
                 }
             }
             var selectedRowData = $(jqxgrid_id).jqxGrid('getrowdata', selected_row_indexes[selected_row_indexes.length-1]);//only last selected
-            alert(selectedRowData);
-            console.log(selectedRowData);
             $.ajax({
                 url: $(this).attr('data-action-link'),
                 type: 'POST',
                 dataType: "JSON",
-                data:{'id':selectedRowData.id,'details':selectedRowData},
+                data:{'id':selectedRowData.id},
                 success: function (data, status)
                 {
 
@@ -347,7 +345,10 @@ $(document).ready(function()
         //Bipul Roy||start|| for old file delete
         var html_id="#file-"+$(this).attr('data-current-id');
         $(html_id).remove();
-        var remarks_obj=$(this).closest('tr').find('td').eq(2).find('.remarks');
+        var tr_obj=$(this).closest('tr');
+        var date_entry_obj=tr_obj.find('.date_entry');
+        var remarks_obj=tr_obj.find('.remarks');
+        date_entry_obj.attr("name","date_entry["+$(this).attr('data-current-id')+"]");
         remarks_obj.attr("name","remarks["+$(this).attr('data-current-id')+"]");
         //Bipul Roy||end
     });

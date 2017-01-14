@@ -1,37 +1,74 @@
 <script>
     jQuery(document).ready(function()
     {
+        var input_obj;
         var label_obj;
-        var input_id;
-        var textarea_obj;
+        var tr_obj;
+        var remarks_obj;
+        var date_entry_obj;
+        var delete_obj;
         <?php
             $CI= & get_instance();
             foreach($upload_files as $key=>$value)
             {
-                ?>label_obj=$('#<?php echo $key; ?>').next().find('label');<?php
+                ?>
+                input_obj=$('#<?php echo $key; ?>');
+                label_obj=input_obj.next().find('label');
+                <?php
                 if($value['status']==true)
                 {
+                    $input='<input name="files['.$value['insert_id'].']" value="" type="hidden">';
                     ?>
-                    input_id=$('#<?php echo $key; ?>');
+                    tr_obj=input_obj.closest('tr');
+                    date_entry_obj=tr_obj.find('.date_entry');
+                    remarks_obj=tr_obj.find('.remarks');
+                    delete_obj=tr_obj.find('.system_button_delete');
                     <?php
-                    if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
+                    if($CI->is_edit && $CI->is_delete)
                     {
-                        $input='<input name="files['.$value['insert_id'].']" value="" type="hidden">';
-                        ?>input_id.val('');
-                        input_id.closest('td').append('<?php echo $input; ?>');
-                        $('input[name="files[<?php echo $value['insert_id']; ?>]"]').attr("id","file-"+input_id.attr("data-current-id"));
+                        ?>
+                        input_obj.val('');
+                        input_obj.closest('td').append('<?php echo $input; ?>');
+                        $('input[name="files[<?php echo $value['insert_id']; ?>]"]').attr("id","file-"+input_obj.attr("data-current-id"));
                         label_obj.html('Edit');
-                        label_obj.attr("class","btn btn-primary");
-                        textarea_obj=input_id.closest('tr').find('td').eq(2).find('textarea');
-                        textarea_obj.attr('name','remarks_old['+<?php echo $value['insert_id']; ?>+']');
+                        date_entry_obj.attr('name','date_entry_old['+<?php echo $value['insert_id']; ?>+']');
+                        remarks_obj.attr('name','remarks_old['+<?php echo $value['insert_id']; ?>+']');
                         <?php
                     }
-                    else
+                    elseif($CI->is_edit)
                     {
-                        ?>input_id.closest('tr').remove();<?php
+                        $input='<input name="files['.$value['insert_id'].']" value="" type="hidden">';
+                        ?>
+                        input_obj.val('');
+                        input_obj.closest('td').append('<?php echo $input; ?>');
+                        $('input[name="files[<?php echo $value['insert_id']; ?>]"]').attr("id","file-"+input_obj.attr("data-current-id"));
+                        label_obj.html('Edit');
+                        date_entry_obj.attr('name','date_entry_old['+<?php echo $value['insert_id']; ?>+']');
+                        remarks_obj.attr('name','remarks_old['+<?php echo $value['insert_id']; ?>+']');
+                        delete_obj.remove();
+                        <?php
                     }
-                    ?>
-                    <?php
+                    elseif($CI->is_delete)
+                    {
+                        ?>
+                        input_obj.closest('td').append('<?php echo $input; ?>');
+                        $('input[name="files[<?php echo $value['insert_id']; ?>]"]').attr("id","file-"+input_obj.attr("data-current-id"));
+                        input_obj.remove();
+                        label_obj.remove();
+                        date_entry_obj.attr("disabled",true);
+                        remarks_obj.attr("disabled",true);
+                        <?php
+                    }
+                    elseif($CI->is_add)
+                    {
+                        ?>
+                        input_obj.remove();
+                        label_obj.remove();
+                        delete_obj.remove();
+                        date_entry_obj.attr("disabled",true);
+                        remarks_obj.attr("disabled",true);
+                        <?php
+                    }
                 }
                 else
                 {

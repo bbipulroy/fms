@@ -2,11 +2,11 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 $CI= & get_instance();
 $action_data=array();
-if(isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))
+if($CI->is_add || $CI->is_edit || $CI->is_delete)
 {
     $action_data['action_edit']=site_url($CI->controller_url.'/index/edit');
 }
-if(isset($CI->permissions['action0']) && ($CI->permissions['action0']==1))
+if($CI->is_view)
 {
     $action_data['action_details']=site_url($CI->controller_url.'/index/details');
 }

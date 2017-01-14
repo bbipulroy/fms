@@ -1,11 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-$CI = & get_instance();
+$CI= & get_instance();
 $action_data=array();
-$action_data['action_refresh']=site_url($CI->controller_url);
+$action_data['action_back']=site_url($CI->controller_url);
+$action_data['action_refresh']=site_url($CI->controller_url.'/index/edit/'.$items['id']);
 $action_data['action_save']='#save_form';
-$action_data['action_save_new']='#save_form';
-//$action_data['action_clear']='#save_form';
 $CI->load->view('action_buttons',$action_data);
 ?>
 <form class="form_valid" id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
@@ -14,101 +13,187 @@ $CI->load->view('action_buttons',$action_data);
     <div class="row widget">
         <div class="widget-header">
             <div class="title">
-                <?php echo $title; ?>
+                Entry pages in <?php echo $items['name']; ?>
             </div>
             <div class="clearfix"></div>
         </div>
 
-        <div style="" class="row show-grid">
+        <div class="row show-grid">
             <div class="col-xs-4">
-                <label for="id_category" class="control-label pull-right">
-                    <?php echo $CI->lang->line('LABEL_FILE_CATEGORY');?>
-                    <span style="color:#FF0000">*</span>
-                </label>
+                <label class="control-label pull-right">File Name:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_category" name="items[id_category]" class="form-control" tabindex="-1">
-                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
-                    <?php
-                    foreach($categories as $category)
-                    {?>
-                        <option value="<?php echo $category['value']?>" <?php if($category['value']==$items['id_category']){ echo 'selected';}?>><?php echo $category['text'];?></option>
-                    <?php
-                    }
-                    ?>
-                </select>
+                <label><?php echo $items['name'] ?></label>
             </div>
         </div>
-
-        <div style="<?php if(!($items['id_class']>0)){echo 'display:none';} ?>" class="row show-grid" id="class_container">
+        <div class="row show-grid">
             <div class="col-xs-4">
-                <label for="id_class" class="control-label pull-right">
-                    <?php echo $CI->lang->line('LABEL_FILE_CLASS');?>
-                    <span style="color:#FF0000">*</span></label>
+                <label class="control-label pull-right">File Category:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_class" name="items[id_class]" class="form-control" tabindex="-1">
-                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
-                    <?php
-                    foreach($classes as $class)
-                    {?>
-                        <option value="<?php echo $class['value']?>" <?php if($class['value']==$items['id_class']){ echo 'selected';}?>><?php echo $class['text'];?></option>
-                    <?php
-                    }
-                    ?>
-                </select>
+                <label><?php echo $items['category_name'] ?></label>
             </div>
         </div>
-
-        <div style="<?php if(!($items['id_type']>0)){echo 'display:none';} ?>" class="row show-grid" id="type_container">
+        <div class="row show-grid">
             <div class="col-xs-4">
-                <label for="id_type" class="control-label pull-right">
-                    <?php echo $CI->lang->line('LABEL_FILE_TYPE');?>
-                    <span style="color:#FF0000">*</span>
-                </label>
+                <label class="control-label pull-right">File Class:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_type" name="items[id_type]" class="form-control">
-                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
-                    <?php
-                    foreach($types as $type)
-                    {?>
-                        <option value="<?php echo $type['value']?>" <?php if($type['value']==$items['id_type']){echo "selected";}?>><?php echo $type['text'];?></option>
-                    <?php
-                    }
-                    ?>
-                </select>
+                <label><?php echo $items['class_name'] ?></label>
             </div>
         </div>
-
-        <div style="<?php if(!($items['id_name']>0)){echo 'display:none';} ?>" class="row show-grid" id="name_container">
+        <div class="row show-grid">
             <div class="col-xs-4">
-                <label for="id_name" class="control-label pull-right">
-                    <?php echo $CI->lang->line('LABEL_FILE_NAME');?>
-                    <span style="color:#FF0000">*</span>
-                </label>
+                <label class="control-label pull-right">File Type:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_name" name="items[id_name]" class="form-control">
-                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
-                    <?php
-                    foreach($names as $name)
-                    {?>
-                        <option value="<?php echo $name['value']?>" <?php if($name['value']==$items['id_name']){echo "selected";}?>><?php echo $name['text'];?></option>
-                    <?php
-                    }
-                    ?>
-                </select>
+                <label><?php echo $items['type_name'] ?></label>
+            </div>
+        </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Number of Pages:</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label><?php echo $items['file_total'] ?></label>
             </div>
         </div>
 
         <div id="files_container">
+            <div style="overflow-x: auto;" class="row show-grid">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th style="min-width: 250px;">File/Picture</th>
+                        <th style="min-width: 50px;">UPLOAD</th>
+                        <th style="min-width: 50px;">Entry Date</th>
+                        <th style="min-width: 100px;">Remarks</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                        $old_files='';
+                        foreach($stored_files as $index=>$file)
+                        {
+                            $old_files.=$file['id'].',';
+                            $file_url=$CI->config->item('system_upload_folder').'/'.$items['id'].'/'.$file['name'];
+                            $is_image=false;
+                            if(substr($file['mime_type'],0,5)=='image')
+                            {
+                                $is_image=true;
+                            }
+                            ?>
+                            <tr>
+                                <td>
+                                    <div class="preview_container_file" id="preview_container_file_<?php echo $index+1;?>">
+                                        <?php
+                                        if($is_image)
+                                        {
+                                            ?>
+                                            <img style="max-width: 250px;" src="<?php echo base_url($file_url); ?>">
+                                        <?php
+                                        }
+                                        else
+                                        {
+                                            echo $file['name'];
+                                        }
+                                        ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <?php
+                                        if($CI->is_edit)
+                                        {
+                                            ?>
+                                            <input type="file" id="file_<?php echo $index+1; ?>" name="file_<?php echo $index+1; ?>" data-current-id="<?php echo $index+1; ?>" data-preview-container="#preview_container_file_<?php echo $index+1;?>" class="browse_button"><br>
+                                            <?php
+                                        }
+                                        if($CI->is_edit || $CI->is_delete)
+                                        {
+                                            ?><input id="file-<?php echo $index+1; ?>" type="hidden" name="files[<?php echo $file['id']; ?>]" value=""><?php
 
+                                        }
+                                        if($CI->is_delete)
+                                        {
+                                            ?>
+                                            <button type="button" class="btn btn-danger system_button_delete" data-current-id="<?php echo $index+1; ?>"><?php echo $CI->lang->line('DELETE'); ?></button>
+                                            <?php
+                                        }
+                                    ?>
+                                </td>
+                                <td>
+                                    <input type="text" name="date_entry_old[<?php echo $file['id']; ?>]" class="form-control datepicker date_entry" value="<?php echo System_helper::display_date($file['date_entry']); ?>" <?php if(!$CI->is_edit){echo 'disabled';} ?>>
+                                </td>
+                                <td>
+                                    <textarea name="remarks_old[<?php echo $file['id']; ?>]" class="form-control remarks" <?php if(!$CI->is_edit){echo 'disabled';} ?>><?php echo $file['remarks']; ?></textarea>
+                                </td>
+                            </tr>
+                        <?php
+                        }
+                        if($CI->is_edit || $CI->is_delete)
+                        {
+                            if(strlen($old_files)>0)
+                            {
+                                $old_files=substr($old_files,0,-1);
+                            }
+                            $CI->session->set_userdata('active_files',$old_files);
+                        }
+                    ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php
+                if($CI->is_add)
+                {
+                    ?>
+                    <div class="row show-grid">
+                        <div class="col-xs-4"></div>
+                        <div class="col-xs-4">
+                            <button type="button" class="btn btn-warning system_button_add" data-current-id="<?php echo sizeof($stored_files); ?>">
+                                <?php echo $CI->lang->line('LABEL_ADD_MORE'); ?>
+                            </button>
+                            <!--<button id="camera" type="button" class="btn btn-warning">
+                                Camera
+                            </button>
+                            <button id="take-photo" type="button" class="btn btn-warning">
+                                Take Photo
+                            </button>
+                            <button id="camera-close" type="button" class="btn btn-warning">
+                                Camera Off
+                            </button>-->
+                        </div>
+                        <div class="col-xs-4"></div>
+                    </div>
+                    <?php
+                }
+            ?>
         </div>
-
     </div>
     <div class="clearfix"></div>
 </form>
+
+<div id="system_content_add" style="display: none;">
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <div class="preview_container_file">
+                </div>
+            </td>
+            <td>
+                <input type="file" class="browse_button_new"><br>
+                <button type="button" class="btn btn-danger system_button_delete"><?php echo $CI->lang->line('DELETE'); ?></button>
+            </td>
+            <td>
+                <input type="text" class="form-control date_entry" value="<?php echo System_helper::display_date(time()); ?>">
+            </td>
+            <td>
+                <textarea class="form-control remarks"></textarea>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
 <div class="row show-grid">
     <div class="col-xs-12">
@@ -137,155 +222,44 @@ $CI->load->view('action_buttons',$action_data);
     jQuery(document).ready(function()
     {
         $('video').hide();
-        $(document).off("change", "#id_category");
-        $(document).on("change","#id_category",function()
+        $(document).off("click",".system_button_add");
+        $(document).off("click",".system_button_delete");
+        $('.datepicker').datepicker({dateFormat : display_date_format});
+        $('.browse_button').filestyle({input: false,icon: false,buttonText: "Edit",buttonName: "btn-primary"});
+        $(document).on("click", ".system_button_add", function(event)
         {
-            $("#id_class").val("");
-            $("#id_type").val("");
-            $("#id_name").val("");
-            $("#files_container").html('');
-            var id_category=$('#id_category').val();
-            if(id_category>0)
-            {
-                $('#class_container').show();
-                $('#type_container').hide();
-                $('#name_container').hide();
-                $.ajax(
-                {
-                    url: "<?php echo site_url($CI->controller_url.'/index/get_drop_down'); ?>",
-                    type: 'POST',
-                    datatype: "JSON",
-                    data:
-                    {
-                        html_container_id:'#id_class',
-                        file_type:'class',
-                        id:id_category
-                    },
-                    success: function (data, status)
-                    {
+            var current_id=parseInt($('.system_button_add').attr('data-current-id'))+1;
+            $('.system_button_add').attr('data-current-id',current_id);
+            var content_id='#system_content_add table tbody';
 
-                    },
-                    error: function (xhr, desc, err)
-                    {
-                        console.log("error");
-                    }
-                });
-            }
-            else
-            {
-                $('#class_container').hide();
-                $('#type_container').hide();
-                $('#name_container').hide();
-            }
+            $(content_id+' .browse_button_new').attr('data-preview-container','#preview_container_file_'+current_id);
+            $(content_id+' .browse_button_new').attr('name','file_'+current_id);
+            $(content_id+' .browse_button_new').attr('id','file_'+current_id);
+            $(content_id+' .browse_button_new').attr('data-current-id',current_id);
+            $(content_id+' .preview_container_file').attr('id','preview_container_file_'+current_id);
+            $(content_id+' .date_entry').attr('name','date_entry['+current_id+']');
+            $(content_id+' .date_entry').attr('id','date_entry_'+current_id);
+            $(content_id+' .remarks').attr('name','remarks['+current_id+']');
+
+            var html=$(content_id).html();
+            $('#files_container table tbody').append(html);
+
+            $(content_id+' .browse_button_new').removeAttr('name');
+            $(content_id+' .browse_button_new').removeAttr('data-preview-container');
+            $(content_id+' .browse_button_new').removeAttr('id');
+            $(content_id+' .browse_button_new').removeAttr('data-current-id');
+            $(content_id+' .preview_container_file').removeAttr('id');
+            $(content_id+' .date_entry').removeAttr('name');
+            $(content_id+' .date_entry').removeAttr('id');
+            $(content_id+' .remarks').removeAttr('name');
+
+            $('#file_'+current_id).filestyle({input: false,icon: false,buttonText: "Upload",buttonName: "btn-primary"});
+            $('#date_entry_'+current_id).datepicker({dateFormat : display_date_format});
         });
-        $(document).off("change", "#id_class");
-        $(document).on("change","#id_class",function()
+        $(document).on("click", ".system_button_delete", function(event)
         {
-            $("#id_type").val("");
-            $("#id_name").val("");
-            $("#files_container").html('');
-            var id_class=$('#id_class').val();
-            if(id_class>0)
-            {
-                $('#type_container').show();
-                $('#name_container').hide();
-                $.ajax(
-                    {
-                        url: "<?php echo site_url($CI->controller_url.'/index/get_drop_down'); ?>",
-                        type: 'POST',
-                        datatype: "JSON",
-                        data:
-                        {
-                            html_container_id:'#id_type',
-                            file_type:'type',
-                            id:id_class
-                        },
-                        success: function (data, status)
-                        {
-
-                        },
-                        error: function (xhr, desc, err)
-                        {
-                            console.log("error");
-                        }
-                    });
-            }
-            else
-            {
-                $('#type_container').hide();
-                $('#name_container').hide();
-            }
+            $(this).closest('tr').remove();
         });
-        $(document).off("change", "#id_type");
-        $(document).on("change","#id_type",function()
-        {
-            $("#id_name").val("");
-            $("#files_container").html('');
-            var id_type=$('#id_type').val();
-            if(id_type>0)
-            {
-                $('#name_container').show();
-                $.ajax(
-                    {
-                        url: "<?php echo site_url($CI->controller_url.'/index/get_drop_down'); ?>",
-                        type: 'POST',
-                        datatype: "JSON",
-                        data:
-                        {
-                            html_container_id:'#id_name',
-                            file_type:'name',
-                            id:id_type
-                        },
-                        success: function (data, status)
-                        {
-
-                        },
-                        error: function (xhr, desc, err)
-                        {
-                            console.log("error");
-                        }
-                    });
-            }
-            else
-            {
-                $('#name_container').hide();
-            }
-        });
-        $(document).off("change", "#id_name");
-        $(document).on("change","#id_name",function()
-        {
-            $("#files_container").html('');
-            var id_name=$('#id_name').val();
-            $('input[name="id"]').val(id_name);
-            if(id_name>0)
-            {
-                $.ajax(
-                    {
-                        url: "<?php echo site_url($CI->controller_url.'/index/details/'); ?>"+'/'+id_name,
-                        type: 'POST',
-                        datatype: "JSON",
-                        data:
-                        {
-                            html_container_id:'#files_container tbody'
-                        },
-                        success: function (data, status)
-                        {
-                            if(data.status==false)
-                            {
-                                if(data.status==false)
-                                {
-                                    $('#id_name').val("");
-                                }
-                            }
-                        },
-                        error: function (xhr, desc, err)
-                        {
-                            console.log("error");
-                        }
-                    });
-            }
-        });
-
         $(document).on('click','#camera',function()
         {
             if(camera.data('check'))
