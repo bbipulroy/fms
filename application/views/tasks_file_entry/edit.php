@@ -73,10 +73,10 @@ $CI->load->view('action_buttons',$action_data);
                     <tbody>
                     <?php
                         $old_files='';
+                        $location=$CI->config->item('system_image_base_url').$items['id'].'/';
                         foreach($stored_files as $index=>$file)
                         {
                             $old_files.=$file['id'].',';
-                            $file_url=$CI->config->item('system_upload_folder').'/'.$items['id'].'/'.$file['name'];
                             $is_image=false;
                             if(substr($file['mime_type'],0,5)=='image')
                             {
@@ -90,7 +90,7 @@ $CI->load->view('action_buttons',$action_data);
                                         if($is_image)
                                         {
                                             ?>
-                                            <img style="max-width: 250px;" src="<?php echo base_url($file_url); ?>">
+                                            <img style="max-width: 250px;" src="<?php echo $location.$file['name']; ?>">
                                         <?php
                                         }
                                         else
@@ -110,8 +110,9 @@ $CI->load->view('action_buttons',$action_data);
                                         }
                                         if($CI->is_edit || $CI->is_delete)
                                         {
-                                            ?><input id="file-<?php echo $index+1; ?>" type="hidden" name="files[<?php echo $file['id']; ?>]" value=""><?php
-
+                                            ?>
+                                            <input id="file-<?php echo $index+1; ?>" type="hidden" name="files[<?php echo $file['id']; ?>]" value="">
+                                            <?php
                                         }
                                         if($CI->is_delete)
                                         {

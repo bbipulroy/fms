@@ -12,26 +12,6 @@ $CI= & get_instance();
         </div>
 
         <div class="col-xs-6">
-            <!--<div style="" class="row show-grid">
-                <div class="col-xs-6">
-                    <label for="year" class="control-label pull-right">
-                        Year
-                    </label>
-                </div>
-                <div class="col-xs-6">
-                    <select name="items[year]" id="year" class="form-control" tabindex="-1">
-                        <option value=""><?php /*echo $this->lang->line('SELECT');*/?></option>
-                        <?php
-/*                        for($i=date('Y');$i>(date('Y')-6);--$i)
-                        {*/?>
-                            <option value="<?php /*echo $i; */?>" <?php /*if($i==$items['year']){ echo 'selected';}*/?>><?php /*echo $i; */?></option>
-                        <?php
-/*                        }
-                        */?>
-                    </select>
-                </div>
-            </div>-->
-
             <div style="" class="row show-grid">
                 <div class="col-xs-6">
                     <label for="id_category" class="control-label pull-right">
@@ -174,32 +154,49 @@ $CI= & get_instance();
 
             <div style="" class="row show-grid">
                 <div class="col-xs-6">
-                    <input name="items[date_start]" type="text" id="date_start" class="form-control datepicker" value="<?php echo $items['date_start'] ?>" placeholder="Start Date">
+                    <input name="items[date_start_file]" type="text" id="date_start_file" class="form-control datepicker" value="<?php echo $items['date_start_file'] ?>" placeholder="File Entry From Date">
                 </div>
                 <div class="col-xs-6">
-                    <label for="date_start" class="control-label pull-left">
-                        Start Date
+                    <label for="date_start_file" class="control-label pull-left">
+                        File Entry From Date
                     </label>
                 </div>
             </div>
 
             <div style="" class="row show-grid">
                 <div class="col-xs-6">
-                    <input name="items[date_end]" type="text" id="date_end" class="form-control datepicker" value="<?php echo $items['date_end'] ?>" placeholder="End Date">
+                    <input name="items[date_end_file]" type="text" id="date_end_file" class="form-control datepicker" value="<?php echo $items['date_end_file'] ?>" placeholder="File Entry To Date">
                 </div>
                 <div class="col-xs-6">
-                    <label for="date_end" class="control-label pull-left">
-                        End Date
+                    <label for="date_end_file" class="control-label pull-left">
+                        File Entry To Date
+                    </label>
+                </div>
+            </div>
+
+            <div style="" class="row show-grid">
+                <div class="col-xs-6">
+                    <input name="items[date_start_page]" type="text" id="date_start_page" class="form-control datepicker" value="<?php echo $items['date_start_page'] ?>" placeholder="Page Entry From Date">
+                </div>
+                <div class="col-xs-6">
+                    <label for="date_start_page" class="control-label pull-left">
+                        Page Entry From Date
+                    </label>
+                </div>
+            </div>
+
+            <div style="" class="row show-grid">
+                <div class="col-xs-6">
+                    <input name="items[date_end_page]" type="text" id="date_end_page" class="form-control datepicker" value="<?php echo $items['date_end_page'] ?>" placeholder="Page Entry To Date">
+                </div>
+                <div class="col-xs-6">
+                    <label for="date_end_page" class="control-label pull-left">
+                        Page Entry To Date
                     </label>
                 </div>
             </div>
         </div>
 
-        <div class="row show-grid">
-            <div class="col-xs-3"></div>
-            <div class="col-xs-6" id="report_parameters_info"></div>
-            <div class="col-xs-3"></div>
-        </div>
         <div class="row show-grid">
             <div class="col-xs-7"></div>
             <div class="col-xs-5">
@@ -279,11 +276,13 @@ $CI= & get_instance();
         {
             $("#id_class").val("");
             $("#id_type").val("");
+            $("#id_name").val("");
             var id_category=$('#id_category').val();
             if(id_category>0)
             {
                 $('#class_container').show();
                 $('#type_container').hide();
+                $('#name_container').hide();
                 $.ajax(
                 {
                     url: base_url+"common_controller/get_dropdown_with_select",
@@ -310,6 +309,7 @@ $CI= & get_instance();
             {
                 $('#class_container').hide();
                 $('#type_container').hide();
+                $('#name_container').hide();
             }
         });
         $(document).on("change","#id_class",function()

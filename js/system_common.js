@@ -343,15 +343,25 @@ $(document).ready(function()
             console.log('no container');
         }
         //Bipul Roy||start|| for old file delete
-        var html_id="#file-"+$(this).attr('data-current-id');
-        $(html_id).remove();
-        var tr_obj=$(this).closest('tr');
-        var date_entry_obj=tr_obj.find('.date_entry');
-        var remarks_obj=tr_obj.find('.remarks');
-        date_entry_obj.attr("name","date_entry["+$(this).attr('data-current-id')+"]");
-        remarks_obj.attr("name","remarks["+$(this).attr('data-current-id')+"]");
+            var html_id="#file-"+$(this).attr('data-current-id');
+            $(html_id).remove();
+            var tr_obj=$(this).closest('tr');
+            var date_entry_obj=tr_obj.find('.date_entry');
+            var remarks_obj=tr_obj.find('.remarks');
+            date_entry_obj.attr("name","date_entry["+$(this).attr('data-current-id')+"]");
+            remarks_obj.attr("name","remarks["+$(this).attr('data-current-id')+"]");
         //Bipul Roy||end
     });
+    //Bipul Roy Start
+        $(document).on('click','.system_open_pdf_file',function()
+        {
+            alert('open pdf');
+            /*var link=$(this).attr('data-link');
+            var type=$(this).attr('data-type');
+            var text="<object style='width:100%;height:96vh' data='"+link+"' type='"+type+"'></object>";
+            create_window($(window).width(),$(window).height(),text);*/
+        });
+    //Bipul Roy End
     $(document).on("click", "#button_action_print", function(event)
     {
         var jqxgrid_id='#system_jqx_container';

@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-$CI = & get_instance();
+$CI= & get_instance();
 $action_data=array();
 $action_data['action_back']=site_url($CI->controller_url);
 $action_data["action_refresh"]=site_url($CI->controller_url.'/index/details/'.$item_id);

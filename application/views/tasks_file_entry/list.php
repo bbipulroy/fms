@@ -2,14 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 $CI= & get_instance();
 $action_data=array();
-if($CI->is_add || $CI->is_edit || $CI->is_delete)
-{
-    $action_data['action_edit']=site_url($CI->controller_url.'/index/edit');
-}
-if($CI->is_view)
-{
-    $action_data['action_details']=site_url($CI->controller_url.'/index/details');
-}
+$action_data['action_edit']=site_url($CI->controller_url.'/index/edit');
+$action_data['action_details']=site_url($CI->controller_url.'/index/details');
 $action_data['action_refresh']=site_url($CI->controller_url.'/index/list');
 $CI->load->view('action_buttons',$action_data);
 ?>
