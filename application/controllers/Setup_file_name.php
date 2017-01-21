@@ -31,6 +31,10 @@ class Setup_file_name extends Root_Controller
         {
             $this->system_edit($id);
         }
+        elseif($action=='details')
+        {
+            $this->system_details($id);
+        }
         elseif($action=='save')
         {
             $this->system_save();
@@ -171,6 +175,10 @@ class Setup_file_name extends Root_Controller
             $this->json_return($ajax);
         }
     }
+    private function system_details($id)
+    {
+        #
+    }
     private function system_save()
     {
         $id=$this->input->post('id');
@@ -257,12 +265,24 @@ class Setup_file_name extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('n.id,n.name,n.status,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name');
+        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,ui.name employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) number_of_file');
         $this->db->from($this->config->item('table_setup_file_name').' n');
         $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
         $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->join($this->config->item('table_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=ui.department_id');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=ui.office_id');
+        $this->db->join($this->config->item('table_tasks_digital_file').' df','df.id_file_name=n.id','left');
+        $this->db->where('ui.revision',1);
         $this->db->order_by('n.ordering');
-        $this->json_return($this->db->get()->result_array());
+        $this->db->group_by('n.id');
+        $temp=$this->db->get()->result_array();
+        foreach($temp as &$val)
+        {
+            $val['date_start']=System_helper::display_date($val['date_start']);
+        }
+        $this->json_return($temp);
     }
 }

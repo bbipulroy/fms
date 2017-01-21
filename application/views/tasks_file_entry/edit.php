@@ -28,6 +28,30 @@ $CI->load->view('action_buttons',$action_data);
         </div>
         <div class="row show-grid">
             <div class="col-xs-4">
+                <label class="control-label pull-right">Responsible Employee:</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label><?php echo $items['employee_name'] ?></label>
+            </div>
+        </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Hardcopy Location:</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label><?php echo $items['hardcopy_location'] ?></label>
+            </div>
+        </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Opening Date:</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label><?php echo System_helper::display_date($items['date_start']); ?></label>
+            </div>
+        </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
                 <label class="control-label pull-right">File Category:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
@@ -48,6 +72,22 @@ $CI->load->view('action_buttons',$action_data);
             </div>
             <div class="col-sm-4 col-xs-8">
                 <label><?php echo $items['type_name'] ?></label>
+            </div>
+        </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Office:</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label><?php echo $items['office_name'] ?></label>
+            </div>
+        </div>
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label class="control-label pull-right">Department:</label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <label><?php echo $items['department_name'] ?></label>
             </div>
         </div>
         <div class="row show-grid">

@@ -34,7 +34,7 @@ $CI->load->view("action_buttons",$action_data);
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="type_name"><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="office_name">Office</label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="department_name">Department</label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="details_button">Details</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="details_button">Details</label>
             </div>
         </div>
         <?php
@@ -65,7 +65,9 @@ $CI->load->view("action_buttons",$action_data);
                 data:
                 {
                     html_container_id:'#popup_content',
-                    id:id
+                    id:id,
+                    date_from_start_page: $('#date_from_start_page').val(),
+                    date_to_start_page: $('#date_to_start_page').val()
                 },
                 success: function (data, status)
                 {
@@ -140,7 +142,7 @@ $CI->load->view("action_buttons",$action_data);
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',pinned:true,rendered: tooltiprenderer,filtertype:'list'},
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',pinned:true,rendered: tooltiprenderer,filtertype:'list'},
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',pinned:true,rendered: tooltiprenderer,filtertype:'list'},
-                { text: 'Office', dataField: 'office_name',pinned:true,rendered: tooltiprenderer,filtertype:'list'},
+                { text: 'Office', dataField: 'office_name',pinned:false,rendered: tooltiprenderer,filtertype:'list'},
                 { text: 'Department', dataField: 'department_name',pinned:true,rendered: tooltiprenderer,filtertype:'list'},
                 { text: 'Details', dataField: 'details_button',cellsrenderer:cellsrenderer}
             ]

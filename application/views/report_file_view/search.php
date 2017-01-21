@@ -154,10 +154,10 @@ $CI= & get_instance();
 
             <div style="" class="row show-grid">
                 <div class="col-xs-6">
-                    <input name="items[date_start_file]" type="text" id="date_start_file" class="form-control datepicker" value="<?php echo $items['date_start_file'] ?>" placeholder="File Entry From Date">
+                    <input name="items[date_from_start_file]" type="text" id="date_from_start_file" class="form-control datepicker" value="<?php echo $items['date_from_start_file'] ?>" placeholder="File Entry From Date">
                 </div>
                 <div class="col-xs-6">
-                    <label for="date_start_file" class="control-label pull-left">
+                    <label for="date_from_start_file" class="control-label pull-left">
                         File Entry From Date
                     </label>
                 </div>
@@ -165,10 +165,10 @@ $CI= & get_instance();
 
             <div style="" class="row show-grid">
                 <div class="col-xs-6">
-                    <input name="items[date_end_file]" type="text" id="date_end_file" class="form-control datepicker" value="<?php echo $items['date_end_file'] ?>" placeholder="File Entry To Date">
+                    <input name="items[date_to_start_file]" type="text" id="date_to_start_file" class="form-control datepicker" value="<?php echo $items['date_to_start_file'] ?>" placeholder="File Entry To Date">
                 </div>
                 <div class="col-xs-6">
-                    <label for="date_end_file" class="control-label pull-left">
+                    <label for="date_to_start_file" class="control-label pull-left">
                         File Entry To Date
                     </label>
                 </div>
@@ -176,10 +176,10 @@ $CI= & get_instance();
 
             <div style="" class="row show-grid">
                 <div class="col-xs-6">
-                    <input name="items[date_start_page]" type="text" id="date_start_page" class="form-control datepicker" value="<?php echo $items['date_start_page'] ?>" placeholder="Page Entry From Date">
+                    <input name="items[date_from_start_page]" type="text" id="date_from_start_page" class="form-control datepicker" value="<?php echo $items['date_from_start_page'] ?>" placeholder="Page Entry From Date">
                 </div>
                 <div class="col-xs-6">
-                    <label for="date_start_page" class="control-label pull-left">
+                    <label for="date_from_start_page" class="control-label pull-left">
                         Page Entry From Date
                     </label>
                 </div>
@@ -187,10 +187,10 @@ $CI= & get_instance();
 
             <div style="" class="row show-grid">
                 <div class="col-xs-6">
-                    <input name="items[date_end_page]" type="text" id="date_end_page" class="form-control datepicker" value="<?php echo $items['date_end_page'] ?>" placeholder="Page Entry To Date">
+                    <input name="items[date_to_start_page]" type="text" id="date_to_start_page" class="form-control datepicker" value="<?php echo $items['date_to_start_page'] ?>" placeholder="Page Entry To Date">
                 </div>
                 <div class="col-xs-6">
-                    <label for="date_end_page" class="control-label pull-left">
+                    <label for="date_to_start_page" class="control-label pull-left">
                         Page Entry To Date
                     </label>
                 </div>

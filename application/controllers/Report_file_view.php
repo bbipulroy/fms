@@ -47,10 +47,10 @@ class Report_file_view extends Root_Controller
                 'id_class'=>'',
                 'id_type'=>'',
                 'id_name'=>'',
-                'date_start_file'=>'',
-                'date_end_file'=>'',
-                'date_start_page'=>'',
-                'date_end_page'=>'',
+                'date_from_start_file'=>'',
+                'date_to_start_file'=>'',
+                'date_from_start_page'=>'',
+                'date_to_start_page'=>'',
                 'id_office'=>'',
                 'id_department'=>'',
                 'employee_responsible'=>''
@@ -94,7 +94,7 @@ class Report_file_view extends Root_Controller
             if($items['id_name']>0)
             {
                 $data=array();
-                $this->get_data($data,$items['id_name']);
+                $this->get_data($data,$items['id_name'],System_helper::get_time($items['date_from_start_page']),System_helper::get_time($items['date_to_start_page']));
                 $ajax['system_content'][]=array('id'=>'#system_report_container','html'=>$this->load->view($this->controller_url.'/details',$data,true));
             }
             else
@@ -127,8 +127,10 @@ class Report_file_view extends Root_Controller
     {
         $id=$this->input->post('id');
         $html_id=$this->input->post('html_container_id');
+        $date_from_start_page=System_helper::get_time($this->input->post('date_from_start_page'));
+        $date_to_start_page=System_helper::get_time($this->input->post('date_to_start_page'));
         $data=array();
-        $this->get_data($data,$id);
+        $this->get_data($data,$id,$date_from_start_page,$date_to_start_page);
         $ajax['system_content'][]=array('id'=>$html_id,'html'=>$this->load->view($this->controller_url.'/details',$data,true));
         if($this->message)
         {
@@ -137,7 +139,7 @@ class Report_file_view extends Root_Controller
         $ajax['status']=true;
         $this->json_return($ajax);
     }
-    private function get_data(&$data,$id_file_name)
+    private function get_data(&$data,$id_file_name,$date_from_start_page,$date_to_start_page)
     {
         $this->db->select('n.id,n.name,t.name type_name,cls.name class_name,ctg.name category_name,COUNT(df.id) file_total');
         $this->db->from($this->config->item('table_setup_file_name').' n');
@@ -154,6 +156,7 @@ class Report_file_view extends Root_Controller
         $this->db->from($this->config->item('table_tasks_digital_file'));
         $this->db->where('id_file_name',$id_file_name);
         $this->db->where('status',$this->config->item('system_status_active'));
+        $this->add_extra_query($date_from_start_page,$date_to_start_page,'date_entry');
         $data['files_info']=$this->db->get()->result_array();
     }
     private function system_get_items()
@@ -165,8 +168,8 @@ class Report_file_view extends Root_Controller
         $employee_responsible=$this->input->post('employee_responsible');
         $id_department=$this->input->post('id_department');
         $id_office=$this->input->post('id_office');
-        $date_start=$this->input->post('date_start');
-        $date_end=$this->input->post('date_end');
+        $date_from_start_file=$this->input->post('date_from_start_file');
+        $date_to_start_file=$this->input->post('date_to_start_file');
 
         $this->db->select('n.id,n.name,n.date_start,t.name type_name,cls.name class_name,ctg.name category_name,ui.name employee_name,d.name department_name,o.name office_name');
         $this->db->from($this->config->item('table_setup_file_name').' n');
@@ -205,7 +208,7 @@ class Report_file_view extends Root_Controller
             $where_in='SELECT user_id FROM '.$this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' WHERE office_id='.$id_office;
             $this->db->where_in('n.employee_responsible',$where_in,false);
         }
-        $this->add_extra_query(System_helper::get_time($date_start),System_helper::get_time($date_end),'n.date_start');
+        $this->add_extra_query(System_helper::get_time($date_from_start_file),System_helper::get_time($date_to_start_file),'n.date_start');
         $temp=$this->db->get()->result_array();
         foreach($temp as &$value)
         {

@@ -68,7 +68,7 @@ $CI= & get_instance();
             echo '<tr><td>'.$file['name'].'</td>';
             if(substr($file['mime_type'],0,5)=='image')
             {
-                echo '<td><img src="'.$location.$file['name'].'" width="250" height="150"></td>';
+                echo '<td><img src="'.$location.$file['name'].'" style="max-width:250px;max-height:150px"></td>';
             }
             else
             {

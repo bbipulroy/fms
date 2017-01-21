@@ -22,6 +22,30 @@ $CI->load->view('action_buttons',$action_data);
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
+            <label class="control-label pull-right">Responsible Employee:</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label><?php echo $details['employee_name'] ?></label>
+        </div>
+    </div>
+    <div class="row show-grid">
+        <div class="col-xs-4">
+            <label class="control-label pull-right">Hardcopy Location:</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label><?php echo $details['hardcopy_location'] ?></label>
+        </div>
+    </div>
+    <div class="row show-grid">
+        <div class="col-xs-4">
+            <label class="control-label pull-right">Opening Date:</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label><?php echo System_helper::display_date($details['date_start']); ?></label>
+        </div>
+    </div>
+    <div class="row show-grid">
+        <div class="col-xs-4">
             <label class="control-label pull-right">File Category:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
@@ -42,6 +66,22 @@ $CI->load->view('action_buttons',$action_data);
         </div>
         <div class="col-sm-4 col-xs-8">
             <label><?php echo $details['type_name'] ?></label>
+        </div>
+    </div>
+    <div class="row show-grid">
+        <div class="col-xs-4">
+            <label class="control-label pull-right">Office:</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label><?php echo $details['office_name'] ?></label>
+        </div>
+    </div>
+    <div class="row show-grid">
+        <div class="col-xs-4">
+            <label class="control-label pull-right">Department:</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label><?php echo $details['department_name'] ?></label>
         </div>
     </div>
     <div class="row show-grid">
@@ -71,7 +111,7 @@ $CI->load->view('action_buttons',$action_data);
             echo '<tr><td>'.$file['name'].'</td>';
             if(substr($file['mime_type'],0,5)=='image')
             {
-                echo '<td><img src="'.$location.$file['name'].'" width="250" height="150"></td>';
+                echo '<td><img src="'.$location.$file['name'].'" style="max-width: 250px;max-height:150px"></td>';
             }
             else
             {

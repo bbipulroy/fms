@@ -58,16 +58,6 @@ $CI = & get_instance();
             var base_url = "<?php echo site_url(); ?>";
             var display_date_format = "dd-M-yy";
             var SELCET_ONE_ITEM = "<?php echo $CI->lang->line('SELECT_ONE_ITEM'); ?>";
-
-            //Start Bipul Roy
-                var my_window;
-                function create_window(width_size,height_size,text_to_write)
-                {
-                    my_window=window.open("","AR Malik & Co. (Pvt.) Ltd.","width="+width_size+",height="+height_size);
-                    my_window.document.write(text_to_write);
-                }
-            //End Bipul Roy
-
         </script>
         <header class="hidden-print">
 

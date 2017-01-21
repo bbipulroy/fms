@@ -15,6 +15,28 @@ $CI->load->view('action_buttons',$action_data);
         </div>
         <div class="clearfix"></div>
     </div>
+    <?php
+    if(isset($CI->permissions['action6']) && ($CI->permissions['action6']==1))
+    {
+        ?>
+        <div class="col-xs-12" style="margin-bottom: 20px;">
+            <div class="col-xs-12" style="margin-bottom: 20px;">
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="name"><?php echo $CI->lang->line('LABEL_FILE_NAME'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="employee_name">Responsible Employee</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="date_start">Opening Date</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="number_of_file">Number of Page</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="hardcopy_location">Hardcopy Location</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="category_name"><?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="class_name"><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="type_name"><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="office_name">Office</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="department_name">Department</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="ordering">Ordering</label>
+            </div>
+        </div>
+    <?php
+    }
+    ?>
     <div class="col-xs-12" id="system_jqx_container">
 
     </div>
@@ -24,45 +46,63 @@ $CI->load->view('action_buttons',$action_data);
     $(document).ready(function()
     {
         var url="<?php echo site_url($CI->controller_url.'/index/get_items');?>";
-        var source=
+        var source =
         {
-            dataType:"json",
-            dataFields:[
+            dataType: "json",
+            dataFields: [
                 { name: 'id', type: 'int' },
                 { name: 'name', type: 'string' },
-                { name: 'class_name', type: 'string' },
                 { name: 'category_name', type: 'string' },
+                { name: 'class_name', type: 'string' },
                 { name: 'type_name', type: 'string' },
-                { name: 'number_of_file', type: 'string' },
-                { name: 'date_start', type: 'string' }
+                { name: 'ordering', type: 'int' },
+                { name: 'date_start', type: 'string' },
+                { name: 'number_of_file', type: 'int' },
+                { name: 'hardcopy_location', type: 'string' },
+                { name: 'office_name', type: 'string' },
+                { name: 'department_name', type: 'string' },
+                { name: 'employee_name', type: 'string' }
             ],
             id: 'id',
             url: url
         };
+        var tooltiprenderer = function (element) {
+            $(element).jqxTooltip({position: 'mouse', content: $(element).text() });
+        };
 
-        var dataAdapter=new $.jqx.dataAdapter(source);
+        var dataAdapter = new $.jqx.dataAdapter(source);
         // create jqxgrid.
         $("#system_jqx_container").jqxGrid(
             {
                 width: '100%',
+                height:'350px',
                 source: dataAdapter,
+                columnsresize: true,
+                columnsreorder: true,
                 pageable: true,
                 filterable: true,
                 sortable: true,
                 showfilterrow: true,
-                columnsresize: true,
                 pagesize:50,
                 pagesizeoptions: ['20', '50', '100', '200','300','500'],
                 selectionmode: 'singlerow',
                 altrows: true,
-                autoheight: true,
-                columns: [
-                    { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'name',width: '300'},
-                    { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',filtertype: 'list'},
-                    { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',filtertype: 'list'},
-                    { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',filtertype: 'list'},
-                    { text: 'Number of Page', dataField: 'number_of_file',filtertype: 'int',cellsAlign: 'right', width: '80'},
-                    { text: 'Opening Date', dataField: 'date_start',filtertype: 'list',width:'150'}
+                enabletooltips: true,
+                showaggregates: true,
+                showstatusbar: true,
+                rowsheight: 45,
+                columns:[
+                    { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'name',width:'300',pinned:true,rendered: tooltiprenderer},
+                    { text: 'Responsible Employee', dataField: 'employee_name',width:'200',pinned:false,rendered: tooltiprenderer},
+                    { text: 'Opening Date', dataField: 'date_start',width:'100',pinned:false,rendered: tooltiprenderer},
+                    { text: 'Number of Page', dataField: 'number_of_file',width:'60',pinned:false,rendered: tooltiprenderer},
+                    { text: '<?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>', dataField: 'hardcopy_location',width:200,pinned:false,rendered: tooltiprenderer,filtertype:'list'},
+                    { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',width:200,pinned:false,rendered: tooltiprenderer,filtertype:'list'},
+                    { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',width:200,pinned:false,rendered: tooltiprenderer,filtertype:'list'},
+                    { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',width:200,pinned:false,rendered: tooltiprenderer,filtertype:'list'},
+                    { text: 'Office', dataField: 'office_name',width:200,pinned:false,rendered: tooltiprenderer,filtertype:'list'},
+                    { text: 'Department', dataField: 'department_name',width:200,pinned:false,rendered: tooltiprenderer,filtertype:'list'},
+                    { text: 'Ordering', dataField: 'ordering',width:60,pinned:false,rendered: tooltiprenderer}
                 ]
             });
     });
