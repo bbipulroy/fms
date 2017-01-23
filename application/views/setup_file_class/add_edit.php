@@ -8,8 +8,8 @@ $action_data['action_save_new']='#save_form';
 $action_data['action_clear']='#save_form';
 $CI->load->view('action_buttons',$action_data);
 ?>
-<form class="form_valid" id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
-    <input type="hidden" id="id" name="id" value="<?php echo $items['id']; ?>">
+<form id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
+    <input type="hidden" id="id" name="id" value="<?php echo $item['id']; ?>">
     <input type="hidden" id="system_save_new_status" name="system_save_new_status" value="0">
     <div class="row widget">
         <div class="widget-header">
@@ -27,12 +27,12 @@ $CI->load->view('action_buttons',$action_data);
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_category" name="items[id_category]" class="form-control" tabindex="-1">
+                <select id="id_category" name="item[id_category]" class="form-control" tabindex="-1">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
                     foreach($categories as $category)
                     {?>
-                        <option value="<?php echo $category['value']?>" <?php if($category['value']==$items['id_category']){ echo 'selected';}?>><?php echo $category['text'];?></option>
+                        <option value="<?php echo $category['value']?>" <?php if($category['value']==$item['id_category']){ echo 'selected';}?>><?php echo $category['text'];?></option>
                     <?php
                     }
                     ?>
@@ -48,7 +48,7 @@ $CI->load->view('action_buttons',$action_data);
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <input type="text" name="items[name]" id="name" class="form-control" value="<?php echo $items['name'];?>"/>
+                <input type="text" name="item[name]" id="name" class="form-control" value="<?php echo $item['name'];?>"/>
             </div>
         </div>
 
@@ -60,7 +60,7 @@ $CI->load->view('action_buttons',$action_data);
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <input type="text" name="items[ordering]" id="ordering" class="form-control" value="<?php echo $items['ordering'] ?>" >
+                <input type="text" name="item[ordering]" id="ordering" class="form-control" value="<?php echo $item['ordering'] ?>" >
             </div>
         </div>
 
@@ -72,12 +72,15 @@ $CI->load->view('action_buttons',$action_data);
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <textarea name="items[remarks]" id="remarks" class="form-control"><?php echo $items['remarks'] ?></textarea>
+                <textarea name="item[remarks]" id="remarks" class="form-control"><?php echo $item['remarks'] ?></textarea>
             </div>
         </div>
     </div>
     <div class="clearfix"></div>
 </form>
 <script>
-    turn_off_triggers();
+    jQuery(document).ready(function()
+    {
+        $(document).off("click", "#id_category");
+    });
 </script>

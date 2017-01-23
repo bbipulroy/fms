@@ -66,7 +66,7 @@ class Setup_file_type extends Root_Controller
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
             $data['title']='Create New File Type';
-            $data['items']=array
+            $data['item']=array
             (
                 'id'=>0,
                 'name'=>'',
@@ -110,10 +110,10 @@ class Setup_file_type extends Root_Controller
             $this->db->from($this->config->item('table_setup_file_type').' t');
             $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
             $this->db->where('t.id',$item_id);
-            $data['items']=$this->db->get()->row_array();
-            $data['title']='Edit File Type ('.$data['items']['name'].')';
+            $data['item']=$this->db->get()->row_array();
+            $data['title']='Edit File Type ('.$data['item']['name'].')';
             $data['categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
-            $data['classes']=Query_helper::get_info($this->config->item('table_setup_file_class'),array('id value','name text'),array('id_category='.$data['items']['id_category']));
+            $data['classes']=Query_helper::get_info($this->config->item('table_setup_file_class'),array('id value','name text'),array('id_category='.$data['item']['id_category']));
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
@@ -162,7 +162,7 @@ class Setup_file_type extends Root_Controller
         }
         else
         {
-            $data=$this->input->post('items');
+            $data=$this->input->post('item');
             $this->db->trans_start(); //DB Transaction Handle START
             if($id>0)
             {
@@ -201,8 +201,8 @@ class Setup_file_type extends Root_Controller
     private function check_validation()
     {
         $this->load->library('form_validation');
-        $this->form_validation->set_rules('items[name]',$this->lang->line('LABEL_NAME'),'required');
-        $this->form_validation->set_rules('items[id_class]',$this->lang->line('LABEL_FILE_CLASS'),'required');
+        $this->form_validation->set_rules('item[name]',$this->lang->line('LABEL_NAME'),'required');
+        $this->form_validation->set_rules('item[id_class]',$this->lang->line('LABEL_FILE_CLASS'),'required');
         if($this->form_validation->run()==false)
         {
             $this->message=validation_errors();

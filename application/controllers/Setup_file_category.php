@@ -66,7 +66,7 @@ class Setup_file_category extends Root_Controller
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
             $data['title']='Create New File Category';
-            $data['items']=array
+            $data['item']=array
             (
                 'id'=>0,
                 'name'=>'',
@@ -102,8 +102,8 @@ class Setup_file_category extends Root_Controller
             {
                 $item_id=$id;
             }
-            $data['items']=Query_helper::get_info($this->config->item('table_setup_file_category'),'*',array('id ='.$item_id),1);
-            $data['title']='Edit File Category ('.$data['items']['name'].')';
+            $data['item']=Query_helper::get_info($this->config->item('table_setup_file_category'),'*',array('id ='.$item_id),1);
+            $data['title']='Edit File Category ('.$data['item']['name'].')';
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
@@ -152,7 +152,7 @@ class Setup_file_category extends Root_Controller
         }
         else
         {
-            $data=$this->input->post('items');
+            $data=$this->input->post('item');
             $this->db->trans_start(); //DB Transaction Handle START
             if($id>0)
             {
@@ -191,7 +191,7 @@ class Setup_file_category extends Root_Controller
     private function check_validation()
     {
         $this->load->library('form_validation');
-        $this->form_validation->set_rules('items[name]',$this->lang->line('LABEL_NAME'),'required');
+        $this->form_validation->set_rules('item[name]',$this->lang->line('LABEL_NAME'),'required');
         if($this->form_validation->run()==false)
         {
             $this->message=validation_errors();
@@ -201,7 +201,7 @@ class Setup_file_category extends Root_Controller
     }
     private function system_get_items()
     {
-        $items=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
-        $this->json_return($items);
+        $item=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
+        $this->json_return($item);
     }
 }

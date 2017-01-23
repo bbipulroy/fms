@@ -89,7 +89,7 @@ class Tasks_file_entry extends Root_Controller
         {
             if($this->is_add || $this->is_edit || $this->is_delete)
             {
-                $data['items']=$this->edit_details_helper($item_id);
+                $data['item']=$this->edit_details_helper($item_id);
                 $this->session->set_userdata('active_files','');
 
                 $this->db->select('id,name,date_entry,remarks,mime_type');
@@ -97,7 +97,6 @@ class Tasks_file_entry extends Root_Controller
                 $this->db->where('id_file_name',$item_id);
                 $this->db->where('status',$this->config->item('system_status_active'));
                 $data['stored_files']=$this->db->get()->result_array();
-
                 $ajax['system_page_url']=site_url($this->controller_url.'/index/edit/'.$item_id);
                 $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/edit',$data,true));
                 if($this->message)
@@ -174,15 +173,16 @@ class Tasks_file_entry extends Root_Controller
     }
     private function edit_details_helper($file_name_id)
     {
-        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,ui.name employee_name,d.name department_name,o.name office_name,COUNT(df.id) file_total');
+        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,COUNT(df.id) file_total');
         $this->db->from($this->config->item('table_setup_file_name').' n');
         $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
         $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
         $this->db->join($this->config->item('table_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=ui.department_id');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=ui.office_id');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user').' u','ui.user_id=u.id');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=n.id_department','left');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=n.id_office','left');
         $this->db->join($this->config->item('table_tasks_digital_file').' df','df.id_file_name=n.id','left');
         $this->db->where('ui.revision',1);
         $this->db->where('n.id',$file_name_id);
@@ -322,6 +322,7 @@ class Tasks_file_entry extends Root_Controller
                             }
                             $this->session->set_userdata('active_files',$temp_session_active_files);
                             $upload_complete_info['upload_files']=$upload_files;
+                            $upload_complete_info['id']=$id; //use for folder name
                             $ajax['system_content'][]=array('id'=>'#upload-complete-info','html'=>$this->load->view($this->controller_url.'/upload-result',$upload_complete_info,true));
                             $this->json_return($ajax);
                         }
@@ -403,16 +404,17 @@ class Tasks_file_entry extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,ui.name employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) number_of_file');
+        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) number_of_file');
         $this->db->from($this->config->item('table_setup_file_name').' n');
         $this->db->join($this->config->item('table_setup_assign_file_user_group').' fug','n.id=fug.id_file');
         $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
         $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
         $this->db->join($this->config->item('table_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=ui.department_id');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=ui.office_id');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user').' u','ui.user_id=u.id');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=n.id_department','left');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=n.id_office','left');
         $this->db->join($this->config->item('table_tasks_digital_file').' df','df.id_file_name=n.id','left');
         $this->db->where('ui.revision',1);
         $this->db->where('fug.user_group_id',$this->user_group);

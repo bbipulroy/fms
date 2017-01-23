@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-$CI = & get_instance();
+$CI= & get_instance();
 $action_data=array();
 $action_data['action_back']=site_url($CI->controller_url);
 $action_data['action_save']='#save_form';
@@ -8,8 +8,8 @@ $action_data['action_save_new']='#save_form';
 $action_data['action_clear']='#save_form';
 $CI->load->view('action_buttons',$action_data);
 ?>
-<form class="form_valid" id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
-    <input type="hidden" id="id" name="id" value="<?php echo $items['id']; ?>">
+<form id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
+    <input type="hidden" id="id" name="id" value="<?php echo $item['id']; ?>">
     <input type="hidden" id="system_save_new_status" name="system_save_new_status" value="0">
     <div class="row widget">
         <div class="widget-header">
@@ -27,7 +27,7 @@ $CI->load->view('action_buttons',$action_data);
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <input type="text" name="items[name]" id="name" class="form-control" value="<?php echo $items['name'];?>"/>
+                <input type="text" name="item[name]" id="name" class="form-control" value="<?php echo $item['name'];?>"/>
             </div>
         </div>
 
@@ -39,7 +39,7 @@ $CI->load->view('action_buttons',$action_data);
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <input type="text" name="items[ordering]" id="ordering" class="form-control" value="<?php echo $items['ordering'] ?>" >
+                <input type="text" name="item[ordering]" id="ordering" class="form-control" value="<?php echo $item['ordering'] ?>" >
             </div>
         </div>
 
@@ -51,7 +51,7 @@ $CI->load->view('action_buttons',$action_data);
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <textarea name="items[remarks]" id="remarks" class="form-control"><?php echo $items['remarks'] ?></textarea>
+                <textarea name="item[remarks]" id="remarks" class="form-control"><?php echo $item['remarks'] ?></textarea>
             </div>
         </div>
     </div>

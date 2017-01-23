@@ -101,18 +101,6 @@ class Setup_assign_file_user_group extends Root_Controller
             $this->json_return($ajax);
         }
     }
-    /*private function system_get_file_permission_list($id)
-    {
-        $this->db->select('n.*,ctg.name category_name,cls.name class_name,t.name type_name');
-        $this->db->from($this->config->item('table_setup_assign_file_user_group').' fug');
-        $this->db->join($this->config->item('table_setup_file_name').' n','n.id=fug.id_file');
-        $this->db->join($this->config->item('table_setup_file_type').' t','t.id=n.id_type');
-        $this->db->join($this->config->item('table_setup_file_class').' cls','cls.id=t.id_class');
-        $this->db->join($this->config->item('table_setup_file_category').' ctg','ctg.id=cls.id_category');
-        $this->db->where('fug.user_group_id',$id);
-        $this->db->where('fug.status',$this->config->item('system_status_active'));
-        $this->json_return($this->db->get()->result_array());
-    }*/
     private function system_edit($id)
     {
         if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
@@ -181,7 +169,7 @@ class Setup_assign_file_user_group extends Root_Controller
     private function system_save()
     {
         $id=$this->input->post('id');
-        $data=$this->input->post('items');
+        $data=$this->input->post('item');
         $actions=$this->input->post('actions');
         if(!is_array($data))
         {
@@ -345,7 +333,7 @@ class Setup_assign_file_user_group extends Root_Controller
         $this->db->from($this->config->item('table_setup_file_name').' n');
         if($action=='details')
         {
-            $this->db->join($this->config->item('table_setup_assign_file_user_group').' fug','fug.id_file=n.id');
+            $this->db->join($this->config->item('table_setup_assign_file_user_group').' fug','fug.id_file=n.id','left');
         }
         $this->db->join($this->config->item('table_setup_file_type').' t','t.id=n.id_type');
         $this->db->join($this->config->item('table_setup_file_class').' cls','cls.id=t.id_class');
@@ -573,7 +561,7 @@ class Setup_assign_file_user_group extends Root_Controller
                 if($action=='edit')
                 {
                     ?>
-                    <input name="items[<?php echo $file['name_id']; ?>]" id="name-<?php echo $file['name_id']; ?>" type="checkbox" data-id="<?php echo $file['name_id']; ?>" data-type="name" class="all name category_<?php echo $file['category_id']; ?> class_<?php echo $file['class_id']; ?> type_<?php echo $file['type_id']; ?>"<?php echo $name_checked; ?>>
+                    <input name="item[<?php echo $file['name_id']; ?>]" id="name-<?php echo $file['name_id']; ?>" type="checkbox" data-id="<?php echo $file['name_id']; ?>" data-type="name" class="all name category_<?php echo $file['category_id']; ?> class_<?php echo $file['class_id']; ?> type_<?php echo $file['type_id']; ?>"<?php echo $name_checked; ?>>
                     <label for="name-<?php echo $file['name_id']; ?>"><?php echo $file['name_name']; ?></label>
                     <?php
                 }

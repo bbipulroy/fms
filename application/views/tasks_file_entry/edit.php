@@ -3,17 +3,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $CI= & get_instance();
 $action_data=array();
 $action_data['action_back']=site_url($CI->controller_url);
-$action_data['action_refresh']=site_url($CI->controller_url.'/index/edit/'.$items['id']);
+$action_data['action_refresh']=site_url($CI->controller_url.'/index/edit/'.$item['id']);
 $action_data['action_save']='#save_form';
 $CI->load->view('action_buttons',$action_data);
 ?>
-<form class="form_valid" id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
-    <input type="hidden" name="id" value="<?php echo $items['id']; ?>">
+<form id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
+    <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
     <input type="hidden" id="system_save_new_status" name="system_save_new_status" value="0">
     <div class="row widget">
         <div class="widget-header">
             <div class="title">
-                Entry pages in <?php echo $items['name']; ?>
+                Entry pages in <?php echo $item['name']; ?>
             </div>
             <div class="clearfix"></div>
         </div>
@@ -23,7 +23,7 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right">File Name:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label><?php echo $items['name'] ?></label>
+                <label><?php echo $item['name'] ?></label>
             </div>
         </div>
         <div class="row show-grid">
@@ -31,7 +31,7 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right">Responsible Employee:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label><?php echo $items['employee_name'] ?></label>
+                <label><?php echo $item['employee_name'] ?></label>
             </div>
         </div>
         <div class="row show-grid">
@@ -39,7 +39,7 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right">Hardcopy Location:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label><?php echo $items['hardcopy_location'] ?></label>
+                <label><?php echo $item['hardcopy_location'] ?></label>
             </div>
         </div>
         <div class="row show-grid">
@@ -47,7 +47,7 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right">Opening Date:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label><?php echo System_helper::display_date($items['date_start']); ?></label>
+                <label><?php echo System_helper::display_date($item['date_start']); ?></label>
             </div>
         </div>
         <div class="row show-grid">
@@ -55,7 +55,7 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right">File Category:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label><?php echo $items['category_name'] ?></label>
+                <label><?php echo $item['category_name'] ?></label>
             </div>
         </div>
         <div class="row show-grid">
@@ -63,7 +63,7 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right">File Class:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label><?php echo $items['class_name'] ?></label>
+                <label><?php echo $item['class_name'] ?></label>
             </div>
         </div>
         <div class="row show-grid">
@@ -71,7 +71,7 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right">File Type:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label><?php echo $items['type_name'] ?></label>
+                <label><?php echo $item['type_name'] ?></label>
             </div>
         </div>
         <div class="row show-grid">
@@ -79,7 +79,7 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right">Office:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label><?php echo $items['office_name'] ?></label>
+                <label><?php echo $item['office_name'] ?></label>
             </div>
         </div>
         <div class="row show-grid">
@@ -87,7 +87,7 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right">Department:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label><?php echo $items['department_name'] ?></label>
+                <label><?php echo $item['department_name'] ?></label>
             </div>
         </div>
         <div class="row show-grid">
@@ -95,7 +95,7 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right">Number of Pages:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label><?php echo $items['file_total'] ?></label>
+                <label><?php echo $item['file_total'] ?></label>
             </div>
         </div>
 
@@ -113,7 +113,7 @@ $CI->load->view('action_buttons',$action_data);
                     <tbody>
                     <?php
                         $old_files='';
-                        $location=$CI->config->item('system_image_base_url').$items['id'].'/';
+                        $location=$CI->config->item('system_image_base_url').$item['id'].'/';
                         foreach($stored_files as $index=>$file)
                         {
                             $old_files.=$file['id'].',';
@@ -131,11 +131,13 @@ $CI->load->view('action_buttons',$action_data);
                                         {
                                             ?>
                                             <img style="max-width: 250px;" src="<?php echo $location.$file['name']; ?>">
-                                        <?php
+                                            <?php
                                         }
                                         else
                                         {
-                                            echo $file['name'];
+                                            ?>
+                                            <a href="<?php echo $location.$file['name']; ?>" class="external" target="_blank"><?php echo $file['name']; ?></a>
+                                            <?php
                                         }
                                         ?>
                                     </div>
@@ -262,9 +264,10 @@ $CI->load->view('action_buttons',$action_data);
     }
     jQuery(document).ready(function()
     {
-        $('video').hide();
         $(document).off("click",".system_button_add");
         $(document).off("click",".system_button_delete");
+
+        $('video').hide();
         $('.datepicker').datepicker({dateFormat : display_date_format});
         $('.browse_button').filestyle({input: false,icon: false,buttonText: "Edit",buttonName: "btn-primary"});
         $(document).on("click", ".system_button_add", function(event)

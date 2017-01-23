@@ -13,7 +13,7 @@ $CI->load->view('action_buttons',$action_data);
 if($action=='edit')
 {
     ?>
-    <form class="form_valid" id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
+    <form id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
         <input type="hidden" id="id" name="id" value="<?php echo $item_id; ?>">
     <?php
 }

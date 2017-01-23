@@ -41,7 +41,7 @@ class Report_file_view extends Root_Controller
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
             $data['title']='Report View';
-            $data['items']=array
+            $data['item']=array
             (
                 'id_category'=>'',
                 'id_class'=>'',
@@ -90,18 +90,18 @@ class Report_file_view extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $items=$this->input->post('items');
-            if($items['id_name']>0)
+            $item=$this->input->post('item');
+            if($item['id_name']>0)
             {
                 $data=array();
-                $this->get_data($data,$items['id_name'],System_helper::get_time($items['date_from_start_page']),System_helper::get_time($items['date_to_start_page']));
+                $this->get_data($data,$item['id_name'],System_helper::get_time($item['date_from_start_page']),System_helper::get_time($item['date_to_start_page']));
                 $ajax['system_content'][]=array('id'=>'#system_report_container','html'=>$this->load->view($this->controller_url.'/details',$data,true));
             }
             else
             {
                 $data['title']='Report for '.$this->lang->line('LABEL_FILE_NAME').' List';
                 $ajax_post='';
-                foreach($items as $key=>$val)
+                foreach($item as $key=>$val)
                 {
                     $ajax_post.=$key.':"'.$val.'",';
                 }
@@ -129,6 +129,7 @@ class Report_file_view extends Root_Controller
         $html_id=$this->input->post('html_container_id');
         $date_from_start_page=System_helper::get_time($this->input->post('date_from_start_page'));
         $date_to_start_page=System_helper::get_time($this->input->post('date_to_start_page'));
+
         $data=array();
         $this->get_data($data,$id,$date_from_start_page,$date_to_start_page);
         $ajax['system_content'][]=array('id'=>$html_id,'html'=>$this->load->view($this->controller_url.'/details',$data,true));
@@ -141,12 +142,18 @@ class Report_file_view extends Root_Controller
     }
     private function get_data(&$data,$id_file_name,$date_from_start_page,$date_to_start_page)
     {
-        $this->db->select('n.id,n.name,t.name type_name,cls.name class_name,ctg.name category_name,COUNT(df.id) file_total');
+        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,COUNT(df.id) file_total');
         $this->db->from($this->config->item('table_setup_file_name').' n');
-        $this->db->join($this->config->item('table_setup_file_type').' t','t.id=n.id_type');
-        $this->db->join($this->config->item('table_setup_file_class').' cls','cls.id=t.id_class');
-        $this->db->join($this->config->item('table_setup_file_category').' ctg','ctg.id=cls.id_category');
+        $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
+        $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
+        $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->join($this->config->item('table_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user').' u','ui.user_id=u.id');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=n.id_department','left');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=n.id_office','left');
         $this->db->join($this->config->item('table_tasks_digital_file').' df','df.id_file_name=n.id','left');
+        $this->db->where('ui.revision',1);
         $this->db->where('n.id',$id_file_name);
         $this->db->where('n.status',$this->config->item('system_status_active'));
         $this->db->where('df.status',$this->config->item('system_status_active'));
@@ -171,14 +178,16 @@ class Report_file_view extends Root_Controller
         $date_from_start_file=$this->input->post('date_from_start_file');
         $date_to_start_file=$this->input->post('date_to_start_file');
 
-        $this->db->select('n.id,n.name,n.date_start,t.name type_name,cls.name class_name,ctg.name category_name,ui.name employee_name,d.name department_name,o.name office_name');
+        $this->db->select('n.id,n.name,n.date_start,n.ordering,hl.name hardcopy_location,t.name type_name,cls.name class_name,ctg.name category_name,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name');
         $this->db->from($this->config->item('table_setup_file_name').' n');
+        $this->db->from($this->config->item('table_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
         $this->db->join($this->config->item('table_setup_file_type').' t','t.id=n.id_type');
         $this->db->join($this->config->item('table_setup_file_class').' cls','cls.id=t.id_class');
         $this->db->join($this->config->item('table_setup_file_category').' ctg','ctg.id=cls.id_category');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=ui.department_id');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=ui.office_id');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user').' u','ui.user_id=u.id');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=n.id_department','left');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=n.id_office','left');
         $this->db->where('ui.revision',1);
         if($id_type>0)
         {
@@ -198,17 +207,24 @@ class Report_file_view extends Root_Controller
         {
             $this->db->where('n.employee_responsible',$employee_responsible);
         }
-        elseif($id_department>0)
+        else
         {
-            $where_in='SELECT user_id FROM '.$this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' WHERE department_id='.$id_department;
-            $this->db->where_in('n.employee_responsible',$where_in,false);
-        }
-        elseif($id_office>0)
-        {
-            $where_in='SELECT user_id FROM '.$this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' WHERE office_id='.$id_office;
-            $this->db->where_in('n.employee_responsible',$where_in,false);
+            if($id_department>0)
+            {
+                $this->db->where('n.id_department',$id_department);
+            }
+            if($id_office>0 && $id_department>0)
+            {
+                $this->db->or_where('n.id_office',$id_office);
+            }
+            elseif($id_office>0)
+            {
+                $this->db->where('n.id_office',$id_office);
+            }
         }
         $this->add_extra_query(System_helper::get_time($date_from_start_file),System_helper::get_time($date_to_start_file),'n.date_start');
+        $this->db->group_by('n.id');
+        $this->db->order_by('n.ordering');
         $temp=$this->db->get()->result_array();
         foreach($temp as &$value)
         {

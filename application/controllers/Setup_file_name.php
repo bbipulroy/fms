@@ -70,7 +70,7 @@ class Setup_file_name extends Root_Controller
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
             $data['title']='Create New File Name';
-            $data['items']=array
+            $data['item']=array
             (
                 'id'=>0,
                 'name'=>'',
@@ -134,12 +134,12 @@ class Setup_file_name extends Root_Controller
             $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
             $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
             $this->db->where('n.id',$item_id);
-            $data['items']=$this->db->get()->row_array();
-            $data['items']['date_start']=System_helper::display_date($data['items']['date_start']);
-            $data['title']='Edit File Name ('.$data['items']['name'].')';
+            $data['item']=$this->db->get()->row_array();
+            $data['item']['date_start']=System_helper::display_date($data['item']['date_start']);
+            $data['title']='Edit File Name ('.$data['item']['name'].')';
             $data['categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
-            $data['classes']=Query_helper::get_info($this->config->item('table_setup_file_class'),array('id value','name text'),array('id_category='.$data['items']['id_category']));
-            $data['types']=Query_helper::get_info($this->config->item('table_setup_file_type'),array('id value','name text'),array('id_class='.$data['items']['id_class']));
+            $data['classes']=Query_helper::get_info($this->config->item('table_setup_file_class'),array('id value','name text'),array('id_category='.$data['item']['id_category']));
+            $data['types']=Query_helper::get_info($this->config->item('table_setup_file_type'),array('id value','name text'),array('id_class='.$data['item']['id_class']));
             $data['hc_locations']=Query_helper::get_info($this->config->item('table_setup_file_hc_location'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
 
             $LOGIN=$this->load->database('armalik_login',true);
@@ -156,9 +156,10 @@ class Setup_file_name extends Root_Controller
             $LOGIN->join($this->config->item('table_setup_user_info').' ui','u.id=ui.user_id');
             $LOGIN->where('u.status',$this->config->item('system_status_active'));
             $LOGIN->where('ui.revision',1);
-            $LOGIN->where('ui.department_id',$data['items']['id_department']);
+            $LOGIN->where('ui.department_id',$data['item']['id_department']);
+            $LOGIN->or_where('ui.office_id',$data['item']['id_office']);
+            $LOGIN->group_by('u.id');
             $data['employees']=$LOGIN->get()->result_array();
-            #print_r($data['employees']);die();
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
@@ -174,10 +175,6 @@ class Setup_file_name extends Root_Controller
             $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
             $this->json_return($ajax);
         }
-    }
-    private function system_details($id)
-    {
-        #
     }
     private function system_save()
     {
@@ -211,7 +208,7 @@ class Setup_file_name extends Root_Controller
         }
         else
         {
-            $data=$this->input->post('items');
+            $data=$this->input->post('item');
             $data['date_start']=System_helper::get_time($data['date_start']);
             $this->db->trans_start(); //DB Transaction Handle START
             if($id>0)
@@ -251,11 +248,11 @@ class Setup_file_name extends Root_Controller
     private function check_validation()
     {
         $this->load->library('form_validation');
-        $this->form_validation->set_rules('items[name]',$this->lang->line('LABEL_NAME'),'required');
-        $this->form_validation->set_rules('items[id_type]',$this->lang->line('LABEL_FILE_TYPE'),'required');
-        $this->form_validation->set_rules('items[id_hc_location]',$this->lang->line('LABEL_HC_LOCATION'),'required');
-        $this->form_validation->set_rules('items[date_start]','Start Date','required');
-        $this->form_validation->set_rules('items[employee_responsible]','Responsible Employee','required');
+        $this->form_validation->set_rules('item[name]',$this->lang->line('LABEL_NAME'),'required');
+        $this->form_validation->set_rules('item[id_type]',$this->lang->line('LABEL_FILE_TYPE'),'required');
+        $this->form_validation->set_rules('item[id_hc_location]',$this->lang->line('LABEL_HC_LOCATION'),'required');
+        $this->form_validation->set_rules('item[date_start]','Start Date','required');
+        $this->form_validation->set_rules('item[employee_responsible]','Responsible Employee','required');
         if($this->form_validation->run()==false)
         {
             $this->message=validation_errors();
@@ -265,15 +262,16 @@ class Setup_file_name extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,ui.name employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) number_of_file');
+        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) number_of_file');
         $this->db->from($this->config->item('table_setup_file_name').' n');
         $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
         $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
         $this->db->join($this->config->item('table_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=ui.department_id');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=ui.office_id');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user').' u','ui.user_id=u.id');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=n.id_department','left');
+        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=n.id_office','left');
         $this->db->join($this->config->item('table_tasks_digital_file').' df','df.id_file_name=n.id','left');
         $this->db->where('ui.revision',1);
         $this->db->order_by('n.ordering');

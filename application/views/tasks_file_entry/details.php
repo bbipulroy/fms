@@ -108,10 +108,15 @@ $CI->load->view('action_buttons',$action_data);
         $location=$this->config->item('system_image_base_url').$details['id'].'/';
         foreach($files_info as $file)
         {
-            echo '<tr><td>'.$file['name'].'</td>';
+            ?>
+            <tr>
+                <td><?php echo $file['name']; ?></td>
+            <?php
             if(substr($file['mime_type'],0,5)=='image')
             {
-                echo '<td><img src="'.$location.$file['name'].'" style="max-width: 250px;max-height:150px"></td>';
+                ?>
+                <td><img src="<?php echo $location.$file['name']; ?>" style="max-width: 250px;max-height:150px"></td>
+                <?php
             }
             else
             {
@@ -131,6 +136,7 @@ $CI->load->view('action_buttons',$action_data);
             ?>
             <td><?php echo System_helper::display_date($file['date_entry']); ?></td>
             <td><?php echo $file['remarks']; ?></td>
+            </tr>
             <?php
         }
         ?>
