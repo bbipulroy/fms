@@ -142,7 +142,7 @@ class Report_file_view extends Root_Controller
     }
     private function get_data(&$data,$id_file_name,$date_from_start_page,$date_to_start_page)
     {
-        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,COUNT(df.id) file_total');
+        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) file_total');
         $this->db->from($this->config->item('table_setup_file_name').' n');
         $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
@@ -156,7 +156,6 @@ class Report_file_view extends Root_Controller
         $this->db->where('ui.revision',1);
         $this->db->where('n.id',$id_file_name);
         $this->db->where('n.status',$this->config->item('system_status_active'));
-        $this->db->where('df.status',$this->config->item('system_status_active'));
         $data['details']=$this->db->get()->row_array();
 
         $this->db->select('name,date_entry,remarks,mime_type');
@@ -203,24 +202,37 @@ class Report_file_view extends Root_Controller
             $where_in='SELECT id FROM '.$this->config->item('table_setup_file_type').' WHERE id_class IN (SELECT id FROM '.$this->config->item('table_setup_file_class').' WHERE id_category='.$id_category.')';
             $this->db->where_in('n.id_type',$where_in,false);
         }
-        if($employee_responsible>0)
+        if($id_office>0 && $id_department>0 && $employee_responsible>0)
+        {
+            $where='(n.id_office='.$id_office.' OR '.'n.id_department='.$id_department.' OR '.'n.employee_responsible='.$employee_responsible.')';
+            $this->db->where($where,'',false);
+        }
+        elseif($id_office>0 && $id_department>0)
+        {
+            $where='(n.id_office='.$id_office.' OR '.'n.id_department='.$id_department.')';
+            $this->db->where($where,'',false);
+        }
+        elseif($id_office>0 && $employee_responsible>0)
+        {
+            $where='(n.id_office='.$id_office.' OR '.'n.employee_responsible='.$employee_responsible.')';
+            $this->db->where($where,'',false);
+        }
+        elseif($id_department>0 && $employee_responsible>0)
+        {
+            $where='(n.id_department='.$id_department.' OR '.'n.employee_responsible='.$employee_responsible.')';
+            $this->db->where($where,'',false);
+        }
+        elseif($id_office>0)
+        {
+            $this->db->where('n.id_office',$id_office);
+        }
+        elseif($id_department>0)
+        {
+            $this->db->where('n.id_department',$id_department);
+        }
+        elseif($employee_responsible>0)
         {
             $this->db->where('n.employee_responsible',$employee_responsible);
-        }
-        else
-        {
-            if($id_department>0)
-            {
-                $this->db->where('n.id_department',$id_department);
-            }
-            if($id_office>0 && $id_department>0)
-            {
-                $this->db->or_where('n.id_office',$id_office);
-            }
-            elseif($id_office>0)
-            {
-                $this->db->where('n.id_office',$id_office);
-            }
         }
         $this->add_extra_query(System_helper::get_time($date_from_start_file),System_helper::get_time($date_to_start_file),'n.date_start');
         $this->db->group_by('n.id');
@@ -230,7 +242,7 @@ class Report_file_view extends Root_Controller
         {
             $value['date_start']=System_helper::display_date($value['date_start']);
         }
-        $this->jsonReturn($temp);
+        $this->json_return($temp);
     }
     private function add_extra_query($start,$end,$field)
     {

@@ -58,7 +58,7 @@ class Tasks_file_entry extends Root_Controller
     {
         if($this->is_view)
         {
-            $data['title']='Permitted Files List';
+            $data['title']='Permitted Files List for File Entry';
             $ajax['system_page_url']=site_url($this->controller_url.'/index/list');
             $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
@@ -173,7 +173,7 @@ class Tasks_file_entry extends Root_Controller
     }
     private function edit_details_helper($file_name_id)
     {
-        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,COUNT(df.id) file_total');
+        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) file_total');
         $this->db->from($this->config->item('table_setup_file_name').' n');
         $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
@@ -187,7 +187,6 @@ class Tasks_file_entry extends Root_Controller
         $this->db->where('ui.revision',1);
         $this->db->where('n.id',$file_name_id);
         $this->db->where('n.status',$this->config->item('system_status_active'));
-        $this->db->where('df.status',$this->config->item('system_status_active'));
         return $this->db->get()->row_array();
     }
     private function system_save()
@@ -234,15 +233,17 @@ class Tasks_file_entry extends Root_Controller
                         foreach($date_entry_old as $row_key=>$row_value)
                         {
                             $update_data['date_entry']=System_helper::get_time($row_value);
-                            $this->db->where('id',$row_key);
-                            $this->db->update($this->config->item('table_tasks_digital_file'),$update_data);
+                            #$this->db->where('id',$row_key);
+                            #$this->db->update($this->config->item('table_tasks_digital_file'),$update_data);
+                            Query_helper::update($this->config->item('table_tasks_digital_file'),$update_data,array('id='.$row_key));
                         }
                         $update_data=array();
                         foreach($remarks_old as $row_key=>$row_value)
                         {
                             $update_data['remarks']=$row_value;
-                            $this->db->where('id',$row_key);
-                            $this->db->update($this->config->item('table_tasks_digital_file'),$update_data);
+                            #$this->db->where('id',$row_key);
+                            #$this->db->update($this->config->item('table_tasks_digital_file'),$update_data);
+                            Query_helper::update($this->config->item('table_tasks_digital_file'),$update_data,array('id='.$row_key));
                         }
                     }
                     $temp_session_active_files=$this->session->userdata('active_files');
@@ -277,8 +278,9 @@ class Tasks_file_entry extends Root_Controller
                                     $update_delete_data['user_updated']=$this->user_id;
                                     $update_delete_data['date_updated']=$time;
                                     $update_delete_data['status']=$this->config->item('system_status_delete');
-                                    $this->db->where('id',$af);
-                                    $this->db->update($this->config->item('table_tasks_digital_file'),$update_delete_data);
+                                    #$this->db->where('id',$af);
+                                    #$this->db->update($this->config->item('table_tasks_digital_file'),$update_delete_data);
+                                    Query_helper::update($this->config->item('table_tasks_digital_file'),$update_delete_data,array('id='.$af));
                                 }
                             }
                         }
@@ -302,7 +304,7 @@ class Tasks_file_entry extends Root_Controller
                                 $upload_file_data['mime_type']=$value['info']['file_type'];
                                 $upload_file_data['name']=$value['info']['file_name'];
                                 $upload_files[$key]['insert_id']=Query_helper::add($this->config->item('table_tasks_digital_file'),$upload_file_data);
-                                if($this->is_edit)
+                                if($this->is_edit || $this->is_delete)
                                 {
                                     $temp_session_active_files.=','.$upload_files[$key]['insert_id'];
                                 }

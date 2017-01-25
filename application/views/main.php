@@ -55,7 +55,7 @@ $CI = & get_instance();
 
         <!--    for jqx grid end-->
         <script type="text/javascript">
-            var base_url = "<?php echo site_url(); ?>";
+            var base_url = "<?php echo base_url(); ?>";
             var display_date_format = "dd-M-yy";
             var SELCET_ONE_ITEM = "<?php echo $CI->lang->line('SELECT_ONE_ITEM'); ?>";
         </script>
