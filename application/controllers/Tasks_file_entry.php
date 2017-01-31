@@ -60,7 +60,7 @@ class Tasks_file_entry extends Root_Controller
         {
             $data['title']='Permitted Files List for File Entry';
             $ajax['system_page_url']=site_url($this->controller_url.'/index/list');
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/list',$data,true));
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -93,12 +93,12 @@ class Tasks_file_entry extends Root_Controller
                 $this->session->set_userdata('active_files','');
 
                 $this->db->select('id,name,date_entry,remarks,mime_type');
-                $this->db->from($this->config->item('table_tasks_digital_file'));
+                $this->db->from($this->config->item('table_fms_tasks_digital_file'));
                 $this->db->where('id_file_name',$item_id);
                 $this->db->where('status',$this->config->item('system_status_active'));
                 $data['stored_files']=$this->db->get()->result_array();
                 $ajax['system_page_url']=site_url($this->controller_url.'/index/edit/'.$item_id);
-                $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/edit',$data,true));
+                $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/edit',$data,true));
                 if($this->message)
                 {
                     $ajax['system_message']=$this->message;
@@ -144,12 +144,12 @@ class Tasks_file_entry extends Root_Controller
                 else
                 {
                     $this->db->select('name,date_entry,remarks,mime_type');
-                    $this->db->from($this->config->item('table_tasks_digital_file'));
+                    $this->db->from($this->config->item('table_fms_tasks_digital_file'));
                     $this->db->where('id_file_name',$item_id);
                     $this->db->where('status',$this->config->item('system_status_active'));
                     $data['files_info']=$this->db->get()->result_array();
                 }
-                $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/details',$data,true));
+                $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/details',$data,true));
                 $ajax['system_page_url']=site_url($this->controller_url.'/index/details/'.$item_id);
                 $ajax['status']=true;
                 if($this->message)
@@ -174,16 +174,16 @@ class Tasks_file_entry extends Root_Controller
     private function edit_details_helper($file_name_id)
     {
         $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) file_total');
-        $this->db->from($this->config->item('table_setup_file_name').' n');
-        $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
-        $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
-        $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
-        $this->db->join($this->config->item('table_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user').' u','ui.user_id=u.id');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=n.id_department','left');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=n.id_office','left');
-        $this->db->join($this->config->item('table_tasks_digital_file').' df','df.id_file_name=n.id','left');
+        $this->db->from($this->config->item('table_fms_setup_file_name').' n');
+        $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
+        $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
+        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->join($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');
+        $this->db->join($this->config->item('table_fms_tasks_digital_file').' df','df.id_file_name=n.id','left');
         $this->db->where('ui.revision',1);
         $this->db->where('n.id',$file_name_id);
         $this->db->where('n.status',$this->config->item('system_status_active'));
@@ -206,12 +206,12 @@ class Tasks_file_entry extends Root_Controller
                 }
                 else
                 {
-                    $folder=FCPATH.$this->config->item('system_upload_folder').'/'.$id;
+                    $folder=FCPATH.$this->config->item('system_folder_upload').'/'.$id;
                     if(!is_dir($folder))
                     {
                         mkdir($folder,0777);
                     }
-                    $delete_folder=$folder.'/'.$this->config->item('system_upload_delete_folder');
+                    $delete_folder=$folder.'/'.$this->config->item('system_folder_upload_delete');
                     if(!is_dir($delete_folder))
                     {
                         mkdir($delete_folder,0777);
@@ -233,17 +233,13 @@ class Tasks_file_entry extends Root_Controller
                         foreach($date_entry_old as $row_key=>$row_value)
                         {
                             $update_data['date_entry']=System_helper::get_time($row_value);
-                            #$this->db->where('id',$row_key);
-                            #$this->db->update($this->config->item('table_tasks_digital_file'),$update_data);
-                            Query_helper::update($this->config->item('table_tasks_digital_file'),$update_data,array('id='.$row_key));
+                            Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_data,array('id='.$row_key));
                         }
                         $update_data=array();
                         foreach($remarks_old as $row_key=>$row_value)
                         {
                             $update_data['remarks']=$row_value;
-                            #$this->db->where('id',$row_key);
-                            #$this->db->update($this->config->item('table_tasks_digital_file'),$update_data);
-                            Query_helper::update($this->config->item('table_tasks_digital_file'),$update_data,array('id='.$row_key));
+                            Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_data,array('id='.$row_key));
                         }
                     }
                     $temp_session_active_files=$this->session->userdata('active_files');
@@ -270,7 +266,7 @@ class Tasks_file_entry extends Root_Controller
                                     $temp_session_active_files=str_replace($af,'',$temp_session_active_files);
 
                                     $this->db->select('name');
-                                    $this->db->from($this->config->item('table_tasks_digital_file'));
+                                    $this->db->from($this->config->item('table_fms_tasks_digital_file'));
                                     $this->db->where('id',$af);
                                     $file_delete=$this->db->get()->row_array();
 
@@ -278,9 +274,7 @@ class Tasks_file_entry extends Root_Controller
                                     $update_delete_data['user_updated']=$this->user_id;
                                     $update_delete_data['date_updated']=$time;
                                     $update_delete_data['status']=$this->config->item('system_status_delete');
-                                    #$this->db->where('id',$af);
-                                    #$this->db->update($this->config->item('table_tasks_digital_file'),$update_delete_data);
-                                    Query_helper::update($this->config->item('table_tasks_digital_file'),$update_delete_data,array('id='.$af));
+                                    Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_delete_data,array('id='.$af));
                                 }
                             }
                         }
@@ -291,7 +285,7 @@ class Tasks_file_entry extends Root_Controller
                         $upload_file_data['date_created']=$time;
                         $upload_file_data['user_created']=$this->user_id;
                         $errors=0;
-                        $upload_files=System_helper::upload_file($this->config->item('system_upload_folder').'/'.$id);
+                        $upload_files=System_helper::upload_file($this->config->item('system_folder_upload').'/'.$id);
                         $date_entry=$this->input->post('date_entry');
                         $remarks=$this->input->post('remarks');
                         foreach($upload_files as $key=>$value)
@@ -303,7 +297,7 @@ class Tasks_file_entry extends Root_Controller
                                 $upload_file_data['remarks']=$remarks[$index];
                                 $upload_file_data['mime_type']=$value['info']['file_type'];
                                 $upload_file_data['name']=$value['info']['file_name'];
-                                $upload_files[$key]['insert_id']=Query_helper::add($this->config->item('table_tasks_digital_file'),$upload_file_data);
+                                $upload_files[$key]['insert_id']=Query_helper::add($this->config->item('table_fms_tasks_digital_file'),$upload_file_data);
                                 if($this->is_edit || $this->is_delete)
                                 {
                                     $temp_session_active_files.=','.$upload_files[$key]['insert_id'];
@@ -350,7 +344,7 @@ class Tasks_file_entry extends Root_Controller
     private function permission_helper($file_name_id)
     {
         $this->db->select('action1,action2,action3');
-        $this->db->from($this->config->item('table_setup_assign_file_user_group'));
+        $this->db->from($this->config->item('table_fms_setup_assign_file_user_group'));
         $this->db->where('user_group_id',$this->user_group);
         $this->db->where('id_file',$file_name_id);
         $this->db->where('status',$this->config->item('system_status_active'));
@@ -379,18 +373,21 @@ class Tasks_file_entry extends Root_Controller
     private function move_deleted_file($folder,$file_name)
     {
         $return_value=$file_name;
-        $extension='.'.pathinfo($file_name,PATHINFO_EXTENSION);
-        $raw_name=pathinfo($file_name,PATHINFO_FILENAME);
-        $delete_folder=$this->config->item('system_upload_delete_folder');
-        $i=0;
-        $file=$folder.'/'.$delete_folder.'/'.$file_name;
-        while(file_exists($file))
+        if(file_exists($folder.'/'.$file_name))
         {
-            ++$i;
-            $file=$folder.'/'.$delete_folder.'/'.$raw_name.$i.$extension;
-            $return_value=$raw_name.$i.$extension;
+            $extension='.'.pathinfo($file_name,PATHINFO_EXTENSION);
+            $raw_name=pathinfo($file_name,PATHINFO_FILENAME);
+            $delete_folder=$this->config->item('system_folder_upload_delete');
+            $i=0;
+            $file=$folder.'/'.$delete_folder.'/'.$file_name;
+            while(file_exists($file))
+            {
+                ++$i;
+                $file=$folder.'/'.$delete_folder.'/'.$raw_name.$i.$extension;
+                $return_value=$raw_name.$i.$extension;
+            }
+            rename($folder.'/'.$file_name,$file);
         }
-        rename($folder.'/'.$file_name,$file);
         return $return_value;
     }
     private function check_validation()
@@ -407,17 +404,17 @@ class Tasks_file_entry extends Root_Controller
     private function system_get_items()
     {
         $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) number_of_file');
-        $this->db->from($this->config->item('table_setup_file_name').' n');
-        $this->db->join($this->config->item('table_setup_assign_file_user_group').' fug','n.id=fug.id_file');
-        $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
-        $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
-        $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
-        $this->db->join($this->config->item('table_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user').' u','ui.user_id=u.id');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=n.id_department','left');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=n.id_office','left');
-        $this->db->join($this->config->item('table_tasks_digital_file').' df','df.id_file_name=n.id','left');
+        $this->db->from($this->config->item('table_fms_setup_file_name').' n');
+        $this->db->join($this->config->item('table_fms_setup_assign_file_user_group').' fug','n.id=fug.id_file');
+        $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
+        $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
+        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->join($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');
+        $this->db->join($this->config->item('table_fms_tasks_digital_file').' df','df.id_file_name=n.id','left');
         $this->db->where('ui.revision',1);
         $this->db->where('fug.user_group_id',$this->user_group);
         $this->db->where('fug.status',$this->config->item('system_status_active'));

@@ -22,7 +22,7 @@ $CI->load->view('action_buttons',$action_data);
         <div style="" class="row show-grid">
             <div class="col-xs-4">
                 <label for="id_office" class="control-label pull-right">
-                    Office
+                    <?php echo $CI->lang->line('LABEL_OFFICE'); ?>
                     <span style="color:#FF0000">*</span>
                 </label>
             </div>
@@ -43,7 +43,7 @@ $CI->load->view('action_buttons',$action_data);
         <div style="<?php if(!($item['id_department']>0)){echo 'display:none';} ?>" class="row show-grid" id="department_container">
             <div class="col-xs-4">
                 <label for="id_department" class="control-label pull-right">
-                    Department
+                    <?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>
                     <span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
@@ -63,7 +63,7 @@ $CI->load->view('action_buttons',$action_data);
         <div style="<?php if(!($item['employee_responsible']>0)){echo 'display: none';} ?>" class="row show-grid" id="employee_responsible_container">
             <div class="col-xs-4">
                 <label for="employee_responsible" class="control-label pull-right">
-                    Responsible Employee
+                    <?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>
                     <span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
@@ -189,7 +189,7 @@ $CI->load->view('action_buttons',$action_data);
         <div style="" class="row show-grid">
             <div class="col-xs-4">
                 <label for="date_start" class="control-label pull-right">
-                    Start Date:
+                    <?php echo $CI->lang->line('LABEL_DATE_START'); ?>
                     <span style="color:#FF0000">*</span>
                 </label>
             </div>
@@ -201,7 +201,7 @@ $CI->load->view('action_buttons',$action_data);
         <div style="" class="row show-grid">
             <div class="col-xs-4">
                 <label for="remarks" class="control-label pull-right">
-                    Remarks
+                    <?php echo $CI->lang->line('LABEL_REMARKS'); ?>
                     <span style="color:#FF0000">*</span>
                 </label>
             </div>
@@ -213,13 +213,13 @@ $CI->load->view('action_buttons',$action_data);
     <div class="clearfix"></div>
 </form>
 <script type="text/javascript">
-    $(document).off("click", "#id_office");
-    $(document).off("click", "#id_department");
-    $(document).off("click", "#employee_responsible");
-    $(document).off("click", "#id_category");
-    $(document).off("click", "#id_class");
-    $(document).off("click", "#id_type");
-    $(document).off("click", "#id_hc_location");
+    $(document).off("change", "#id_office");
+    $(document).off("change", "#id_department");
+    $(document).off("change", "#employee_responsible");
+    $(document).off("change", "#id_category");
+    $(document).off("change", "#id_class");
+    $(document).off("change", "#id_type");
+    $(document).off("change", "#id_hc_location");
     jQuery(document).ready(function()
     {
         $(".datepicker").datepicker({dateFormat : display_date_format});
@@ -290,7 +290,7 @@ $CI->load->view('action_buttons',$action_data);
                     data:
                     {
                         html_container_id:'#id_class',
-                        table:'<?php echo $CI->config->item('table_setup_file_class'); ?>',
+                        table:'<?php echo $CI->config->item('table_fms_setup_file_class'); ?>',
                         table_column:'id_category',
                         table_column_value:id_category
                     },
@@ -325,7 +325,7 @@ $CI->load->view('action_buttons',$action_data);
                         data:
                         {
                             html_container_id:'#id_type',
-                            table:'<?php echo $CI->config->item('table_setup_file_type'); ?>',
+                            table:'<?php echo $CI->config->item('table_fms_setup_file_type'); ?>',
                             table_column:'id_class',
                             table_column_value:id_class
                         },

@@ -24,10 +24,9 @@ class Common_controller extends Root_Controller
     public function get_departments()
     {
         $html_container_id=$this->input->post('html_container_id');
-        $LOGIN=$this->load->database('armalik_login',true);
-        $LOGIN->select('id value,name text');
-        $LOGIN->from($this->config->item('table_setup_department'));
-        $data['items']=$LOGIN->get()->result_array();
+        $this->db->select('id value,name text');
+        $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'));
+        $data['items']=$this->db->get()->result_array();
         $ajax['system_content'][]=array('id'=>$html_container_id,'html'=>$this->load->view('dropdown_with_select',$data,true));
         $ajax['status']=true;
         $this->json_return($ajax);
@@ -38,27 +37,26 @@ class Common_controller extends Root_Controller
         $id_office=$this->input->post('id_office');
         $id_department=$this->input->post('id_department');
 
-        $LOGIN=$this->load->database('armalik_login',true);
-        $LOGIN->select("u.id value,CONCAT('[',u.employee_id,'] ',ui.name) text");
-        $LOGIN->from($this->config->item('table_setup_user').' u');
-        $LOGIN->join($this->config->item('table_setup_user_info').' ui','u.id=ui.user_id');
-        $LOGIN->where('u.status',$this->config->item('system_status_active'));
-        $LOGIN->where('ui.revision',1);
+        $this->db->select("u.id value,CONCAT('[',u.employee_id,'] ',ui.name) text");
+        $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','u.id=ui.user_id');
+        $this->db->where('u.status',$this->config->item('system_status_active'));
+        $this->db->where('ui.revision',1);
         if($id_department>0)
         {
-            $LOGIN->where('ui.department_id',$id_department);
+            $this->db->where('ui.department_id',$id_department);
         }
         if($id_office>0 && $id_department>0)
         {
-            $LOGIN->or_where('ui.office_id',$id_office);
+            $this->db->or_where('ui.office_id',$id_office);
         }
         elseif($id_office>0)
         {
-            $LOGIN->where('ui.office_id',$id_office);
+            $this->db->where('ui.office_id',$id_office);
         }
-        $LOGIN->order_by('u.employee_id');
-        $LOGIN->group_by('u.id');
-        $data['items']=$LOGIN->get()->result_array();
+        $this->db->order_by('u.employee_id');
+        $this->db->group_by('u.id');
+        $data['items']=$this->db->get()->result_array();
         $ajax['system_content'][]=array('id'=>$html_container_id,'html'=>$this->load->view('dropdown_with_select',$data,true));
         $ajax['status']=true;
         $this->json_return($ajax);

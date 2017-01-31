@@ -14,7 +14,7 @@ $CI->load->view('action_buttons',$action_data);
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
-            <label class="control-label pull-right">File Name:</label>
+            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
             <label><?php echo $details['name'] ?></label>
@@ -22,7 +22,7 @@ $CI->load->view('action_buttons',$action_data);
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
-            <label class="control-label pull-right">Responsible Employee:</label>
+            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
             <label><?php echo $details['employee_name'] ?></label>
@@ -30,7 +30,7 @@ $CI->load->view('action_buttons',$action_data);
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
-            <label class="control-label pull-right">Hardcopy Location:</label>
+            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
             <label><?php echo $details['hardcopy_location'] ?></label>
@@ -46,7 +46,7 @@ $CI->load->view('action_buttons',$action_data);
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
-            <label class="control-label pull-right">File Category:</label>
+            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
             <label><?php echo $details['category_name'] ?></label>
@@ -54,7 +54,7 @@ $CI->load->view('action_buttons',$action_data);
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
-            <label class="control-label pull-right">File Class:</label>
+            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
             <label><?php echo $details['class_name'] ?></label>
@@ -62,7 +62,7 @@ $CI->load->view('action_buttons',$action_data);
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
-            <label class="control-label pull-right">File Type:</label>
+            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
             <label><?php echo $details['type_name'] ?></label>
@@ -70,7 +70,7 @@ $CI->load->view('action_buttons',$action_data);
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
-            <label class="control-label pull-right">Office:</label>
+            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_OFFICE'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
             <label><?php echo $details['office_name'] ?></label>
@@ -78,7 +78,7 @@ $CI->load->view('action_buttons',$action_data);
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
-            <label class="control-label pull-right">Department:</label>
+            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
             <label><?php echo $details['department_name'] ?></label>
@@ -100,12 +100,12 @@ $CI->load->view('action_buttons',$action_data);
             <th>File Name</th>
             <th>Picture/Thumbnail</th>
             <th>Entry Date</th>
-            <th>Remarks</th>
+            <th><?php echo $CI->lang->line('LABEL_REMARKS'); ?></th>
         </tr>
     </thead>
     <tbody>
         <?php
-        $location=$this->config->item('system_image_base_url').$details['id'].'/';
+        $location=$this->config->item('system_image_base_url').$this->config->item('system_folder_upload').'/'.$details['id'].'/';
         foreach($files_info as $file)
         {
             ?>

@@ -44,8 +44,8 @@ class Setup_file_type extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']='File Type List';
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/list',$data,true));
+            $data['title']=$this->config->item('LABEL_FILE_TYPE').' List';
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -65,7 +65,7 @@ class Setup_file_type extends Root_Controller
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
-            $data['title']='Create New File Type';
+            $data['title']='Create New '.$this->lang->line('LABEL_FILE_TYPE');
             $data['item']=array
             (
                 'id'=>0,
@@ -76,10 +76,10 @@ class Setup_file_type extends Root_Controller
                 'status'=>$this->config->item('system_status_active'),
                 'remarks'=>''
             );
-            $data['categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
+            $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
             $data['classes']=array();
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -107,14 +107,14 @@ class Setup_file_type extends Root_Controller
                 $item_id=$id;
             }
             $this->db->select('t.*,cls.id_category');
-            $this->db->from($this->config->item('table_setup_file_type').' t');
-            $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
+            $this->db->from($this->config->item('table_fms_setup_file_type').' t');
+            $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
             $this->db->where('t.id',$item_id);
             $data['item']=$this->db->get()->row_array();
-            $data['title']='Edit File Type ('.$data['item']['name'].')';
-            $data['categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
-            $data['classes']=Query_helper::get_info($this->config->item('table_setup_file_class'),array('id value','name text'),array('id_category='.$data['item']['id_category']));
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
+            $data['title']='Edit '.$this->lang->line('LABEL_FILE_TYPE').' ('.$data['item']['name'].')';
+            $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
+            $data['classes']=Query_helper::get_info($this->config->item('table_fms_setup_file_class'),array('id value','name text'),array('id_category='.$data['item']['id_category']));
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -141,7 +141,6 @@ class Setup_file_type extends Root_Controller
                 $ajax['status']=false;
                 $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
                 $this->json_return($ajax);
-                die();
             }
         }
         else
@@ -151,7 +150,6 @@ class Setup_file_type extends Root_Controller
                 $ajax['status']=false;
                 $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
                 $this->json_return($ajax);
-                die();
             }
         }
         if(!$this->check_validation())
@@ -168,13 +166,13 @@ class Setup_file_type extends Root_Controller
             {
                 $data['user_updated']=$user->user_id;
                 $data['date_updated']=time();
-                Query_helper::update($this->config->item('table_setup_file_type'),$data,array('id='.$id));
+                Query_helper::update($this->config->item('table_fms_setup_file_type'),$data,array('id='.$id));
             }
             else
             {
                 $data['user_created']=$user->user_id;
                 $data['date_created']=time();
-                Query_helper::add($this->config->item('table_setup_file_type'),$data);
+                Query_helper::add($this->config->item('table_fms_setup_file_type'),$data);
             }
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
@@ -213,9 +211,11 @@ class Setup_file_type extends Root_Controller
     private function system_get_items()
     {
         $this->db->select('t.id,t.name type_name,t.status,t.ordering,ctg.name category_name,cls.name class_name');
-        $this->db->from($this->config->item('table_setup_file_type').' t');
-        $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
-        $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->from($this->config->item('table_fms_setup_file_type').' t');
+        $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
+        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->order_by('ctg.ordering');
+        $this->db->order_by('cls.ordering');
         $this->db->order_by('t.ordering');
         $this->json_return($this->db->get()->result_array());
     }

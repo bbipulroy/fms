@@ -1,10 +1,11 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 //login
 $lang['MSG_USERNAME_PASSWORD_INVALID'] = 'Username and Password did not match or Invalid';
 $lang['MSG_LOGIN_SUCCESS'] = 'Successfully Logged In';
 $lang['MSG_LOGOUT_SUCCESS'] = 'Successfully Logged out';
-$lang['MSG_NOT_ASSIGNED_GROUP'] = 'Please Contact with Admin(01777709208) to assign some task.';
-$lang['MSG_SITE_OFFLINE'] = 'Site is Currently Offline.Please contact with admin(01777709208).';
+$lang['MSG_NOT_ASSIGNED_GROUP'] = 'Please Contact with Admin(09666775544.Ext.901) to assign some task.';
+$lang['MSG_SITE_OFFLINE'] = 'Site is Currently Offline.Please contact with admin(09666775544.Ext.901).';
 
 //Action buttons
 $lang['ACTION_DASHBOARD'] = 'Dashboard';
@@ -24,6 +25,7 @@ $lang['DELETE_CONFIRM'] = 'Are You sure to delete?';
 $lang['MSG_ROLE_ASSIGN_SUCCESS'] = 'Role Assign Successful.';
 
 //****MODULE TASK//
+
 $lang['LABEL_PARENT'] = 'Parent';
 $lang['LABEL_CONTROLLER_NAME'] = 'Controller';
 $lang['TOTAL_TASK'] = 'Number of Tasks';
@@ -36,13 +38,6 @@ $lang['LABEL_ACTION4'] = 'Print';
 $lang['LABEL_ACTION5'] = 'Download';
 $lang['LABEL_ACTION6'] = 'Column Headers';
 //*****//
-
-//common
-$lang['YOU_DONT_HAVE_ACCESS'] = 'You cannot access this page';
-$lang['ACTIVE'] = 'Active';
-$lang['INACTIVE'] = 'In-active';
-$lang['DELETE'] = 'Delete';
-$lang['SELECT'] = 'Select';
 
 $lang['SERIAL'] = 'Serial';
 $lang['STATUS'] = 'Status';
@@ -82,6 +77,7 @@ $lang['LABEL_CREATED_BY'] = 'Created By';
 $lang['LABEL_CREATED_DATE'] = 'Created Date';
 $lang['LABEL_CREATED_TIME'] = 'Created Time';
 $lang['LABEL_ADVANCE_FOR'] = 'Advance For';
+$lang['LABEL_ADVANCE_BY'] = 'Advance By';
 $lang['LABEL_PICTURE'] = 'Picture';
 $lang['LABEL_CHECKED_BY'] = 'Checked By';
 $lang['LABEL_APPROVED_BY'] = 'Approved By';
@@ -91,7 +87,6 @@ $lang['LABEL_RECEIVED_BY'] = 'Received By';
 $lang['LABEL_USERNAME'] = 'User name';
 $lang['LABEL_EMPLOYEE_ID'] = 'Employee id';
 $lang['LABEL_USER_GROUP'] = 'User Group';
-$lang['LABEL_OFFICE_NAME'] = 'Office';
 $lang['LABEL_DEPARTMENT_NAME'] = 'Department';
 $lang['LABEL_DESIGNATION_NAME'] = 'Designation';
 $lang['LABEL_CATEGORY_NAME'] = 'Category';
@@ -107,15 +102,18 @@ $lang['LABEL_COMPANY_NAME'] = 'Company';
 $lang['LABEL_EMPLOYEE_NAME'] = 'Employee Name';
 $lang['LABEL_EMPLOYEE_ID'] = 'Employee ID';
 $lang['LABEL_NUM_DAYS'] = 'Number of Days';
+$lang['LABEL_NUM_PERSON'] = 'Number of People';
 $lang['LABEL_HOTEL_BILL'] = 'Hotel';
 $lang['LABEL_TRANSPORT_BILL'] = 'Transport';
 $lang['LABEL_LOCAL_TRANSPORT_BILL'] = 'Local Conveyance';
 $lang['LABEL_OTHER_BILL'] = 'MISC';
 
-//Bipul Roy||start
-// Setup Menu
 $lang['LABEL_FILE_CATEGORY']='File Category';
 $lang['LABEL_FILE_CLASS']='File Class';
 $lang['LABEL_FILE_TYPE']='File Type';
 $lang['LABEL_FILE_NAME']='File Name';
+$lang['LABEL_RESPONSIBLE_EMPLOYEE']='Responsible Employee';
+$lang['LABEL_OPENING_DATE']='Opening Date';
 $lang['LABEL_HC_LOCATION']='Hardcopy Location';
+$lang['LABEL_OFFICE']='Office';
+$lang['LABEL_DEPARTMENT']='Department';

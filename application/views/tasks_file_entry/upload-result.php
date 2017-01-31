@@ -10,7 +10,7 @@
         var preview_obj;
         <?php
             $CI= & get_instance();
-            $location=$CI->config->item('system_image_base_url').$id.'/';
+            $location=$this->config->item('system_image_base_url').$this->config->item('system_folder_upload').'/'.$id.'/';
             foreach($upload_files as $key=>$value)
             {
                 ?>

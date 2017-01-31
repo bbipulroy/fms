@@ -20,7 +20,7 @@ $CI->load->view('action_buttons',$action_data);
 
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right">File Name:</label>
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <label><?php echo $item['name'] ?></label>
@@ -28,7 +28,7 @@ $CI->load->view('action_buttons',$action_data);
         </div>
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right">Responsible Employee:</label>
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <label><?php echo $item['employee_name'] ?></label>
@@ -36,7 +36,7 @@ $CI->load->view('action_buttons',$action_data);
         </div>
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right">Hardcopy Location:</label>
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <label><?php echo $item['hardcopy_location'] ?></label>
@@ -52,7 +52,7 @@ $CI->load->view('action_buttons',$action_data);
         </div>
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right">File Category:</label>
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <label><?php echo $item['category_name'] ?></label>
@@ -60,7 +60,7 @@ $CI->load->view('action_buttons',$action_data);
         </div>
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right">File Class:</label>
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <label><?php echo $item['class_name'] ?></label>
@@ -68,7 +68,7 @@ $CI->load->view('action_buttons',$action_data);
         </div>
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right">File Type:</label>
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <label><?php echo $item['type_name'] ?></label>
@@ -76,7 +76,7 @@ $CI->load->view('action_buttons',$action_data);
         </div>
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right">Office:</label>
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_OFFICE'); ?>:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <label><?php echo $item['office_name'] ?></label>
@@ -84,7 +84,7 @@ $CI->load->view('action_buttons',$action_data);
         </div>
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right">Department:</label>
+                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <label><?php echo $item['department_name'] ?></label>
@@ -103,17 +103,17 @@ $CI->load->view('action_buttons',$action_data);
             <div style="overflow-x: auto;" class="row show-grid">
                 <table class="table table-bordered">
                     <thead>
-                    <tr>
-                        <th style="min-width: 250px;">File/Picture</th>
-                        <th style="min-width: 50px;">UPLOAD</th>
-                        <th style="min-width: 50px;">Entry Date</th>
-                        <th style="min-width: 100px;">Remarks</th>
-                    </tr>
+                        <tr>
+                            <th style="min-width: 250px;">File/Picture</th>
+                            <th style="min-width: 50px;">UPLOAD</th>
+                            <th style="min-width: 50px;">Entry Date</th>
+                            <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_REMARKS'); ?></th>
+                        </tr>
                     </thead>
                     <tbody>
                     <?php
                         $old_files='';
-                        $location=$CI->config->item('system_image_base_url').$item['id'].'/';
+                        $location=$this->config->item('system_image_base_url').$this->config->item('system_folder_upload').'/'.$item['id'].'/';
                         foreach($stored_files as $index=>$file)
                         {
                             $old_files.=$file['id'].',';
@@ -218,22 +218,22 @@ $CI->load->view('action_buttons',$action_data);
 <div id="system_content_add" style="display: none;">
     <table>
         <tbody>
-        <tr>
-            <td>
-                <div class="preview_container_file">
-                </div>
-            </td>
-            <td>
-                <input type="file" class="browse_button_new"><br>
-                <button type="button" class="btn btn-danger system_button_delete"><?php echo $CI->lang->line('DELETE'); ?></button>
-            </td>
-            <td>
-                <input type="text" class="form-control date_entry" value="<?php echo System_helper::display_date(time()); ?>">
-            </td>
-            <td>
-                <textarea class="form-control remarks"></textarea>
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    <div class="preview_container_file">
+                    </div>
+                </td>
+                <td>
+                    <input type="file" class="browse_button_new"><br>
+                    <button type="button" class="btn btn-danger system_button_delete"><?php echo $CI->lang->line('DELETE'); ?></button>
+                </td>
+                <td>
+                    <input type="text" class="form-control date_entry" value="<?php echo System_helper::display_date(time()); ?>">
+                </td>
+                <td>
+                    <textarea class="form-control remarks"></textarea>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>

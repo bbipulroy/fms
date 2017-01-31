@@ -55,23 +55,22 @@ class Report_file_view extends Root_Controller
                 'id_department'=>'',
                 'employee_responsible'=>''
             );
-            $data['categories']=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
+            $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
             $data['classes']=array();
             $data['types']=array();
             $data['names']=array();
 
-            $LOGIN=$this->load->database('armalik_login',true);
-            $LOGIN->select('id value,name text');
-            $LOGIN->from($this->config->item('table_setup_office'));
-            $data['offices']=$LOGIN->get()->result_array();
+            $this->db->select('id value,name text');
+            $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices'));
+            $data['offices']=$this->db->get()->result_array();
 
-            $LOGIN->select('id value,name text');
-            $LOGIN->from($this->config->item('table_setup_department'));
-            $data['departments']=$LOGIN->get()->result_array();
+            $this->db->select('id value,name text');
+            $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'));
+            $data['departments']=$this->db->get()->result_array();
 
             $data['employees']=array();
             $ajax['system_page_url']=site_url($this->controller_url.'/index/search');
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/search',$data,true));
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/search',$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -143,23 +142,23 @@ class Report_file_view extends Root_Controller
     private function get_data(&$data,$id_file_name,$date_from_start_page,$date_to_start_page)
     {
         $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) file_total');
-        $this->db->from($this->config->item('table_setup_file_name').' n');
-        $this->db->join($this->config->item('table_setup_file_type').' t','n.id_type=t.id');
-        $this->db->join($this->config->item('table_setup_file_class').' cls','t.id_class=cls.id');
-        $this->db->join($this->config->item('table_setup_file_category').' ctg','cls.id_category=ctg.id');
-        $this->db->join($this->config->item('table_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user').' u','ui.user_id=u.id');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=n.id_department','left');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=n.id_office','left');
-        $this->db->join($this->config->item('table_tasks_digital_file').' df','df.id_file_name=n.id','left');
+        $this->db->from($this->config->item('table_fms_setup_file_name').' n');
+        $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
+        $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
+        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->join($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');
+        $this->db->join($this->config->item('table_fms_tasks_digital_file').' df','df.id_file_name=n.id','left');
         $this->db->where('ui.revision',1);
         $this->db->where('n.id',$id_file_name);
         $this->db->where('n.status',$this->config->item('system_status_active'));
         $data['details']=$this->db->get()->row_array();
 
         $this->db->select('name,date_entry,remarks,mime_type');
-        $this->db->from($this->config->item('table_tasks_digital_file'));
+        $this->db->from($this->config->item('table_fms_tasks_digital_file'));
         $this->db->where('id_file_name',$id_file_name);
         $this->db->where('status',$this->config->item('system_status_active'));
         $this->add_extra_query($date_from_start_page,$date_to_start_page,'date_entry');
@@ -167,7 +166,6 @@ class Report_file_view extends Root_Controller
     }
     private function system_get_items()
     {
-        $LOGIN=$this->load->database('armalik_login',true);
         $id_type=$this->input->post('id_type');
         $id_class=$this->input->post('id_class');
         $id_category=$this->input->post('id_category');
@@ -178,15 +176,15 @@ class Report_file_view extends Root_Controller
         $date_to_start_file=$this->input->post('date_to_start_file');
 
         $this->db->select('n.id,n.name,n.date_start,n.ordering,hl.name hardcopy_location,t.name type_name,cls.name class_name,ctg.name category_name,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name');
-        $this->db->from($this->config->item('table_setup_file_name').' n');
-        $this->db->from($this->config->item('table_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
-        $this->db->join($this->config->item('table_setup_file_type').' t','t.id=n.id_type');
-        $this->db->join($this->config->item('table_setup_file_class').' cls','cls.id=t.id_class');
-        $this->db->join($this->config->item('table_setup_file_category').' ctg','ctg.id=cls.id_category');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_user').' u','ui.user_id=u.id');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_department').' d','d.id=n.id_department','left');
-        $this->db->join($this->config->item('system_login_database').'.'.$this->config->item('table_setup_office').' o','o.id=n.id_office','left');
+        $this->db->from($this->config->item('table_fms_setup_file_name').' n');
+        $this->db->from($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
+        $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');
+        $this->db->join($this->config->item('table_fms_setup_file_class').' cls','cls.id=t.id_class');
+        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=cls.id_category');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');
         $this->db->where('ui.revision',1);
         if($id_type>0)
         {
@@ -194,12 +192,12 @@ class Report_file_view extends Root_Controller
         }
         elseif($id_class>0)
         {
-            $where_in='SELECT id FROM '.$this->config->item('table_setup_file_type').' WHERE id_class='.$id_class;
+            $where_in='SELECT id FROM '.$this->config->item('table_fms_setup_file_type').' WHERE id_class='.$id_class;
             $this->db->where_in('n.id_type',$where_in,false);
         }
         elseif($id_category>0)
         {
-            $where_in='SELECT id FROM '.$this->config->item('table_setup_file_type').' WHERE id_class IN (SELECT id FROM '.$this->config->item('table_setup_file_class').' WHERE id_category='.$id_category.')';
+            $where_in='SELECT id FROM '.$this->config->item('table_fms_setup_file_type').' WHERE id_class IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_class').' WHERE id_category='.$id_category.')';
             $this->db->where_in('n.id_type',$where_in,false);
         }
         if($id_office>0 && $id_department>0 && $employee_responsible>0)

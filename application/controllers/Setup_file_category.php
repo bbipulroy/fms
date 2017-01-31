@@ -44,8 +44,8 @@ class Setup_file_category extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']='File Category List';
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/list',$data,true));
+            $data['title']=$this->config->item('LABEL_FILE_CATEGORY').' List';
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -65,7 +65,7 @@ class Setup_file_category extends Root_Controller
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
-            $data['title']='Create New File Category';
+            $data['title']='Create New '.$this->lang->line('LABEL_FILE_CATEGORY');
             $data['item']=array
             (
                 'id'=>0,
@@ -75,7 +75,7 @@ class Setup_file_category extends Root_Controller
                 'remarks'=>''
             );
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -102,9 +102,9 @@ class Setup_file_category extends Root_Controller
             {
                 $item_id=$id;
             }
-            $data['item']=Query_helper::get_info($this->config->item('table_setup_file_category'),'*',array('id ='.$item_id),1);
-            $data['title']='Edit File Category ('.$data['item']['name'].')';
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
+            $data['item']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),'*',array('id ='.$item_id),1);
+            $data['title']='Edit '.$this->lang->line('LABEL_FILE_CATEGORY').' ('.$data['item']['name'].')';
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -131,7 +131,6 @@ class Setup_file_category extends Root_Controller
                 $ajax['status']=false;
                 $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
                 $this->json_return($ajax);
-                die();
             }
         }
         else
@@ -141,7 +140,6 @@ class Setup_file_category extends Root_Controller
                 $ajax['status']=false;
                 $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
                 $this->json_return($ajax);
-                die();
             }
         }
         if(!$this->check_validation())
@@ -158,13 +156,13 @@ class Setup_file_category extends Root_Controller
             {
                 $data['user_updated']=$user->user_id;
                 $data['date_updated']=time();
-                Query_helper::update($this->config->item('table_setup_file_category'),$data,array('id='.$id));
+                Query_helper::update($this->config->item('table_fms_setup_file_category'),$data,array('id='.$id));
             }
             else
             {
                 $data['user_created']=$user->user_id;
                 $data['date_created']=time();
-                Query_helper::add($this->config->item('table_setup_file_category'),$data);
+                Query_helper::add($this->config->item('table_fms_setup_file_category'),$data);
             }
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
@@ -201,7 +199,7 @@ class Setup_file_category extends Root_Controller
     }
     private function system_get_items()
     {
-        $item=Query_helper::get_info($this->config->item('table_setup_file_category'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
+        $item=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
         $this->json_return($item);
     }
 }

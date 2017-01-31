@@ -88,7 +88,7 @@ $CI->load->view('action_buttons',$action_data);
         <div style="" class="row show-grid">
             <div class="col-xs-4">
                 <label for="remarks" class="control-label pull-right">
-                    Remarks
+                    <?php echo $this->lang->line('LABEL_REMARKS'); ?>
                     <span style="color:#FF0000">*</span>
                 </label>
             </div>
@@ -102,8 +102,8 @@ $CI->load->view('action_buttons',$action_data);
 <script type="text/javascript">
     jQuery(document).ready(function()
     {
-        $(document).off("click", "#id_category");
-        $(document).off("click", "#id_class");
+        $(document).off("change", "#id_category");
+        $(document).off("change", "#id_class");
         $(document).on("change","#id_category",function()
         {
             $("#id_class").val("");
@@ -119,7 +119,7 @@ $CI->load->view('action_buttons',$action_data);
                     data:
                     {
                         html_container_id:'#id_class',
-                        table:'<?php echo $CI->config->item('table_setup_file_class'); ?>',
+                        table:'<?php echo $CI->config->item('table_fms_setup_file_class'); ?>',
                         table_column:'id_category',
                         table_column_value:id_category
                     },

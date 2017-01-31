@@ -43,6 +43,7 @@ function number_format(number, decimals, dec_point, thousands_sep)
 
 $(document).ready(function()
 {
+
     $(document).ajaxStart(function()
     {
         $("#system_loading").show();
@@ -120,12 +121,11 @@ $(document).ready(function()
             return true;
         }
         event.preventDefault();
-        $.ajax(
-        {
+        $.ajax({
             url: $(this).attr("action"),
             type: $(this).attr("method"),
             dataType: "JSON",
-            data:  new FormData(this),
+            data: new FormData(this),
             processData: false,
             contentType: false,
             success: function (data, status)
@@ -134,6 +134,7 @@ $(document).ready(function()
             },
             error: function (xhr, desc, err)
             {
+
 
             }
         });
@@ -170,12 +171,15 @@ $(document).ready(function()
     });
     $(document).on("click", "#button_action_clear", function(event)
     {
+
         $($(this).attr('data-form')).trigger('reset');
+
     });
     $(document).on("click", "#button_action_report", function(event)
     {
         $('#system_report_container').html('');
         $($(this).attr('data-form')).submit();
+
     });
     $(document).on("click", "#button_action_save", function(event)
     {
@@ -230,7 +234,9 @@ $(document).ready(function()
                     return;
                 }
             }
+            //var selectedRowData = $(jqxgrid_id).jqxGrid('getrowdata', selected_row_indexes[0]);//only first selected
             var selectedRowData = $(jqxgrid_id).jqxGrid('getrowdata', selected_row_indexes[selected_row_indexes.length-1]);//only last selected
+
             $.ajax({
                 url: $(this).attr('data-action-link'),
                 type: 'POST',
@@ -480,10 +486,4 @@ function animate_message(message)
     $("#system_message").hide();
     $("#system_message").html(message);
     $('#system_message').slideToggle("slow").delay(3000).slideToggle("slow");
-}
-function turn_off_triggers()
-{
-    $(document).off("click", "#button_action_save_jqx");
-    $(document).off("click", ".task_action_all");
-    $(document).off("click", ".task_header_all");
 }

@@ -26,11 +26,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $config['base_url'] = 'http://localhost/fms/';
 /*if(strpos($_SERVER['HTTP_HOST'],'www')===false)
 {
-    $config['base_url'] = 'http://fms.malikseeds.com/';
+    $config['base_url'] = 'http://pms.malikseeds.com/';
 }
 else
 {
-    $config['base_url'] = 'http://www.fms.malikseeds.com/';
+    $config['base_url'] = 'http://www.pms.malikseeds.com/';
 }*/
 
 /*

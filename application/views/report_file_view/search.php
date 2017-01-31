@@ -109,7 +109,7 @@ $CI= & get_instance();
                     </div>
                     <div class="col-xs-6">
                         <label for="id_office" class="control-label pull-left">
-                            Office
+                            <?php echo $CI->lang->line('LABEL_OFFICE'); ?>
                         </label>
                     </div>
                 </div>
@@ -129,7 +129,7 @@ $CI= & get_instance();
                     </div>
                     <div class="col-xs-6">
                         <label for="id_department" class="control-label pull-left">
-                            Department
+                            <?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>
                         </label>
                     </div>
                 </div>
@@ -149,7 +149,7 @@ $CI= & get_instance();
                     </div>
                     <div class="col-xs-6">
                         <label for="employee_responsible" class="control-label pull-left">
-                            Responsible Employee
+                            <?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>
                     </div>
                 </div>
             </div>
@@ -290,7 +290,7 @@ $CI= & get_instance();
                     data:
                     {
                         html_container_id:'#id_class',
-                        table:'<?php echo $CI->config->item('table_setup_file_class'); ?>',
+                        table:'<?php echo $CI->config->item('table_fms_setup_file_class'); ?>',
                         table_column:'id_category',
                         table_column_value:id_category
                     },
@@ -328,7 +328,7 @@ $CI= & get_instance();
                         data:
                         {
                             html_container_id:'#id_type',
-                            table:'<?php echo $CI->config->item('table_setup_file_type'); ?>',
+                            table:'<?php echo $CI->config->item('table_fms_setup_file_type'); ?>',
                             table_column:'id_class',
                             table_column_value:id_class
                         },
@@ -363,7 +363,7 @@ $CI= & get_instance();
                         data:
                         {
                             html_container_id:'#id_name',
-                            table:'<?php echo $CI->config->item('table_setup_file_name'); ?>',
+                            table:'<?php echo $CI->config->item('table_fms_setup_file_name'); ?>',
                             table_column:'id_type',
                             table_column_value:id_type
                         },

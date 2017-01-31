@@ -44,8 +44,8 @@ class Setup_file_hc_location extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']='Hardcopy Location List';
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/list',$data,true));
+            $data['title']=$this->lang->line('LABEL_HC_LOCATION').' List';
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -65,7 +65,7 @@ class Setup_file_hc_location extends Root_Controller
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
-            $data['title']='Create New Hardcopy Location';
+            $data['title']='Create New '.$this->lang->line('LABEL_HC_LOCATION');
             $data['item']=array
             (
                 'id'=>0,
@@ -75,7 +75,7 @@ class Setup_file_hc_location extends Root_Controller
                 'remarks'=>''
             );
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -102,9 +102,9 @@ class Setup_file_hc_location extends Root_Controller
             {
                 $item_id=$id;
             }
-            $data['item']=Query_helper::get_info($this->config->item('table_setup_file_hc_location'),'*',array('id ='.$item_id),1);
-            $data['title']='Edit Hardcopy Location ('.$data['item']['name'].')';
-            $ajax['system_content'][]=array('id'=>$this->config->item('system_div_id'),'html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
+            $data['item']=Query_helper::get_info($this->config->item('table_fms_setup_file_hc_location'),'*',array('id ='.$item_id),1);
+            $data['title']='Edit '.$this->lang->line('LABEL_HC_LOCATION').' ('.$data['item']['name'].')';
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
                 $ajax['system_message']=$this->message;
@@ -131,7 +131,6 @@ class Setup_file_hc_location extends Root_Controller
                 $ajax['status']=false;
                 $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
                 $this->json_return($ajax);
-                die();
             }
         }
         else
@@ -141,7 +140,6 @@ class Setup_file_hc_location extends Root_Controller
                 $ajax['status']=false;
                 $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
                 $this->json_return($ajax);
-                die();
             }
         }
         if(!$this->check_validation())
@@ -158,13 +156,13 @@ class Setup_file_hc_location extends Root_Controller
             {
                 $data['user_updated']=$user->user_id;
                 $data['date_updated']=time();
-                Query_helper::update($this->config->item('table_setup_file_hc_location'),$data,array('id='.$id));
+                Query_helper::update($this->config->item('table_fms_setup_file_hc_location'),$data,array('id='.$id));
             }
             else
             {
                 $data['user_created']=$user->user_id;
                 $data['date_created']=time();
-                Query_helper::add($this->config->item('table_setup_file_hc_location'),$data);
+                Query_helper::add($this->config->item('table_fms_setup_file_hc_location'),$data);
             }
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
@@ -201,7 +199,7 @@ class Setup_file_hc_location extends Root_Controller
     }
     private function system_get_items()
     {
-        $items=Query_helper::get_info($this->config->item('table_setup_file_hc_location'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
+        $items=Query_helper::get_info($this->config->item('table_fms_setup_file_hc_location'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
         $this->json_return($items);
     }
 }

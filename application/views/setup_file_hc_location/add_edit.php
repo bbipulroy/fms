@@ -40,7 +40,7 @@ $CI->load->view('action_buttons',$action_data);
         <div style="" class="row show-grid">
             <div class="col-xs-4">
                 <label for="remarks" class="control-label pull-right">
-                    Remarks
+                    <?php echo $CI->lang->line('LABEL_REMARKS');?>
                     <span style="color:#FF0000">*</span>
                 </label>
             </div>

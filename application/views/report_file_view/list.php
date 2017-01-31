@@ -27,15 +27,15 @@ $CI->load->view("action_buttons",$action_data);
         <div class="col-xs-12" style="margin-bottom: 20px;">
             <div class="col-xs-12" style="margin-bottom: 20px;">
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="name"><?php echo $CI->lang->line('LABEL_FILE_NAME'); ?></label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="employee_name">Responsible Employee</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="employee_name"><?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="date_start">Opening Date</label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="hardcopy_location">Hardcopy Location</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="hardcopy_location"><?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="category_name"><?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="class_name"><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="type_name"><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?></label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="office_name">Office</label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="department_name">Department</label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="ordering">Ordering</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="office_name"><?php echo $CI->lang->line('LABEL_OFFICE'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="department_name"><?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="ordering"><?php echo $CI->lang->line('LABEL_ORDER'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="details_button">Details</label>
             </div>
         </div>
@@ -108,15 +108,15 @@ $CI->load->view("action_buttons",$action_data);
             rowsheight: 45,
             columns:[
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'name',width:'300',pinned:true,rendered: tooltiprenderer},
-                { text: 'Responsible Employee', dataField: 'employee_name',width:'200',rendered: tooltiprenderer},
+                { text: '<?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>', dataField: 'employee_name',width:'200',rendered: tooltiprenderer},
                 { text: 'Opening Date', dataField: 'date_start',width:'100',rendered: tooltiprenderer,hidden:true},
-                { text: 'Hardcopy Location', dataField: 'hardcopy_location',width:'200',rendered: tooltiprenderer,filtertype:'list'},
+                { text: '<?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>', dataField: 'hardcopy_location',width:'200',rendered: tooltiprenderer,filtertype:'list'},
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
-                { text: 'Office', dataField: 'office_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},
-                { text: 'Department', dataField: 'department_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},
-                { text: 'Ordering', dataField: 'ordering',width:'60',rendered: tooltiprenderer,hidden:true},
+                { text: '<?php echo $CI->lang->line('LABEL_OFFICE'); ?>', dataField: 'office_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},
+                { text: '<?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>', dataField: 'department_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},
+                { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'60',rendered: tooltiprenderer,hidden:true},
                 { text: 'Details', dataField: 'details_button',width:'85',cellsrenderer:cellsrenderer}
             ]
         });
