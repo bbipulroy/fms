@@ -75,7 +75,7 @@ $CI->load->view('action_buttons',$action_data);
         $("#system_jqx_container").jqxGrid(
             {
                 width: '100%',
-                height:'350px',
+                //height:'350px',
                 source: dataAdapter,
                 columnsresize: true,
                 columnsreorder: true,
@@ -90,7 +90,8 @@ $CI->load->view('action_buttons',$action_data);
                 enabletooltips: true,
                 showaggregates: true,
                 showstatusbar: true,
-                rowsheight: 45,
+                //rowsheight: 45,
+                autoheight: true,
                 columns:[
                     { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'name',width:'300',pinned:true,rendered: tooltiprenderer},
                     { text: '<?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>', dataField: 'employee_name',width:'200',pinned:false,rendered: tooltiprenderer},
