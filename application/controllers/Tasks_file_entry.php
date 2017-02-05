@@ -22,10 +22,6 @@ class Tasks_file_entry extends Root_Controller
         $this->user_id=$this->user->user_id;
         $this->controller_url='tasks_file_entry';
         $this->permissions=User_helper::get_permission('Tasks_file_entry');
-        if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
-        {
-            $this->is_view=true;
-        }
     }
     public function index($action='list',$id=0)
     {
@@ -56,7 +52,7 @@ class Tasks_file_entry extends Root_Controller
     }
     private function system_list()
     {
-        if($this->is_view)
+        if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
             $data['title']='Permitted Files List for File Entry';
             $ajax['system_page_url']=site_url($this->controller_url.'/index/list');
@@ -130,46 +126,37 @@ class Tasks_file_entry extends Root_Controller
         {
             $item_id=$id;
         }
-        if($this->is_view)
+        if($this->permission_helper($item_id) && $this->is_view)
         {
-            if($this->permission_helper($item_id))
+            $data['details']=$this->edit_details_helper($item_id);
+            if($data['details']['file_total']<1)
             {
-                $data['details']=$this->edit_details_helper($item_id);
-                if($data['details']['file_total']<1)
-                {
-                    $ajax['system_message']='Your selected File is empty.';
-                    $ajax['status']=false;
-                    $this->json_return($ajax);
-                }
-                else
-                {
-                    $this->db->select('name,date_entry,remarks,mime_type');
-                    $this->db->from($this->config->item('table_fms_tasks_digital_file'));
-                    $this->db->where('id_file_name',$item_id);
-                    $this->db->where('status',$this->config->item('system_status_active'));
-                    $data['files_info']=$this->db->get()->result_array();
-                }
-                $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/details',$data,true));
-                $ajax['system_page_url']=site_url($this->controller_url.'/index/details/'.$item_id);
-                $ajax['status']=true;
-                if($this->message)
-                {
-                    $ajax['system_message']=$this->message;
-                }
+                $ajax['system_message']='Your selected File is empty.';
+                $ajax['status']=false;
+                $this->json_return($ajax);
             }
             else
             {
-                $ajax['status']=false;
-                $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
+                $this->db->select('name,date_entry,remarks,mime_type');
+                $this->db->from($this->config->item('table_fms_tasks_digital_file'));
+                $this->db->where('id_file_name',$item_id);
+                $this->db->where('status',$this->config->item('system_status_active'));
+                $data['files_info']=$this->db->get()->result_array();
             }
-            $this->json_return($ajax);
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/details',$data,true));
+            $ajax['system_page_url']=site_url($this->controller_url.'/index/details/'.$item_id);
+            $ajax['status']=true;
+            if($this->message)
+            {
+                $ajax['system_message']=$this->message;
+            }
         }
         else
         {
             $ajax['status']=false;
             $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
-            $this->json_return($ajax);
         }
+        $this->json_return($ajax);
     }
     private function edit_details_helper($file_name_id)
     {
@@ -285,7 +272,8 @@ class Tasks_file_entry extends Root_Controller
                         $upload_file_data['date_created']=$time;
                         $upload_file_data['user_created']=$this->user_id;
                         $errors=0;
-                        $upload_files=System_helper::upload_file($this->config->item('system_folder_upload').'/'.$id);
+                        $allowed_types='gif|jpg|png|doc|docx|pdf|xls|xlsx|ppt|pptx|txt';
+                        $upload_files=System_helper::upload_file($this->config->item('system_folder_upload').'/'.$id,$allowed_types);
                         $date_entry=$this->input->post('date_entry');
                         $remarks=$this->input->post('remarks');
                         foreach($upload_files as $key=>$value)
@@ -343,14 +331,18 @@ class Tasks_file_entry extends Root_Controller
     }
     private function permission_helper($file_name_id)
     {
-        $this->db->select('action1,action2,action3');
+        $this->db->select('action0,action1,action2,action3');
         $this->db->from($this->config->item('table_fms_setup_assign_file_user_group'));
         $this->db->where('user_group_id',$this->user_group);
         $this->db->where('id_file',$file_name_id);
-        $this->db->where('status',$this->config->item('system_status_active'));
+        $this->db->where('revision',1);
         $actions=$this->db->get()->row_array();
         if($actions)
         {
+            if($actions['action0'])
+            {
+                $this->is_view=true;
+            }
             if($actions['action1'])
             {
                 $this->is_add=true;
@@ -417,7 +409,7 @@ class Tasks_file_entry extends Root_Controller
         $this->db->join($this->config->item('table_fms_tasks_digital_file').' df','df.id_file_name=n.id','left');
         $this->db->where('ui.revision',1);
         $this->db->where('fug.user_group_id',$this->user_group);
-        $this->db->where('fug.status',$this->config->item('system_status_active'));
+        $this->db->where('fug.revision',1);
         $this->db->order_by('n.ordering');
         $this->db->group_by('n.id');
         $temp=$this->db->get()->result_array();

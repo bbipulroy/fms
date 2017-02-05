@@ -44,7 +44,7 @@ class Setup_file_type extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']=$this->config->item('LABEL_FILE_TYPE').' List';
+            $data['title']=$this->lang->line('LABEL_FILE_TYPE').' List';
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
             {

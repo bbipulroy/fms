@@ -150,8 +150,8 @@ class Setup_file_name extends Root_Controller
             $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','u.id=ui.user_id');
             $this->db->where('u.status',$this->config->item('system_status_active'));
             $this->db->where('ui.revision',1);
-            $this->db->where('ui.department_id',$data['item']['id_department']);
-            $this->db->or_where('ui.office_id',$data['item']['id_office']);
+            $where='(ui.office_id='.$data['item']['id_office'].' OR '.'ui.department_id='.$data['item']['id_department'].')';
+            $this->db->where($where,'',false);
             $this->db->group_by('u.id');
             $data['employees']=$this->db->get()->result_array();
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));

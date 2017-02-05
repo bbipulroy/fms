@@ -5,6 +5,7 @@ $config['system_site_short_name']='fms';
 $config['offline_controllers']=array('home','sys_site_offline');//active controller when site is offline
 $config['external_controllers']=array('home');//user can use them without login
 $config['system_max_actions']=7;
+$config['system_fms_max_actions']=4;
 
 //dbs
 $config['system_db_login']='shaiful_arm_login';
