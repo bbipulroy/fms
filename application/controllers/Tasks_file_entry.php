@@ -160,7 +160,7 @@ class Tasks_file_entry extends Root_Controller
     }
     private function edit_details_helper($file_name_id)
     {
-        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) file_total');
+        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(u.employee_id,\' - \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) file_total');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
@@ -178,6 +178,20 @@ class Tasks_file_entry extends Root_Controller
     }
     private function system_save()
     {
+        $file_types_array_for_page_count=array
+        (
+            'gif'=>$this->config->item('system_digital_file_image'),
+            'jpg'=>$this->config->item('system_digital_file_image'),
+            'png'=>$this->config->item('system_digital_file_image'),
+            'doc'=>$this->config->item('system_digital_file_word'),
+            'docx'=>$this->config->item('system_digital_file_word'),
+            'pdf'=>$this->config->item('system_digital_file_book'),
+            'txt'=>$this->config->item('system_digital_file_book'),
+            'xls'=>$this->config->item('system_digital_file_excel'),
+            'xlsx'=>$this->config->item('system_digital_file_excel'),
+            'ppt'=>$this->config->item('system_digital_file_slide_show'),
+            'pptx'=>$this->config->item('system_digital_file_slide_show')
+        );
         $id=$this->input->post('id');
         $time=time();
 
@@ -258,6 +272,10 @@ class Tasks_file_entry extends Root_Controller
                                     $file_delete=$this->db->get()->row_array();
 
                                     $update_delete_data['name']=$this->move_deleted_file($folder,$file_delete['name']);
+                                    if($update_delete_data['name']===false)
+                                    {
+                                        continue;
+                                    }
                                     $update_delete_data['user_updated']=$this->user_id;
                                     $update_delete_data['date_updated']=$time;
                                     $update_delete_data['status']=$this->config->item('system_status_delete');
@@ -284,6 +302,7 @@ class Tasks_file_entry extends Root_Controller
                                 $upload_file_data['date_entry']=System_helper::get_time($date_entry[$index]);
                                 $upload_file_data['remarks']=$remarks[$index];
                                 $upload_file_data['mime_type']=$value['info']['file_type'];
+                                $upload_file_data['type']=$file_types_array_for_page_count[strtolower(substr($value['info']['file_ext'],1))];
                                 $upload_file_data['name']=$value['info']['file_name'];
                                 $upload_files[$key]['insert_id']=Query_helper::add($this->config->item('table_fms_tasks_digital_file'),$upload_file_data);
                                 if($this->is_edit || $this->is_delete)
@@ -331,7 +350,7 @@ class Tasks_file_entry extends Root_Controller
     }
     private function permission_helper($file_name_id)
     {
-        $this->db->select('action0,action1,action2,action3');
+        $this->db->select('*');
         $this->db->from($this->config->item('table_fms_setup_assign_file_user_group'));
         $this->db->where('user_group_id',$this->user_group);
         $this->db->where('id_file',$file_name_id);
@@ -364,9 +383,9 @@ class Tasks_file_entry extends Root_Controller
     }
     private function move_deleted_file($folder,$file_name)
     {
-        $return_value=$file_name;
         if(file_exists($folder.'/'.$file_name))
         {
+            $return_value=$file_name;
             $extension='.'.pathinfo($file_name,PATHINFO_EXTENSION);
             $raw_name=pathinfo($file_name,PATHINFO_FILENAME);
             $delete_folder=$this->config->item('system_folder_upload_delete');
@@ -379,8 +398,12 @@ class Tasks_file_entry extends Root_Controller
                 $return_value=$raw_name.$i.$extension;
             }
             rename($folder.'/'.$file_name,$file);
+            return $return_value;
         }
-        return $return_value;
+        else
+        {
+            return false;
+        }
     }
     private function check_validation()
     {
@@ -395,7 +418,7 @@ class Tasks_file_entry extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) number_of_file');
+        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(u.employee_id,\' - \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) number_of_file');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_assign_file_user_group').' fug','n.id=fug.id_file');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');

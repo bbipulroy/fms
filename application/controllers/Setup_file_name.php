@@ -145,7 +145,7 @@ class Setup_file_name extends Root_Controller
             $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'));
             $data['departments']=$this->db->get()->result_array();
 
-            $this->db->select("u.id value,CONCAT('[',u.employee_id,'] ',ui.name) AS text");
+            $this->db->select("u.id value,CONCAT(u.employee_id,' - ',ui.name) AS text");
             $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u');
             $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','u.id=ui.user_id');
             $this->db->where('u.status',$this->config->item('system_status_active'));
@@ -254,7 +254,8 @@ class Setup_file_name extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) number_of_file');
+        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(u.employee_id,\' - \',ui.name) employee_name,d.name department_name,o.name office_name');
+        $this->db->select('SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' AND df.type=\''.$this->config->item('system_digital_file_image').'\' THEN 1 ELSE 0 END) number_of_file');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');

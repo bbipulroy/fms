@@ -96,10 +96,6 @@ class Setup_assign_file_user_group extends Root_Controller
             $this->db->order_by('t.id');
             $this->db->order_by('n.id');
             $data['all_files']=$this->db->get()->result_array();
-            if(!is_array($data['all_files']))
-            {
-                $data['all_files']=array();
-            }
 
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/details',$data,true));
             if($this->message)
@@ -224,6 +220,7 @@ class Setup_assign_file_user_group extends Root_Controller
             foreach($data as $id_file=>$actions)
             {
                 $data_add=array();
+
                 foreach($actions as $index=>$status)
                 {
                     $data_add[$index]=1;

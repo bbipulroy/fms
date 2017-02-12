@@ -113,15 +113,13 @@ $CI->load->view('action_buttons',$action_data);
                 $('#class_container').show();
                 $.ajax(
                 {
-                    url: base_url+"common_controller/get_dropdown_with_select",
+                    url: '<?php echo site_url('common_controller/get_classes_by_category_id'); ?>',
                     type: 'POST',
                     datatype: "JSON",
                     data:
                     {
                         html_container_id:'#id_class',
-                        table:'<?php echo $CI->config->item('table_fms_setup_file_class'); ?>',
-                        table_column:'id_category',
-                        table_column_value:id_category
+                        id_category:id_category
                     },
                     success: function (data, status)
                     {

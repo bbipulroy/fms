@@ -18,3 +18,9 @@ $config['system_status_delete']='Deleted';
 $config['system_image_base_url']='http://localhost/fms/';
 $config['system_folder_upload']='files';
 $config['system_folder_upload_delete']='deleted';
+
+$config['system_digital_file_image']='image';
+$config['system_digital_file_word']='word';
+$config['system_digital_file_book']='book';
+$config['system_digital_file_slide_show']='slide_show';
+$config['system_digital_file_excel']='excel';

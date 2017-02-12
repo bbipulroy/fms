@@ -22,11 +22,11 @@ $CI->load->view('action_buttons',$action_data);
             <table class="table table-bordered table-responsive">
                 <thead>
                     <tr>
-                        <th>File Category</th>
-                        <th>File Class</th>
-                        <th>File Type</th>
+                        <th><?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?></th>
+                        <th><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?></th>
+                        <th><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?></th>
                         <th>
-                            <label><input type="checkbox" class="system-prevent-click" data-type="file" data-id=""> File Name</label>
+                            <label><input type="checkbox" class="system-prevent-click" data-type="file" data-id=""> <?php echo $CI->lang->line('LABEL_FILE_NAME'); ?></label>
                         </th>
                             <?php
                             for($index=0;$index<$CI->config->item('system_fms_max_actions');$index++)
@@ -129,6 +129,7 @@ $CI->load->view('action_buttons',$action_data);
                 if(attr_data_type!='action')
                 {
                     $('.'+attr_data_type+obj.attr('data-id')+'.action3').prop('checked',false);
+                    $('.'+attr_data_type+obj.attr('data-id')+'.action2').prop('checked',false);
                 }
             }
             else

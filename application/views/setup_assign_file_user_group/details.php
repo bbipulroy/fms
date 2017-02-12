@@ -4,8 +4,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $CI= & get_instance();
 $action_data=array();
 $action_data['action_back']=site_url($CI->controller_url);
-$action_data['action_save']='#save_form';
-$action_data['action_clear']='#save_form';
 $CI->load->view('action_buttons',$action_data);
 ?>
     <div class="row widget">
@@ -20,10 +18,10 @@ $CI->load->view('action_buttons',$action_data);
             <table class="table table-bordered table-responsive">
                 <thead>
                     <tr>
-                        <th>File Category</th>
-                        <th>File Class</th>
-                        <th>File Type</th>
-                        <th>File Name</th>
+                        <th><?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?></th>
+                        <th><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?></th>
+                        <th><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?></th>
+                        <th><?php echo $CI->lang->line('LABEL_FILE_NAME'); ?></th>
                             <?php
                             for($index=0;$index<$CI->config->item('system_fms_max_actions');$index++)
                             {
@@ -115,7 +113,7 @@ $CI->load->view('action_buttons',$action_data);
                     $check_array['category']=array();
                     $check_array['class']=array();
                     $check_array['type']=array();
-                    echo '<tr style="text-align: center;font-size: 18px;"><td colspan="7">No data to display.</td></tr>';
+                    echo '<tr style="text-align: center;font-size: 18px;"><td colspan="8">No data to display.</td></tr>';
                 }
                 ?>
                 </tbody>
