@@ -141,7 +141,8 @@ class Report_file_view extends Root_Controller
     }
     private function get_data(&$data,$id_file_name,$date_from_start_page,$date_to_start_page)
     {
-        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) file_total');
+        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(u.employee_id,\' - \',ui.name) employee_name,d.name department_name,o.name office_name');
+        $this->db->select('SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' AND df.type=\''.$this->config->item('system_digital_file_image').'\' THEN 1 ELSE 0 END) number_of_page');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
@@ -175,7 +176,7 @@ class Report_file_view extends Root_Controller
         $date_from_start_file=$this->input->post('date_from_start_file');
         $date_to_start_file=$this->input->post('date_to_start_file');
 
-        $this->db->select('n.id,n.name,n.date_start,n.ordering,hl.name hardcopy_location,t.name type_name,cls.name class_name,ctg.name category_name,CONCAT(\'[\',u.employee_id,\'] \',ui.name) employee_name,d.name department_name,o.name office_name');
+        $this->db->select('n.id,n.name,n.date_start,n.ordering,hl.name hardcopy_location,t.name type_name,cls.name class_name,ctg.name category_name,CONCAT(u.employee_id,\' - \',ui.name) employee_name,d.name department_name,o.name office_name');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->from($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');

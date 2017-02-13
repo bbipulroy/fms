@@ -348,15 +348,6 @@ $(document).ready(function()
         {
             console.log('no container');
         }
-        //Bipul Roy||start|| for old file delete
-            var html_id="#file-"+$(this).attr('data-current-id');
-            $(html_id).remove();
-            var tr_obj=$(this).closest('tr');
-            var date_entry_obj=tr_obj.find('.date_entry');
-            var remarks_obj=tr_obj.find('.remarks');
-            date_entry_obj.attr("name","date_entry["+$(this).attr('data-current-id')+"]");
-            remarks_obj.attr("name","remarks["+$(this).attr('data-current-id')+"]");
-        //Bipul Roy||end
     });
     $(document).on("click", "#button_action_print", function(event)
     {

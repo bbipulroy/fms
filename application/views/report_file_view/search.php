@@ -247,7 +247,7 @@ $CI= & get_instance();
                 $('#employee_responsible_container').show();
                 $.ajax(
                     {
-                        url: base_url+"common_controller/get_employees",
+                        url: "<?php echo site_url('common_controller/get_employees'); ?>",
                         type: 'POST',
                         datatype: "JSON",
                         data:
@@ -283,26 +283,24 @@ $CI= & get_instance();
                 $('#type_container').hide();
                 $('#name_container').hide();
                 $.ajax(
-                {
-                    url: base_url+"common_controller/get_dropdown_with_select",
-                    type: 'POST',
-                    datatype: "JSON",
-                    data:
                     {
-                        html_container_id:'#id_class',
-                        table:'<?php echo $CI->config->item('table_fms_setup_file_class'); ?>',
-                        table_column:'id_category',
-                        table_column_value:id_category
-                    },
-                    success: function (data, status)
-                    {
+                        url: '<?php echo site_url('common_controller/get_classes_by_category_id'); ?>',
+                        type: 'POST',
+                        datatype: "JSON",
+                        data:
+                        {
+                            html_container_id:'#id_class',
+                            id_category:id_category
+                        },
+                        success: function (data, status)
+                        {
 
-                    },
-                    error: function (xhr, desc, err)
-                    {
-                        console.log("error");
-                    }
-                });
+                        },
+                        error: function (xhr, desc, err)
+                        {
+                            console.log("error");
+                        }
+                    });
             }
             else
             {
@@ -322,15 +320,13 @@ $CI= & get_instance();
                 $('#name_container').hide();
                 $.ajax(
                     {
-                        url: base_url+"common_controller/get_dropdown_with_select",
+                        url: '<?php echo site_url('common_controller/get_types_by_class_id'); ?>',
                         type: 'POST',
                         datatype: "JSON",
                         data:
                         {
                             html_container_id:'#id_type',
-                            table:'<?php echo $CI->config->item('table_fms_setup_file_type'); ?>',
-                            table_column:'id_class',
-                            table_column_value:id_class
+                            id_class:id_class
                         },
                         success: function (data, status)
                         {
@@ -357,15 +353,13 @@ $CI= & get_instance();
                 $('#name_container').show();
                 $.ajax(
                     {
-                        url: base_url+"common_controller/get_dropdown_with_select",
+                        url: '<?php echo site_url('common_controller/get_names_by_type_id'); ?>',
                         type: 'POST',
                         datatype: "JSON",
                         data:
                         {
                             html_container_id:'#id_name',
-                            table:'<?php echo $CI->config->item('table_fms_setup_file_name'); ?>',
-                            table_column:'id_type',
-                            table_column_value:id_type
+                            id_type:id_type
                         },
                         success: function (data, status)
                         {

@@ -89,7 +89,7 @@ $CI->load->view('action_buttons',$action_data);
             <label class="control-label pull-right">Number of Pages:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label><?php echo $details['file_total'] ?></label>
+            <label><?php echo $details['number_of_page'] ?></label>
         </div>
     </div>
 </div>

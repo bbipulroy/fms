@@ -95,7 +95,7 @@ $CI->load->view('action_buttons',$action_data);
                 <label class="control-label pull-right">Number of Pages:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <label><?php echo $item['file_total'] ?></label>
+                <label><?php echo $item['number_of_page'] ?></label>
             </div>
         </div>
 
@@ -147,7 +147,7 @@ $CI->load->view('action_buttons',$action_data);
                                         if($CI->is_edit)
                                         {
                                             ?>
-                                            <input type="file" id="file_<?php echo $index+1; ?>" name="file_<?php echo $index+1; ?>" data-current-id="<?php echo $index+1; ?>" data-preview-container="#preview_container_file_<?php echo $index+1;?>" class="browse_button"><br>
+                                            <input type="file" data-check="system_fms_check" id="file_<?php echo $index+1; ?>" name="file_<?php echo $index+1; ?>" data-current-id="<?php echo $index+1; ?>" data-preview-container="#preview_container_file_<?php echo $index+1;?>" class="browse_button"><br>
                                             <?php
                                         }
                                         if($CI->is_edit || $CI->is_delete)
@@ -224,7 +224,7 @@ $CI->load->view('action_buttons',$action_data);
                     </div>
                 </td>
                 <td>
-                    <input type="file" class="browse_button_new"><br>
+                    <input type="file" data-check="system_fms_check" class="browse_button_new"><br>
                     <button type="button" class="btn btn-danger system_button_delete"><?php echo $CI->lang->line('DELETE'); ?></button>
                 </td>
                 <td>
@@ -238,13 +238,13 @@ $CI->load->view('action_buttons',$action_data);
     </table>
 </div>
 
-<div class="row show-grid">
+<!--<div class="row show-grid">
     <div class="col-xs-12">
         <video id="video" width="1000" height="600" controls autoplay></video>
     </div>
-</div>
+</div>-->
 <script type="text/javascript">
-    var camera_stream;
+    /*var camera_stream;
     function camera_on()
     {
         $('video').show();
@@ -261,13 +261,13 @@ $CI->load->view('action_buttons',$action_data);
                 video.play();
             });
         }
-    }
+    }*/
     jQuery(document).ready(function()
     {
         $(document).off("click",".system_button_add");
         $(document).off("click",".system_button_delete");
 
-        $('video').hide();
+        //$('video').hide();
         $('.datepicker').datepicker({dateFormat : display_date_format});
         $('.browse_button').filestyle({input: false,icon: false,buttonText: "Edit",buttonName: "btn-primary"});
         $(document).on("click", ".system_button_add", function(event)
@@ -304,7 +304,24 @@ $CI->load->view('action_buttons',$action_data);
         {
             $(this).closest('tr').remove();
         });
-        $(document).on('click','#camera',function()
+        $(document).on("change", ":file", function(event)
+        {
+            if(($(this).is('[class*="file_external"]')))
+            {
+                return;
+            }
+            if($(this).attr('data-check')=='system_fms_check')
+            {
+                var html_id="#file-"+$(this).attr('data-current-id');
+                $(html_id).remove();
+                var tr_obj=$(this).closest('tr');
+                var date_entry_obj=tr_obj.find('.date_entry');
+                var remarks_obj=tr_obj.find('.remarks');
+                date_entry_obj.attr("name","date_entry["+$(this).attr('data-current-id')+"]");
+                remarks_obj.attr("name","remarks["+$(this).attr('data-current-id')+"]");
+            }
+        });
+        /*$(document).on('click','#camera',function()
         {
             if(camera.data('check'))
             {
@@ -352,7 +369,7 @@ $CI->load->view('action_buttons',$action_data);
         {
             $('video').show();
             video.play();
-        }
+        }*/
     });
 </script>
 <div id="upload-complete-info"></div>

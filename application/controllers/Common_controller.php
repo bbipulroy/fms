@@ -9,22 +9,6 @@ class Common_controller extends Root_Controller
         parent::__construct();
         $this->message='';
     }
-    public function get_dropdown_with_select()
-    {
-        $html_container_id=$this->input->post('html_container_id');
-        if($this->input->post('html_container_id'))
-        {
-            $html_container_id=$this->input->post('html_container_id');
-        }
-        $table=$this->input->post('table');
-        $table_column=$this->input->post('table_column');
-        $table_column_value=$this->input->post('table_column_value');
-        
-        $data['items']=Query_helper::get_info($table,array('id value','name text'),array($table_column.'='.$table_column_value,'status="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
-        $ajax['system_content'][]=array('id'=>$html_container_id,'html'=>$this->load->view('dropdown_with_select',$data,true));
-        $ajax['status']=true;
-        $this->json_return($ajax);
-    }
     public function get_classes_by_category_id()
     {
         $html_container_id='#id_class';
@@ -51,7 +35,20 @@ class Common_controller extends Root_Controller
         $ajax['status']=true;
         $this->json_return($ajax);
     }
-    public function get_departments()
+    public function get_names_by_type_id()
+    {
+        $html_container_id='#id_name';
+        if($this->input->post('html_container_id'))
+        {
+            $html_container_id=$this->input->post('html_container_id');
+        }
+        $id_type=$this->input->post('id_type');
+        $data['items']=Query_helper::get_info($this->config->item('table_fms_setup_file_name'),array('id value','name text'),array('id_type='.$id_type,'status="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
+        $ajax['system_content'][]=array('id'=>$html_container_id,'html'=>$this->load->view('dropdown_with_select',$data,true));
+        $ajax['status']=true;
+        $this->json_return($ajax);
+    }
+    /*public function get_departments()
     {
         $html_container_id=$this->input->post('html_container_id');
         if($this->input->post('html_container_id'))
@@ -64,7 +61,7 @@ class Common_controller extends Root_Controller
         $ajax['system_content'][]=array('id'=>$html_container_id,'html'=>$this->load->view('dropdown_with_select',$data,true));
         $ajax['status']=true;
         $this->json_return($ajax);
-    }
+    }*/
     public function get_employees()
     {
         $html_container_id='#employee_responsible';
