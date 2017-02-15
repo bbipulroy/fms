@@ -67,8 +67,10 @@
                         $('input[name="files[<?php echo $value['insert_id']; ?>]"]').attr("id","file-"+input_obj.attr("data-current-id"));
                         input_obj.remove();
                         label_obj.remove();
-                        date_entry_obj.attr("disabled",true);
-                        remarks_obj.attr("disabled",true);
+                        //date_entry_obj.attr("disabled",true);
+                        //remarks_obj.attr("disabled",true);
+                        date_entry_obj.closest('td').html(date_entry_obj.val());
+                        remarks_obj.closest('td').html(remarks_obj.val());
                         <?php
                     }
                     elseif($CI->is_add)
@@ -77,8 +79,10 @@
                         input_obj.remove();
                         label_obj.remove();
                         delete_obj.remove();
-                        date_entry_obj.attr("disabled",true);
-                        remarks_obj.attr("disabled",true);
+                        //date_entry_obj.attr("disabled",true);
+                        //remarks_obj.attr("disabled",true);
+                        date_entry_obj.closest('td').html(date_entry_obj.val());
+                        remarks_obj.closest('td').html(remarks_obj.val());
                         <?php
                     }
                 }
