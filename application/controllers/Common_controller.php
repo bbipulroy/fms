@@ -48,20 +48,6 @@ class Common_controller extends Root_Controller
         $ajax['status']=true;
         $this->json_return($ajax);
     }
-    /*public function get_departments()
-    {
-        $html_container_id=$this->input->post('html_container_id');
-        if($this->input->post('html_container_id'))
-        {
-            $html_container_id=$this->input->post('html_container_id');
-        }
-        $this->db->select('id value,name text');
-        $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'));
-        $data['items']=$this->db->get()->result_array();
-        $ajax['system_content'][]=array('id'=>$html_container_id,'html'=>$this->load->view('dropdown_with_select',$data,true));
-        $ajax['status']=true;
-        $this->json_return($ajax);
-    }*/
     public function get_employees()
     {
         $html_container_id='#employee_responsible';
@@ -72,7 +58,7 @@ class Common_controller extends Root_Controller
         $id_office=$this->input->post('id_office');
         $id_department=$this->input->post('id_department');
 
-        $this->db->select("u.id value,CONCAT(u.employee_id,' - ',ui.name) text");
+        $this->db->select("u.id value,CONCAT(ui.name,' - ',u.employee_id) text");
         $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','u.id=ui.user_id');
         $this->db->where('u.status',$this->config->item('system_status_active'));

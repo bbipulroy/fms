@@ -88,8 +88,8 @@ $CI->load->view('action_buttons',$action_data);
                 selectionmode: 'singlerow',
                 altrows: true,
                 enabletooltips: true,
-                showaggregates: true,
-                showstatusbar: true,
+                //showaggregates: true,
+                //showstatusbar: true,
                 //rowsheight: 45,
                 autoheight: true,
                 columns:[

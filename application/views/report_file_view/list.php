@@ -36,7 +36,7 @@ $CI->load->view("action_buttons",$action_data);
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="office_name"><?php echo $CI->lang->line('LABEL_OFFICE'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="department_name"><?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="ordering"><?php echo $CI->lang->line('LABEL_ORDER'); ?></label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="details_button">Details</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="details_button"><?php echo $CI->lang->line('ACTION_DETAILS'); ?></label>
             </div>
         </div>
         <?php
@@ -117,7 +117,7 @@ $CI->load->view("action_buttons",$action_data);
                 { text: '<?php echo $CI->lang->line('LABEL_OFFICE'); ?>', dataField: 'office_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},
                 { text: '<?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>', dataField: 'department_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},
                 { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'60',rendered: tooltiprenderer,hidden:true},
-                { text: 'Details', dataField: 'details_button',width:'85',cellsrenderer:cellsrenderer}
+                { text: '<?php echo $CI->lang->line('ACTION_DETAILS'); ?>', dataField: 'details_button',width:'85',cellsrenderer:cellsrenderer}
             ]
         });
     });

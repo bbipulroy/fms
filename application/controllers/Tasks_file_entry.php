@@ -160,8 +160,7 @@ class Tasks_file_entry extends Root_Controller
     }
     private function edit_details_helper($file_name_id)
     {
-        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(u.employee_id,\' - \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) file_total');
-        #$this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(u.employee_id,\' - \',ui.name) employee_name,d.name department_name,o.name office_name');
+        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(ui.name,\' - \',u.employee_id) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) file_total');
         $this->db->select('SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' AND df.type=\''.$this->config->item('system_digital_file_image').'\' THEN 1 ELSE 0 END) number_of_page');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
@@ -180,6 +179,10 @@ class Tasks_file_entry extends Root_Controller
     }
     private function system_save()
     {
+        $id=$this->input->post('id');
+        $time=time();
+
+        $allowed_types='gif|jpg|png|doc|docx|pdf|xls|xlsx|ppt|pptx|txt';
         $file_types_array_for_page_count=array
         (
             'gif'=>$this->config->item('system_digital_file_image'),
@@ -187,15 +190,13 @@ class Tasks_file_entry extends Root_Controller
             'png'=>$this->config->item('system_digital_file_image'),
             'doc'=>$this->config->item('system_digital_file_word'),
             'docx'=>$this->config->item('system_digital_file_word'),
-            'pdf'=>$this->config->item('system_digital_file_book'),
-            'txt'=>$this->config->item('system_digital_file_book'),
+            'pdf'=>$this->config->item('system_digital_file_pdf'),
+            'txt'=>$this->config->item('system_digital_file_txt_file'),
             'xls'=>$this->config->item('system_digital_file_excel'),
             'xlsx'=>$this->config->item('system_digital_file_excel'),
-            'ppt'=>$this->config->item('system_digital_file_slide_show'),
-            'pptx'=>$this->config->item('system_digital_file_slide_show')
+            'ppt'=>$this->config->item('system_digital_file_power_point'),
+            'pptx'=>$this->config->item('system_digital_file_power_point')
         );
-        $id=$this->input->post('id');
-        $time=time();
 
         if($this->permission_helper($id))
         {
@@ -209,6 +210,11 @@ class Tasks_file_entry extends Root_Controller
                 }
                 else
                 {
+                    $uploading_error_files=0; // if codeigniter cannot upload file
+                    $deleted_move_files_for_undo=array(); // if database transaction failed
+
+                    $this->db->trans_start(); //DB Transaction Handle START
+
                     $folder=FCPATH.$this->config->item('system_folder_upload').'/'.$id;
                     if(!is_dir($folder))
                     {
@@ -282,20 +288,21 @@ class Tasks_file_entry extends Root_Controller
                                     $update_delete_data['date_updated']=$time;
                                     $update_delete_data['status']=$this->config->item('system_status_delete');
                                     Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_delete_data,array('id='.$af));
+                                    $deleted_move_files_for_undo[$update_delete_data['name']]=$file_delete['name'];
                                 }
                             }
                         }
                     }
                     if($this->is_add || $this->is_edit)
                     {
-                        $upload_file_data['id_file_name']=$id;
-                        $upload_file_data['date_created']=$time;
-                        $upload_file_data['user_created']=$this->user_id;
-                        $errors=0;
-                        $allowed_types='gif|jpg|png|doc|docx|pdf|xls|xlsx|ppt|pptx|txt';
                         $upload_files=System_helper::upload_file($this->config->item('system_folder_upload').'/'.$id,$allowed_types);
                         $date_entry=$this->input->post('date_entry');
                         $remarks=$this->input->post('remarks');
+
+                        $upload_file_data['id_file_name']=$id;
+                        $upload_file_data['date_created']=$time;
+                        $upload_file_data['user_created']=$this->user_id;
+
                         foreach($upload_files as $key=>$value)
                         {
                             $index=explode('_',$key)[1];
@@ -314,26 +321,44 @@ class Tasks_file_entry extends Root_Controller
                             }
                             else
                             {
-                                ++$errors;
+                                ++$uploading_error_files;
                             }
                         }
-                        if($errors>0)
+                    }
+
+                    $this->db->trans_complete(); //DB Transaction Handle END
+
+                    if($this->db->trans_status()===true)
+                    {
+                        if($uploading_error_files>0)
                         {
-                            $ajax['status']=false;
-                            $ajax['system_message']='Upload successful. But some errors occur.';
                             if(substr($temp_session_active_files,0,1)==',')
                             {
                                 $temp_session_active_files=substr($temp_session_active_files,1);
                             }
                             $this->session->set_userdata('active_files',$temp_session_active_files);
+
                             $upload_complete_info['upload_files']=$upload_files;
                             $upload_complete_info['id']=$id; //use for folder name
+
+                            $ajax['status']=false;
+                            $ajax['system_message']='Upload successful. But some errors occur.';
                             $ajax['system_content'][]=array('id'=>'#upload-complete-info','html'=>$this->load->view($this->controller_url.'/upload-result',$upload_complete_info,true));
                             $this->json_return($ajax);
                         }
+                        $this->message=$this->lang->line('MSG_SAVED_SUCCESS');
+                        $this->system_list();
                     }
-                    $this->message=$this->lang->line('MSG_SAVED_SUCCESS');
-                    $this->system_list();
+                    else
+                    {
+                        foreach($deleted_move_files_for_undo as $deleted_name=>$real_name)
+                        {
+                            rename($delete_folder.'/'.$deleted_name,$folder.'/'.$real_name);
+                        }
+                        $ajax['status']=false;
+                        $this->message=$this->lang->line('MSG_SAVED_FAIL');
+                        $this->system_list();
+                    }
                 }
             }
             else
@@ -360,6 +385,7 @@ class Tasks_file_entry extends Root_Controller
         $actions=$this->db->get()->row_array();
         if($actions)
         {
+            // these 3 actions are fixed here (but changeable)
             if($actions['action0'])
             {
                 $this->is_view=true;
@@ -420,8 +446,7 @@ class Tasks_file_entry extends Root_Controller
     }
     private function system_get_items()
     {
-        #$this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(u.employee_id,\' - \',ui.name) employee_name,d.name department_name,o.name office_name,SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' THEN 1 ELSE 0 END) number_of_file');
-        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(u.employee_id,\' - \',ui.name) employee_name,d.name department_name,o.name office_name');
+        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(ui.name,\' - \',u.employee_id) employee_name,d.name department_name,o.name office_name');
         $this->db->select('SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' AND df.type=\''.$this->config->item('system_digital_file_image').'\' THEN 1 ELSE 0 END) number_of_page');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_assign_file_user_group').' fug','n.id=fug.id_file');

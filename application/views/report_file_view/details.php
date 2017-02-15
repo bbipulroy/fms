@@ -136,6 +136,6 @@ $CI= & get_instance();
         </tr>
         <?php
     }
-        ?>
+    ?>
     </tbody>
 </table>

@@ -165,10 +165,32 @@ $CI->load->view('action_buttons',$action_data);
                                     ?>
                                 </td>
                                 <td>
-                                    <input type="text" name="date_entry_old[<?php echo $file['id']; ?>]" class="form-control datepicker date_entry" value="<?php echo System_helper::display_date($file['date_entry']); ?>" <?php if(!$CI->is_edit){echo 'disabled';} ?>>
+                                    <?php
+                                        if($CI->is_edit)
+                                        {
+                                            ?>
+                                            <input type="text" name="date_entry_old[<?php echo $file['id']; ?>]" class="form-control datepicker date_entry" value="<?php echo System_helper::display_date($file['date_entry']); ?>">
+                                            <?php
+                                        }
+                                        else
+                                        {
+                                            echo System_helper::display_date($file['date_entry']);
+                                        }
+                                    ?>
                                 </td>
                                 <td>
-                                    <textarea name="remarks_old[<?php echo $file['id']; ?>]" class="form-control remarks" <?php if(!$CI->is_edit){echo 'disabled';} ?>><?php echo $file['remarks']; ?></textarea>
+                                    <?php
+                                    if($CI->is_edit)
+                                    {
+                                        ?>
+                                        <textarea name="remarks_old[<?php echo $file['id']; ?>]" class="form-control remarks"><?php echo $file['remarks']; ?></textarea>
+                                        <?php
+                                    }
+                                    else
+                                    {
+                                        echo $file['remarks'];
+                                    }
+                                    ?>
                                 </td>
                             </tr>
                         <?php
@@ -312,13 +334,12 @@ $CI->load->view('action_buttons',$action_data);
             }
             if($(this).attr('data-check')=='system_fms_check')
             {
-                var html_id="#file-"+$(this).attr('data-current-id');
-                $(html_id).remove();
+                var attr_data_current_id=$(this).attr('data-current-id');
                 var tr_obj=$(this).closest('tr');
-                var date_entry_obj=tr_obj.find('.date_entry');
-                var remarks_obj=tr_obj.find('.remarks');
-                date_entry_obj.attr("name","date_entry["+$(this).attr('data-current-id')+"]");
-                remarks_obj.attr("name","remarks["+$(this).attr('data-current-id')+"]");
+
+                $("#file-"+attr_data_current_id).remove();
+                tr_obj.find('.date_entry').attr("name","date_entry["+attr_data_current_id+"]");
+                tr_obj.find('.remarks').attr("name","remarks["+attr_data_current_id+"]");
             }
         });
         /*$(document).on('click','#camera',function()

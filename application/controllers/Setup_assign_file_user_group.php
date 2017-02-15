@@ -203,7 +203,7 @@ class Setup_assign_file_user_group extends Root_Controller
                 $this->json_return($ajax);
             }
         }
-        if($id==0)
+        if($id<=0)
         {
             $ajax['status']=false;
             $ajax['system_message']='You violate your rules.';
@@ -250,7 +250,7 @@ class Setup_assign_file_user_group extends Root_Controller
     {
         $user=User_helper::get_user();
         $this->db->from($this->config->item('table_system_user_group'));
-        $this->db->select('id,name,status');
+        $this->db->select('*');
         if($user->user_group!=1)
         {
             $this->db->where('id !=1');

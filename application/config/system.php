@@ -21,6 +21,7 @@ $config['system_folder_upload_delete']='deleted';
 
 $config['system_digital_file_image']='image';
 $config['system_digital_file_word']='word';
-$config['system_digital_file_book']='book';
-$config['system_digital_file_slide_show']='slide_show';
+$config['system_digital_file_pdf']='pdf';
+$config['system_digital_file_power_point']='power_point';
 $config['system_digital_file_excel']='excel';
+$config['system_digital_file_txt_file']='txt_file';
