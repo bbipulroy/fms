@@ -27,9 +27,9 @@ class Report_file_view extends Root_Controller
         {
             $this->system_get_items();
         }
-        elseif($action=='details_popup')
+        elseif($action=='details')
         {
-            $this->system_details_popup($id);
+            $this->system_details($id);
         }
         else
         {
@@ -126,7 +126,7 @@ class Report_file_view extends Root_Controller
             $this->json_return($ajax);
         }
     }
-    private function system_details_popup($id)
+    private function system_details($id)
     {
         $id=$this->input->post('id');
         $html_id=$this->input->post('html_container_id');

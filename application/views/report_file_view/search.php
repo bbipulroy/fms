@@ -386,7 +386,7 @@ $CI= & get_instance();
             var id=$("#system_jqx_container").jqxGrid('getrowdata',row).id;
             $.ajax(
                 {
-                    url: "<?php echo site_url($CI->controller_url.'/index/details_popup') ?>",
+                    url: "<?php echo site_url($CI->controller_url.'/index/details') ?>",
                     type: 'POST',
                     datatype: "JSON",
                     data:
