@@ -227,6 +227,16 @@ class Tasks_file_entry extends Root_Controller
                     }
                     if($this->is_edit)
                     {
+                        $this->db->select('id');
+                        $this->db->from($this->config->item('table_fms_tasks_digital_file'));
+                        $this->db->where('id_file_name',$id);
+                        $results=$this->db->get()->result_array();
+                        $these_file_files=array();
+                        foreach($results as $result)
+                        {
+                            $these_file_files[]=$result['id'];
+                        }
+
                         $remarks_old=$this->input->post('remarks_old');
                         if(!is_array($remarks_old))
                         {
@@ -241,14 +251,28 @@ class Tasks_file_entry extends Root_Controller
                         $update_data=array();
                         foreach($date_entry_old as $row_key=>$row_value)
                         {
-                            $update_data['date_entry']=System_helper::get_time($row_value);
-                            Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_data,array('id='.$row_key));
+                            if(in_array($row_key,$these_file_files))
+                            {
+                                $update_data['date_entry']=System_helper::get_time($row_value);
+                                Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_data,array('id='.$row_key));
+                            }
+                            else
+                            {
+                                System_helper::invalid_try('UPDATE',$row_key,$this->config->item('table_fms_tasks_digital_file').' try to update File Entry Date illegal way.');
+                            }
                         }
                         $update_data=array();
                         foreach($remarks_old as $row_key=>$row_value)
                         {
-                            $update_data['remarks']=$row_value;
-                            Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_data,array('id='.$row_key));
+                            if(in_array($row_key,$these_file_files))
+                            {
+                                $update_data['remarks']=$row_value;
+                                Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_data,array('id='.$row_key));
+                            }
+                            else
+                            {
+                                System_helper::invalid_try('UPDATE',$row_key,$this->config->item('table_fms_tasks_digital_file').' try to update File Remarks illegal way.');
+                            }
                         }
                     }
                     $temp_session_active_files=$this->session->userdata('active_files');
@@ -370,6 +394,7 @@ class Tasks_file_entry extends Root_Controller
         }
         else
         {
+            System_helper::invalid_try('UPDATE',$id,$this->config->item('table_fms_tasks_digital_file').' try to Entry File illegal way.');
             $ajax['status']=false;
             $ajax['system_message']='You violate your rules.';
             $this->json_return($ajax);
