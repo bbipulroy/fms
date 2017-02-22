@@ -206,8 +206,10 @@ class Setup_file_class extends Root_Controller
         $this->db->select('cls.id,cls.name class_name,cls.id_category,cls.status,cls.ordering,ctg.name category_name');
         $this->db->from($this->config->item('table_fms_setup_file_class').' cls');
         $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->where('cls.status!=',$this->config->item('system_status_delete'));
         $this->db->order_by('ctg.ordering');
         $this->db->order_by('cls.ordering');
-        $this->json_return($this->db->get()->result_array());
+        $items=$this->db->get()->result_array();
+        $this->json_return($items);
     }
 }

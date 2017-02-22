@@ -161,6 +161,7 @@ class Setup_file_name extends Root_Controller
             $this->db->where('ui.revision',1);
             $where='(ui.office_id='.$data['item']['id_office'].' OR '.'ui.department_id='.$data['item']['id_department'].')';
             $this->db->where($where,'',false);
+            $this->db->order_by('u.employee_id');
             $this->db->group_by('u.id');
             $data['employees']=$this->db->get()->result_array();
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
@@ -263,8 +264,8 @@ class Setup_file_name extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(ui.name,\' - \',u.employee_id) employee_name,d.name department_name,o.name office_name');
-        $this->db->select('SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' AND df.type=\''.$this->config->item('system_digital_file_image').'\' THEN 1 ELSE 0 END) number_of_page');
+        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(ui.name," - ",u.employee_id) employee_name,d.name department_name,o.name office_name');
+        $this->db->select('SUM(CASE WHEN df.status="'.$this->config->item('system_status_active').'" AND MID(df.type,1,5)="image" THEN 1 ELSE 0 END) number_of_page');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
@@ -275,14 +276,15 @@ class Setup_file_name extends Root_Controller
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');
         $this->db->join($this->config->item('table_fms_tasks_digital_file').' df','df.id_file_name=n.id','left');
+        $this->db->where('n.status!=',$this->config->item('system_status_delete'));
         $this->db->where('ui.revision',1);
         $this->db->order_by('n.ordering');
         $this->db->group_by('n.id');
-        $temp=$this->db->get()->result_array();
-        foreach($temp as &$val)
+        $items=$this->db->get()->result_array();
+        foreach($items as &$item)
         {
-            $val['date_start']=System_helper::display_date($val['date_start']);
+            $item['date_start']=System_helper::display_date($item['date_start']);
         }
-        $this->json_return($temp);
+        $this->json_return($items);
     }
 }

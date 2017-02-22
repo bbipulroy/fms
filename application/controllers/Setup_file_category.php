@@ -199,7 +199,7 @@ class Setup_file_category extends Root_Controller
     }
     private function system_get_items()
     {
-        $item=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
-        $this->json_return($item);
+        $items=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
+        $this->json_return($items);
     }
 }

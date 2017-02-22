@@ -113,7 +113,7 @@ class Setup_file_type extends Root_Controller
             $data['item']=$this->db->get()->row_array();
             $data['title']='Edit '.$this->lang->line('LABEL_FILE_TYPE').' ('.$data['item']['name'].')';
             $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
-            $data['classes']=Query_helper::get_info($this->config->item('table_fms_setup_file_class'),array('id value','name text'),array('id_category='.$data['item']['id_category']));
+            $data['classes']=Query_helper::get_info($this->config->item('table_fms_setup_file_class'),array('id value','name text'),array('id_category='.$data['item']['id_category'],'status ="'.$this->config->item('system_status_active').'"'));
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
@@ -214,9 +214,11 @@ class Setup_file_type extends Root_Controller
         $this->db->from($this->config->item('table_fms_setup_file_type').' t');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
         $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->where('t.status!=',$this->config->item('system_status_delete'));
         $this->db->order_by('ctg.ordering');
         $this->db->order_by('cls.ordering');
         $this->db->order_by('t.ordering');
-        $this->json_return($this->db->get()->result_array());
+        $items=$this->db->get()->result_array();
+        $this->json_return($items);
     }
 }
