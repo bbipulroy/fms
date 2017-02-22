@@ -265,7 +265,7 @@ class Setup_file_name extends Root_Controller
     private function system_get_items()
     {
         $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(ui.name," - ",u.employee_id) employee_name,d.name department_name,o.name office_name');
-        $this->db->select('SUM(CASE WHEN df.status="'.$this->config->item('system_status_active').'" AND MID(df.type,1,5)="image" THEN 1 ELSE 0 END) number_of_page');
+        $this->db->select('SUM(CASE WHEN df.status="'.$this->config->item('system_status_active').'" AND MID(df.mime_type,1,5)="image" THEN 1 ELSE 0 END) number_of_page');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');

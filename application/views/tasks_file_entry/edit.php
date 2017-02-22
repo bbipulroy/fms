@@ -144,19 +144,19 @@ $CI->load->view('action_buttons',$action_data);
                                 </td>
                                 <td>
                                     <?php
-                                        if($CI->is_edit)
+                                        if($CI->file_permissions['action2']==1)
                                         {
                                             ?>
                                             <input type="file" data-check="system_fms_check" id="file_<?php echo $index+1; ?>" name="file_<?php echo $index+1; ?>" data-current-id="<?php echo $index+1; ?>" data-preview-container="#preview_container_file_<?php echo $index+1;?>" class="browse_button"><br>
                                             <?php
                                         }
-                                        if($CI->is_edit || $CI->is_delete)
+                                        if($CI->file_permissions['action2']==1 || $CI->file_permissions['action3']==1)
                                         {
                                             ?>
                                             <input id="file-<?php echo $index+1; ?>" type="hidden" name="files[<?php echo $file['id']; ?>]" value="">
                                             <?php
                                         }
-                                        if($CI->is_delete)
+                                        if($CI->file_permissions['action3']==1)
                                         {
                                             ?>
                                             <button type="button" class="btn btn-danger system_button_delete" data-current-id="<?php echo $index+1; ?>"><?php echo $CI->lang->line('DELETE'); ?></button>
@@ -166,7 +166,7 @@ $CI->load->view('action_buttons',$action_data);
                                 </td>
                                 <td>
                                     <?php
-                                        if($CI->is_edit)
+                                        if($CI->file_permissions['action2']==1)
                                         {
                                             ?>
                                             <input type="text" name="date_entry_old[<?php echo $file['id']; ?>]" class="form-control datepicker date_entry" value="<?php echo System_helper::display_date($file['date_entry']); ?>">
@@ -180,7 +180,7 @@ $CI->load->view('action_buttons',$action_data);
                                 </td>
                                 <td>
                                     <?php
-                                    if($CI->is_edit)
+                                    if($CI->file_permissions['action2']==1)
                                     {
                                         ?>
                                         <textarea name="remarks_old[<?php echo $file['id']; ?>]" class="form-control remarks"><?php echo $file['remarks']; ?></textarea>
@@ -195,7 +195,7 @@ $CI->load->view('action_buttons',$action_data);
                             </tr>
                         <?php
                         }
-                        if($CI->is_edit || $CI->is_delete)
+                        if($CI->file_permissions['action2']==1 || $CI->file_permissions['action3']==1)
                         {
                             if(strlen($old_files)>0)
                             {
@@ -208,7 +208,7 @@ $CI->load->view('action_buttons',$action_data);
                 </table>
             </div>
             <?php
-                if($CI->is_add)
+                if($CI->file_permissions['action1']==1)
                 {
                     ?>
                     <div class="row show-grid">

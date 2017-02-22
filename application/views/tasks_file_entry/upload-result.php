@@ -36,7 +36,7 @@
                     remarks_obj=tr_obj.find('.remarks');
                     delete_obj=tr_obj.find('.system_button_delete');
                     <?php
-                    if($CI->is_edit && $CI->is_delete)
+                    if($CI->file_permissions['action2']==1 && $CI->file_permissions['action3']==1)
                     {
                         ?>
                         input_obj.val('');
@@ -47,7 +47,7 @@
                         remarks_obj.attr('name','remarks_old['+<?php echo $value['insert_id']; ?>+']');
                         <?php
                     }
-                    elseif($CI->is_edit)
+                    elseif($CI->file_permissions['action2']==1)
                     {
                         $input='<input name="files['.$value['insert_id'].']" value="" type="hidden">';
                         ?>
@@ -60,7 +60,7 @@
                         delete_obj.remove();
                         <?php
                     }
-                    elseif($CI->is_delete)
+                    elseif($CI->file_permissions['action3']==1)
                     {
                         ?>
                         input_obj.closest('td').append('<?php echo $input; ?>');
@@ -73,7 +73,7 @@
                         remarks_obj.closest('td').html(remarks_obj.val());
                         <?php
                     }
-                    elseif($CI->is_add)
+                    elseif($CI->file_permissions['action1']==1)
                     {
                         ?>
                         input_obj.remove();
