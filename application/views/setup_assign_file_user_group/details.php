@@ -83,16 +83,16 @@ $CI->load->view('action_buttons',$action_data);
                     ?>
                     <tr>
                         <td class="category-<?php echo $file['category_id'].$is_first_category; ?>">
-                            <?php echo $file['category_name']; ?>
+                            <label><?php echo $file['category_name']; ?></label>
                         </td>
                         <td class="class-<?php echo $file['class_id'].$is_first_class; ?>">
-                            <?php echo $file['class_name']; ?>
+                            <label><?php echo $file['class_name']; ?></label>
                         </td>
                         <td class="type-<?php echo $file['type_id'].$is_first_type; ?>">
-                            <?php  echo $file['type_name']; ?>
+                            <label><?php  echo $file['type_name']; ?></label>
                         </td>
                         <td>
-                            <?php echo $file['name_name']; ?>
+                            <label><?php echo $file['file_name']; ?></label>
                         </td>
                         <?php
                         for($i=0;$i<$CI->config->item('system_fms_max_actions');$i++)

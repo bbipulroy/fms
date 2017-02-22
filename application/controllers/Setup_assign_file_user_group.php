@@ -28,6 +28,10 @@ class Setup_assign_file_user_group extends Root_Controller
         {
             $this->system_details($id);
         }
+        elseif($action=='search')
+        {
+            $this->system_search($id);
+        }
         elseif($action=='edit')
         {
             $this->system_edit($id);
@@ -81,7 +85,7 @@ class Setup_assign_file_user_group extends Root_Controller
             $user_group_name=$this->db->get()->row_array();
             $data['title']='Details File Permissions for ('.$user_group_name['name'].')';
 
-            $this->db->select('n.id name_id,n.name name_name,t.id type_id,t.name type_name,cls.id class_id,cls.name class_name,ctg.id category_id,ctg.name category_name');
+            $this->db->select('n.id file_id,n.name file_name,t.id type_id,t.name type_name,cls.id class_id,cls.name class_name,ctg.id category_id,ctg.name category_name');
             $this->db->select('fug.*');
             $this->db->from($this->config->item('table_fms_setup_file_name').' n');
             $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');
@@ -113,16 +117,51 @@ class Setup_assign_file_user_group extends Root_Controller
             $this->json_return($ajax);
         }
     }
+    private function system_search($id)
+    {
+        if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
+        {
+            if(($this->input->post('id')))
+            {
+                $item_id=$this->input->post('id');
+            }
+            else
+            {
+                $item_id=$id;
+            }
+
+            $data['item_id']=$item_id;
+            $this->db->select('name');
+            $this->db->from($this->config->item('table_system_user_group'));
+            $this->db->where('id',$item_id);
+            $user_group_name=$this->db->get()->row_array();
+            $data['title']='Edit File Permission to ('.$user_group_name['name'].')';
+            $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/search',$data,true));
+            if($this->message)
+            {
+                $ajax['system_message']=$this->message;
+            }
+            $ajax['system_page_url']=site_url($this->controller_url.'/index/search/'.$item_id);
+            $ajax['status']=true;
+            $this->json_return($ajax);
+        }
+        else
+        {
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
+            $this->json_return($ajax);
+        }
+    }
     private function system_edit($id)
     {
         if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
         {
-            if($this->input->post('id_category'))
+            $data['item_id']=$this->input->post('id_user_group');
+            $data['id_category']=$this->input->post('id_category');
+            if($data['item_id']>0 && $data['id_category']>0)
             {
-                $data['id_category']=$this->input->post('id_category');
-                $data['item_id']=$this->input->post('id_user_group');
                 $data['permitted_files']=array();
-
                 $this->db->from($this->config->item('table_fms_setup_assign_file_user_group'));
                 $this->db->where('user_group_id',$data['item_id']);
                 $this->db->where('action0',1);
@@ -132,62 +171,40 @@ class Setup_assign_file_user_group extends Root_Controller
                 {
                     $data['permitted_files'][$result['id_file']]=$result;
                 }
-                $data['all_files']=array();
-                $this->db->select('n.id file_id,n.name file_name,t.id type_id,t.name type_name,cls.id class_id,cls.name class_name,ctg.id category_id,ctg.name category_name');
 
+                $data['all_files']=array();
+                $this->db->select('n.id file_id,n.name file_name,t.id type_id,t.name type_name,cls.id class_id,cls.name class_name');
                 $this->db->from($this->config->item('table_fms_setup_file_name').' n');
                 $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');
                 $this->db->join($this->config->item('table_fms_setup_file_class').' cls','cls.id=t.id_class');
-                $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=cls.id_category');
+
+                $where_in='SELECT id FROM '.$this->config->item('table_fms_setup_file_type').' WHERE id_class IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_class').' WHERE id_category='.$data['id_category'].')';
+                $this->db->where_in('n.id_type',$where_in,false);
                 $this->db->where('n.status',$this->config->item('system_status_active'));
 
-                $this->db->order_by('ctg.id');
                 $this->db->order_by('cls.id');
                 $this->db->order_by('t.id');
                 $this->db->order_by('n.id');
                 $results=$this->db->get()->result_array();
                 foreach($results as $result)
                 {
-                    $data['all_files'][$result['category_id']]['name']=$result['category_name'];
-                    $data['all_files'][$result['category_id']]['classes'][$result['class_id']]['name']=$result['class_name'];
-                    $data['all_files'][$result['category_id']]['classes'][$result['class_id']]['types'][$result['type_id']]['name']=$result['type_name'];
-                    $data['all_files'][$result['category_id']]['classes'][$result['class_id']]['types'][$result['type_id']]['files'][$result['file_id']]['name']=$result['file_name'];
+                    $data['all_files'][$result['class_id']]['name']=$result['class_name'];
+                    $data['all_files'][$result['class_id']]['types'][$result['type_id']]['name']=$result['type_name'];
+                    $data['all_files'][$result['class_id']]['types'][$result['type_id']]['files'][$result['file_id']]['name']=$result['file_name'];
                 }
 
-                $ajax['system_content'][]=array('id'=>'#edit_with_category','html'=>$this->load->view($this->controller_url.'/edit_with_category',$data,true));
+                $ajax['system_content'][]=array('id'=>'#edit_form','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
                 if($this->message)
                 {
                     $ajax['system_message']=$this->message;
                 }
-                $ajax['system_page_url']=site_url($this->controller_url.'/index/edit/'.$data['item_id']);
                 $ajax['status']=true;
                 $this->json_return($ajax);
             }
             else
             {
-                if(($this->input->post('id')))
-                {
-                    $item_id=$this->input->post('id');
-                }
-                else
-                {
-                    $item_id=$id;
-                }
-
-                $data['item_id']=$item_id;
-                $this->db->select('name');
-                $this->db->from($this->config->item('table_system_user_group'));
-                $this->db->where('id',$item_id);
-                $user_group_name=$this->db->get()->row_array();
-                $data['title']='Edit File Permission to ('.$user_group_name['name'].')';
-                $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
-                $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
-                if($this->message)
-                {
-                    $ajax['system_message']=$this->message;
-                }
-                $ajax['system_page_url']=site_url($this->controller_url.'/index/edit/'.$item_id);
-                $ajax['status']=true;
+                $ajax['status']=false;
+                $ajax['system_message']='You violate your rules.';
                 $this->json_return($ajax);
             }
         }
@@ -201,6 +218,7 @@ class Setup_assign_file_user_group extends Root_Controller
     private function system_save()
     {
         $id=$this->input->post('id');
+        $id_category=$this->input->post('id_category');
         $data=$this->input->post('items');
         if(!is_array($data))
         {
@@ -228,6 +246,8 @@ class Setup_assign_file_user_group extends Root_Controller
 
             $this->db->set('revision','revision+1',false);
             $this->db->where('user_group_id',$id);
+            $where_in='SELECT id FROM '.$this->config->item('table_fms_setup_file_name').' WHERE id_type IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_type').' WHERE id_class IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_class').' WHERE id_category='.$id_category.'))';
+            $this->db->where_in('id_file',$where_in,false);
             $this->db->update($this->config->item('table_fms_setup_assign_file_user_group'));
 
             foreach($data as $id_file=>$actions)
@@ -248,8 +268,16 @@ class Setup_assign_file_user_group extends Root_Controller
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
             {
+                $save_and_new=$this->input->post('system_save_new_status');
                 $this->message=$this->lang->line('MSG_SAVED_SUCCESS');
-                $this->system_list();
+                if($save_and_new==1)
+                {
+                    $this->system_search($id);
+                }
+                else
+                {
+                    $this->system_list();
+                }
             }
             else
             {

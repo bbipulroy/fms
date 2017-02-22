@@ -4,7 +4,7 @@ $CI = & get_instance();
 $action_data=array();
 if(isset($CI->permissions['action2'])&&($CI->permissions['action2']==1))
 {
-    $action_data["action_edit"]=base_url($CI->controller_url."/index/edit");
+    $action_data["action_edit"]=base_url($CI->controller_url."/index/search");
 }
 $action_data["action_details"]=base_url($CI->controller_url."/index/details");
 $action_data["action_refresh"]=base_url($CI->controller_url."/index/list");
