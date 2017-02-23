@@ -118,6 +118,12 @@ $CI->load->view('action_buttons',$action_data);
                 <td><img src="<?php echo $location.$file['name']; ?>" style="max-width: 250px;max-height:150px"></td>
                 <?php
             }
+            elseif(strlen($file['name'])==0)
+            {
+                ?>
+                <td><img style="max-width: 250px;max-height:150px" src="<?php echo $this->config->item('system_image_base_url').'images/no_image.jpg'; ?>"></td>
+                <?php
+            }
             else
             {
                 $extension=pathinfo($file['name'],PATHINFO_EXTENSION);

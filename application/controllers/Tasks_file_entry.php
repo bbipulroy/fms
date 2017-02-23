@@ -77,7 +77,6 @@ class Tasks_file_entry extends Root_Controller
             if($this->file_permissions['action1']==1 || $this->file_permissions['action2']==1 || $this->file_permissions['action3']==1)
             {
                 $data['item']=$this->get_file_info($item_id);
-                $this->session->set_userdata('active_files','');
 
                 $this->db->select('id,name,date_entry,remarks,mime_type');
                 $this->db->from($this->config->item('table_fms_tasks_digital_file'));
@@ -171,208 +170,158 @@ class Tasks_file_entry extends Root_Controller
     private function system_save()
     {
         $id=$this->input->post('id');
+        $file_open_time_for_save=$this->input->post('file_open_time_for_edit');
         $time=time();
 
         $allowed_types='gif|jpg|png|doc|docx|pdf|xls|xlsx|ppt|pptx|txt';
-        $file_types_array_for_page_count=array
-        (
-            'gif'=>$this->config->item('system_digital_file_image'),
-            'jpg'=>$this->config->item('system_digital_file_image'),
-            'png'=>$this->config->item('system_digital_file_image'),
-            'doc'=>$this->config->item('system_digital_file_word'),
-            'docx'=>$this->config->item('system_digital_file_word'),
-            'pdf'=>$this->config->item('system_digital_file_pdf'),
-            'txt'=>$this->config->item('system_digital_file_txt_file'),
-            'xls'=>$this->config->item('system_digital_file_excel'),
-            'xlsx'=>$this->config->item('system_digital_file_excel'),
-            'ppt'=>$this->config->item('system_digital_file_power_point'),
-            'pptx'=>$this->config->item('system_digital_file_power_point')
-        );
-
         if($this->get_file_permission($id))
         {
             if($this->file_permissions['action1']==1 || $this->file_permissions['action2']==1 || $this->file_permissions['action3']==1)
             {
-                if(!$this->check_validation())
+                $this->db->select('date_updated');
+                $this->db->from($this->config->item('table_fms_setup_file_name'));
+                $this->db->where('id',$id);
+                $time_last_saved=$this->db->get()->row_array()['date_updated'];
+                if($file_open_time_for_save<=$time_last_saved)
+                {
+                    $this->message='This file already saved by another person. Please try again.';
+                    $this->system_edit($id);
+                }
+
+                $folder=FCPATH.$this->config->item('system_folder_upload').'/'.$id;
+                if(!is_dir($folder))
+                {
+                    mkdir($folder,0777);
+                }
+                $upload_files=System_helper::upload_file($this->config->item('system_folder_upload').'/'.$id,$allowed_types);
+                $check_validation=$this->check_validation($upload_files);
+                if($check_validation!==true)
                 {
                     $ajax['status']=false;
-                    $ajax['system_message']=$this->message;
+                    $ajax['system_message']=$check_validation;
                     $this->json_return($ajax);
                 }
                 else
                 {
-                    $uploading_error_files=0; // if codeigniter cannot upload file
-                    $deleted_move_files_for_undo=array(); // if database transaction failed
-
                     $this->db->trans_start(); //DB Transaction Handle START
 
-                    $folder=FCPATH.$this->config->item('system_folder_upload').'/'.$id;
-                    if(!is_dir($folder))
+                    $date_entry_new=$this->input->post('date_entry_new');
+                    $remarks_new=$this->input->post('remarks_new');
+                    $date_entry_old=$this->input->post('date_entry_old');
+                    if(!is_array($date_entry_old))
                     {
-                        mkdir($folder,0777);
+                        $date_entry_old=array();
                     }
-                    $delete_folder=$folder.'/'.$this->config->item('system_folder_upload_delete');
-                    if(!is_dir($delete_folder))
+                    $remarks_old=$this->input->post('remarks_old');
+                    if(!is_array($remarks_old))
                     {
-                        mkdir($delete_folder,0777);
+                        $remarks_old=array();
                     }
-                    if($this->file_permissions['action2']==1)
+
+                    $this->db->select('*');
+                    $this->db->from($this->config->item('table_fms_tasks_digital_file'));
+                    $this->db->where('id_file_name',$id);
+                    $results=$this->db->get()->result_array();
+                    $these_file_details=array(); //file_name's digital files
+                    foreach($results as $result)
                     {
-                        $this->db->select('id');
-                        $this->db->from($this->config->item('table_fms_tasks_digital_file'));
-                        $this->db->where('id_file_name',$id);
-                        $results=$this->db->get()->result_array();
-                        $these_file_files=array();
-                        foreach($results as $result)
-                        {
-                            $these_file_files[]=$result['id'];
-                        }
-
-                        $remarks_old=$this->input->post('remarks_old');
-                        if(!is_array($remarks_old))
-                        {
-                            $remarks_old=array();
-                        }
-                        $date_entry_old=$this->input->post('date_entry_old');
-                        if(!is_array($date_entry_old))
-                        {
-                            $date_entry_old=array();
-                        }
-
-                        $update_data=array();
-                        foreach($date_entry_old as $row_key=>$row_value)
-                        {
-                            if(in_array($row_key,$these_file_files))
-                            {
-                                $update_data['date_entry']=System_helper::get_time($row_value);
-                                Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_data,array('id='.$row_key));
-                            }
-                            else
-                            {
-                                System_helper::invalid_try('UPDATE',$row_key,$this->config->item('table_fms_tasks_digital_file').' try to update File Entry Date illegal way.');
-                            }
-                        }
-                        $update_data=array();
-                        foreach($remarks_old as $row_key=>$row_value)
-                        {
-                            if(in_array($row_key,$these_file_files))
-                            {
-                                $update_data['remarks']=$row_value;
-                                Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_data,array('id='.$row_key));
-                            }
-                            else
-                            {
-                                System_helper::invalid_try('UPDATE',$row_key,$this->config->item('table_fms_tasks_digital_file').' try to update File Remarks illegal way.');
-                            }
-                        }
+                        $these_file_details[$result['id']]=$result;
                     }
-                    $temp_session_active_files=$this->session->userdata('active_files');
-                    if($this->file_permissions['action2']==1 || $this->file_permissions['action3']==1)
-                    {
-                        if(strlen($this->session->userdata('active_files'))>0)
-                        {
-                            $active_files=explode(',',$temp_session_active_files);
-                            $form_files=$this->input->post('files');
-                            if(!is_array($form_files))
-                            {
-                                $form_files=array();
-                            }
-                            foreach($active_files as $af)
-                            {
-                                if(array_key_exists($af,$form_files))
-                                {
-                                    //
-                                }
-                                else
-                                {
-                                    $temp_session_active_files=str_replace($af.',','',$temp_session_active_files);
-                                    $temp_session_active_files=str_replace(','.$af,'',$temp_session_active_files);
-                                    $temp_session_active_files=str_replace($af,'',$temp_session_active_files);
 
-                                    $this->db->select('name');
-                                    $this->db->from($this->config->item('table_fms_tasks_digital_file'));
-                                    $this->db->where('id',$af);
-                                    $file_delete=$this->db->get()->row_array();
-
-                                    $update_delete_data['name']=$this->move_deleted_file($folder,$file_delete['name']);
-                                    if($update_delete_data['name']===false)
-                                    {
-                                        continue;
-                                    }
-                                    $update_delete_data['user_updated']=$this->user_id;
-                                    $update_delete_data['date_updated']=$time;
-                                    $update_delete_data['status']=$this->config->item('system_status_delete');
-                                    Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_delete_data,array('id='.$af));
-                                    $deleted_move_files_for_undo[$update_delete_data['name']]=$file_delete['name'];
-                                }
-                            }
-                        }
-                    }
                     if($this->file_permissions['action1']==1 || $this->file_permissions['action2']==1)
                     {
-                        $upload_files=System_helper::upload_file($this->config->item('system_folder_upload').'/'.$id,$allowed_types);
-                        $date_entry=$this->input->post('date_entry');
-                        $remarks=$this->input->post('remarks');
-
                         $upload_file_data['id_file_name']=$id;
                         $upload_file_data['date_created']=$time;
-                        $upload_file_data['user_created']=$this->user_id;
+                        $upload_file_data['user_created']=User_helper::get_user()->user_id;
 
                         foreach($upload_files as $key=>$value)
                         {
                             $index=explode('_',$key)[1];
-                            if($value['status']==true)
+                            $upload_file_data['date_entry']=System_helper::get_time($date_entry_new[$index]);
+                            $upload_file_data['remarks']=$remarks_new[$index];
+                            $upload_file_data['mime_type']=$value['info']['file_type'];
+                            $upload_file_data['name']=$value['info']['file_name'];
+                            Query_helper::add($this->config->item('table_fms_tasks_digital_file'),$upload_file_data);
+                        }
+                        unset($upload_file_data['mime_type']);
+                        unset($upload_file_data['name']);
+                        foreach ($_FILES as $key=>$value)
+                        {
+                            if(strlen($value['name'])==0)
                             {
-                                $upload_file_data['date_entry']=System_helper::get_time($date_entry[$index]);
-                                $upload_file_data['remarks']=$remarks[$index];
-                                $upload_file_data['mime_type']=$value['info']['file_type'];
-                                $upload_file_data['type']=$file_types_array_for_page_count[strtolower(substr($value['info']['file_ext'],1))];
-                                $upload_file_data['name']=$value['info']['file_name'];
-                                $upload_files[$key]['insert_id']=Query_helper::add($this->config->item('table_fms_tasks_digital_file'),$upload_file_data);
-                                if($this->file_permissions['action2']==1 || $this->file_permissions['action3']==1)
+                                $index=explode('_',$key)[1];
+                                if(isset($date_entry_new[$index]))
                                 {
-                                    $temp_session_active_files.=','.$upload_files[$key]['insert_id'];
+                                    $upload_file_data['date_entry']=System_helper::get_time($date_entry_new[$index]);
+                                    $upload_file_data['remarks']=$remarks_new[$index];
+                                    Query_helper::add($this->config->item('table_fms_tasks_digital_file'),$upload_file_data);
                                 }
-                            }
-                            else
-                            {
-                                ++$uploading_error_files;
                             }
                         }
                     }
 
+                    if($this->file_permissions['action2']==1)
+                    {
+                        $update_data['date_updated']=$time;
+                        $update_data['user_updated']=User_helper::get_user()->user_id;
+                        foreach($date_entry_old as $key=>$value)
+                        {
+                            if(array_key_exists($key,$these_file_details))
+                            {
+                                $update_data['date_entry']=System_helper::get_time($value);
+                                if(isset($remarks_old[$key]))
+                                {
+                                    $update_data['remarks']=$remarks_old[$key];
+                                    if($update_data['date_entry']!=$these_file_details[$key]['date_entry'] || $update_data['remarks']!=$these_file_details[$key]['remarks'])
+                                    {
+                                        Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_data,array('id='.$key));
+                                    }
+                                }
+                                else
+                                {
+                                    System_helper::invalid_try('UPDATE',$id,$this->config->item('table_fms_tasks_digital_file').' try to update File Entry Date or Remarks in illegal way. ('.$key.')');
+                                }
+                            }
+                            else
+                            {
+                                System_helper::invalid_try('UPDATE',$id,$this->config->item('table_fms_tasks_digital_file').' try to update File Entry Date or Remarks in illegal way. ('.$key.')');
+                            }
+                        }
+                    }
+
+                    if($this->file_permissions['action2']==1 || $this->file_permissions['action3']==1)
+                    {
+                        $form_files=$this->input->post('files');
+                        if(!is_array($form_files))
+                        {
+                            $form_files=array();
+                        }
+                        $update_data=array();
+                        $update_data['date_updated']=$time;
+                        $update_data['user_updated']=User_helper::get_user()->user_id;
+                        $update_data['status']=$this->config->item('system_status_delete');
+                        foreach($these_file_details as $key=>$value)
+                        {
+                            if(!isset($form_files[$key]))
+                            {
+                                Query_helper::update($this->config->item('table_fms_tasks_digital_file'),$update_data,array('id='.$key));
+                            }
+                        }
+                    }
                     $this->db->trans_complete(); //DB Transaction Handle END
 
                     if($this->db->trans_status()===true)
                     {
-                        if($uploading_error_files>0)
-                        {
-                            if(substr($temp_session_active_files,0,1)==',')
-                            {
-                                $temp_session_active_files=substr($temp_session_active_files,1);
-                            }
-                            $this->session->set_userdata('active_files',$temp_session_active_files);
-
-                            $upload_complete_info['upload_files']=$upload_files;
-                            $upload_complete_info['id']=$id; //use for folder name
-
-                            $ajax['status']=false;
-                            $ajax['system_message']='Upload successful. But some errors occur.';
-                            $ajax['system_content'][]=array('id'=>'#upload-complete-info','html'=>$this->load->view($this->controller_url.'/upload-result',$upload_complete_info,true));
-                            $this->json_return($ajax);
-                        }
+                        $this->db->set('date_updated',time());
+                        $this->db->update($this->config->item('table_fms_setup_file_name'));
                         $this->message=$this->lang->line('MSG_SAVED_SUCCESS');
                         $this->system_list();
                     }
                     else
                     {
-                        foreach($deleted_move_files_for_undo as $deleted_name=>$real_name)
-                        {
-                            rename($delete_folder.'/'.$deleted_name,$folder.'/'.$real_name);
-                        }
                         $ajax['status']=false;
                         $this->message=$this->lang->line('MSG_SAVED_FAIL');
-                        $this->system_list();
+                        $this->system_edit($id);
                     }
                 }
             }
@@ -409,40 +358,24 @@ class Tasks_file_entry extends Root_Controller
             return false;
         }
     }
-    private function move_deleted_file($folder,$file_name)
+    private function check_validation($upload_files)
     {
-        if(file_exists($folder.'/'.$file_name))
+        $error_message='';
+        foreach($upload_files as $file)
         {
-            $return_value=$file_name;
-            $extension='.'.pathinfo($file_name,PATHINFO_EXTENSION);
-            $raw_name=pathinfo($file_name,PATHINFO_FILENAME);
-            $delete_folder=$this->config->item('system_folder_upload_delete');
-            $i=0;
-            $file=$folder.'/'.$delete_folder.'/'.$file_name;
-            while(file_exists($file))
+            if($file['status']==false)
             {
-                ++$i;
-                $file=$folder.'/'.$delete_folder.'/'.$raw_name.$i.$extension;
-                $return_value=$raw_name.$i.$extension;
+                $error_message.=$file['message'];
             }
-            rename($folder.'/'.$file_name,$file);
-            return $return_value;
+        }
+        if(strlen($error_message)>0)
+        {
+            return $error_message;
         }
         else
         {
-            return false;
+            return true;
         }
-    }
-    private function check_validation()
-    {
-        /*$this->load->library('form_validation');
-        $this->form_validation->set_rules('items[id_name]',$this->lang->line('LABEL_FILE_NAME'),'required');
-        if($this->form_validation->run()==false)
-        {
-            $this->message=validation_errors();
-            return false;
-        }*/
-        return true;
     }
     private function system_get_items()
     {
@@ -459,6 +392,7 @@ class Tasks_file_entry extends Root_Controller
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');
         $this->db->join($this->config->item('table_fms_tasks_digital_file').' df','df.id_file_name=n.id','left');
+        $this->db->where('n.status',$this->config->item('system_status_active'));
         $this->db->where('ui.revision',1);
         $this->db->where('fug.user_group_id',User_helper::get_user()->user_group);
         $this->db->where('fug.revision',1);

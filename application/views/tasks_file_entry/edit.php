@@ -9,7 +9,7 @@ $CI->load->view('action_buttons',$action_data);
 ?>
 <form id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
     <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
-    <input type="hidden" id="system_save_new_status" name="system_save_new_status" value="0">
+    <input type="hidden" name="file_open_time_for_edit" value="<?php echo time(); ?>">
     <div class="row widget">
         <div class="widget-header">
             <div class="title">
@@ -105,18 +105,16 @@ $CI->load->view('action_buttons',$action_data);
                     <thead>
                         <tr>
                             <th style="min-width: 250px;">File/Picture</th>
-                            <th style="min-width: 50px;">UPLOAD</th>
+                            <th style="min-width: 50px;">Upload</th>
                             <th style="min-width: 50px;">Entry Date</th>
                             <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_REMARKS'); ?></th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php
-                        $old_files='';
                         $location=$this->config->item('system_image_base_url').$this->config->item('system_folder_upload').'/'.$item['id'].'/';
                         foreach($stored_files as $index=>$file)
                         {
-                            $old_files.=$file['id'].',';
                             $is_image=false;
                             if(substr($file['mime_type'],0,5)=='image')
                             {
@@ -133,6 +131,12 @@ $CI->load->view('action_buttons',$action_data);
                                             <img style="max-width: 250px;" src="<?php echo $location.$file['name']; ?>">
                                             <?php
                                         }
+                                        elseif(strlen($file['name'])==0)
+                                        {
+                                            ?>
+                                            <img style="max-width: 250px;" src="<?php echo $this->config->item('system_image_base_url').'images/no_image.jpg'; ?>">
+                                            <?php
+                                        }
                                         else
                                         {
                                             ?>
@@ -147,7 +151,7 @@ $CI->load->view('action_buttons',$action_data);
                                         if($CI->file_permissions['action2']==1)
                                         {
                                             ?>
-                                            <input type="file" data-check="system_fms_check" id="file_<?php echo $index+1; ?>" name="file_<?php echo $index+1; ?>" data-current-id="<?php echo $index+1; ?>" data-preview-container="#preview_container_file_<?php echo $index+1;?>" class="browse_button"><br>
+                                            <input type="file" id="file_<?php echo $index+1; ?>" name="file_<?php echo $index+1; ?>" data-current-id="<?php echo $index+1; ?>" data-preview-container="#preview_container_file_<?php echo $index+1;?>" class="browse_button system_fms_file"><br>
                                             <?php
                                         }
                                         if($CI->file_permissions['action2']==1 || $CI->file_permissions['action3']==1)
@@ -193,15 +197,7 @@ $CI->load->view('action_buttons',$action_data);
                                     ?>
                                 </td>
                             </tr>
-                        <?php
-                        }
-                        if($CI->file_permissions['action2']==1 || $CI->file_permissions['action3']==1)
-                        {
-                            if(strlen($old_files)>0)
-                            {
-                                $old_files=substr($old_files,0,-1);
-                            }
-                            $CI->session->set_userdata('active_files',$old_files);
+                            <?php
                         }
                     ?>
                     </tbody>
@@ -217,15 +213,6 @@ $CI->load->view('action_buttons',$action_data);
                             <button type="button" class="btn btn-warning system_button_add" data-current-id="<?php echo sizeof($stored_files); ?>">
                                 <?php echo $CI->lang->line('LABEL_ADD_MORE'); ?>
                             </button>
-                            <!--<button id="camera" type="button" class="btn btn-warning">
-                                Camera
-                            </button>
-                            <button id="take-photo" type="button" class="btn btn-warning">
-                                Take Photo
-                            </button>
-                            <button id="camera-close" type="button" class="btn btn-warning">
-                                Camera Off
-                            </button>-->
                         </div>
                         <div class="col-xs-4"></div>
                     </div>
@@ -246,7 +233,7 @@ $CI->load->view('action_buttons',$action_data);
                     </div>
                 </td>
                 <td>
-                    <input type="file" data-check="system_fms_check" class="browse_button_new"><br>
+                    <input type="file" class="browse_button_new system_fms_file"><br>
                     <button type="button" class="btn btn-danger system_button_delete"><?php echo $CI->lang->line('DELETE'); ?></button>
                 </td>
                 <td>
@@ -260,36 +247,13 @@ $CI->load->view('action_buttons',$action_data);
     </table>
 </div>
 
-<!--<div class="row show-grid">
-    <div class="col-xs-12">
-        <video id="video" width="1000" height="600" controls autoplay></video>
-    </div>
-</div>-->
 <script type="text/javascript">
-    /*var camera_stream;
-    function camera_on()
-    {
-        $('video').show();
-        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
-        {
-            navigator.mediaDevices.getUserMedia(
-            {
-                video:true
-            })
-            .then(function(stream)
-            {
-                camera_stream=stream;
-                video.src=window.URL.createObjectURL(stream);
-                video.play();
-            });
-        }
-    }*/
     jQuery(document).ready(function()
     {
         $(document).off("click",".system_button_add");
         $(document).off("click",".system_button_delete");
+        $(document).off("change",".system_fms_file");
 
-        //$('video').hide();
         $('.datepicker').datepicker({dateFormat : display_date_format});
         $('.browse_button').filestyle({input: false,icon: false,buttonText: "Edit",buttonName: "btn-primary"});
         $(document).on("click", ".system_button_add", function(event)
@@ -303,9 +267,9 @@ $CI->load->view('action_buttons',$action_data);
             $(content_id+' .browse_button_new').attr('id','file_'+current_id);
             $(content_id+' .browse_button_new').attr('data-current-id',current_id);
             $(content_id+' .preview_container_file').attr('id','preview_container_file_'+current_id);
-            $(content_id+' .date_entry').attr('name','date_entry['+current_id+']');
+            $(content_id+' .date_entry').attr('name','date_entry_new['+current_id+']');
             $(content_id+' .date_entry').attr('id','date_entry_'+current_id);
-            $(content_id+' .remarks').attr('name','remarks['+current_id+']');
+            $(content_id+' .remarks').attr('name','remarks_new['+current_id+']');
 
             var html=$(content_id).html();
             $('#files_container table tbody').append(html);
@@ -326,71 +290,14 @@ $CI->load->view('action_buttons',$action_data);
         {
             $(this).closest('tr').remove();
         });
-        $(document).on("change", ":file", function(event)
+        $(document).on("change", ".system_fms_file", function(event)
         {
-            if(($(this).is('[class*="file_external"]')))
-            {
-                return;
-            }
-            if($(this).attr('data-check')=='system_fms_check')
-            {
-                var attr_data_current_id=$(this).attr('data-current-id');
-                var tr_obj=$(this).closest('tr');
+            var attr_data_current_id=$(this).attr('data-current-id');
+            var tr_obj=$(this).closest('tr');
 
-                $("#file-"+attr_data_current_id).remove();
-                tr_obj.find('.date_entry').attr("name","date_entry["+attr_data_current_id+"]");
-                tr_obj.find('.remarks').attr("name","remarks["+attr_data_current_id+"]");
-            }
+            $("#file-"+attr_data_current_id).remove();
+            tr_obj.find('.date_entry').attr("name","date_entry_new["+attr_data_current_id+"]");
+            tr_obj.find('.remarks').attr("name","remarks_new["+attr_data_current_id+"]");
         });
-        /*$(document).on('click','#camera',function()
-        {
-            if(camera.data('check'))
-            {
-                camera_off();
-                camera.data('check',false);
-                take_photo.hide();
-            }
-            else
-            {
-                take_photo.show();
-                camera.data('check',true);
-                if(camera.data('no_need_to_on'))
-                {
-                    camera_on_false();
-                }
-                else
-                {
-                    camera_on();
-                    camera.data('no_need_to_on',true);
-                }
-            }
-        });
-        $(document).on('click','#take-photo',function()
-        {
-            var canvas=document.createElement("canvas");
-            canvas.width=video.videoWidth;
-            canvas.height=video.videoHeight;
-            canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
-            var image_data=canvas.toDataURL();
-            alert(image_data);
-        });
-        $(document).on('click','#camera-close',function()
-        {
-            camera_off();
-            take_photo.hide();
-            camera_stream.stop();
-            camera.data('no_need_to_on',false);
-        });
-        function camera_off()
-        {
-            $('video').hide();
-            video.pause();
-        }
-        function camera_on_false()
-        {
-            $('video').show();
-            video.play();
-        }*/
     });
 </script>
-<div id="upload-complete-info"></div>
