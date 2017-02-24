@@ -2,9 +2,14 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 $CI=& get_instance();
-$action_data=array();
-$action_data['action_save']='#save_form';
-$CI->load->view('action_buttons',$action_data);
+$action_buttons=array();
+$action_buttons[]=array(
+    'type'=>'button',
+    'label'=>$CI->lang->line("ACTION_SAVE"),
+    'id'=>'button_action_save',
+    'data-form'=>'#save_form'
+);
+$CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
 
 <form id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
@@ -19,7 +24,7 @@ $CI->load->view('action_buttons',$action_data);
 
         <div style="" class="row show-grid">
             <div class="col-xs-4">
-                <label for="status" class="control-label pull-right"><?php echo $CI->lang->line('STATUS');?><span style="color:#FF0000">*</span></label>
+                <label class="control-label pull-right"><?php echo $CI->lang->line('STATUS');?><span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <select id="status" name="item[status]" class="form-control">
