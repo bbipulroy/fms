@@ -1,10 +1,16 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
-$CI= & get_instance();
-$action_data=array();
-$action_data['action_back']=site_url($CI->controller_url);
-$CI->load->view('action_buttons',$action_data);
+$CI=& get_instance();
+$action_buttons=array();
+$action_buttons[]=array(
+    'label'=>$CI->lang->line("ACTION_BACK"),
+    'href'=>site_url($CI->controller_url)
+);
+$action_buttons[]=array(
+    'label'=>$CI->lang->line("ACTION_EDIT"),
+    'href'=>site_url($CI->controller_url.'/index/search/'.$item_id)
+);
+$CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
     <div class="row widget">
         <div class="widget-header">

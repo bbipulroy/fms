@@ -78,6 +78,7 @@ class Setup_assign_file_user_group extends Root_Controller
             {
                 $item_id=$id;
             }
+            $data['item_id']=$item_id;
 
             $this->db->select('name');
             $this->db->from($this->config->item('table_system_user_group'));
@@ -177,9 +178,7 @@ class Setup_assign_file_user_group extends Root_Controller
                 $this->db->from($this->config->item('table_fms_setup_file_name').' n');
                 $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');
                 $this->db->join($this->config->item('table_fms_setup_file_class').' cls','cls.id=t.id_class');
-
-                $where_in='SELECT id FROM '.$this->config->item('table_fms_setup_file_type').' WHERE id_class IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_class').' WHERE id_category='.$data['id_category'].')';
-                $this->db->where_in('n.id_type',$where_in,false);
+                $this->db->where('cls.id_category',$data['id_category']);
                 $this->db->where('n.status',$this->config->item('system_status_active'));
 
                 $this->db->order_by('cls.id');
@@ -217,6 +216,8 @@ class Setup_assign_file_user_group extends Root_Controller
     }
     private function system_save()
     {
+        $user=User_helper::get_user();
+        $time=time();
         $id=$this->input->post('id');
         $id_category=$this->input->post('id_category');
         $data=$this->input->post('items');
@@ -224,7 +225,7 @@ class Setup_assign_file_user_group extends Root_Controller
         {
             $data=array();
         }
-        $user=User_helper::get_user();
+
         if($id>0)
         {
             if(!(isset($this->permissions['action2']) && ($this->permissions['action2']==1)))
@@ -244,12 +245,15 @@ class Setup_assign_file_user_group extends Root_Controller
         {
             $this->db->trans_start(); //DB Transaction Handle START
 
-            $this->db->set('revision','revision+1',false);
-            $this->db->where('user_group_id',$id);
-            $where_in='SELECT id FROM '.$this->config->item('table_fms_setup_file_name').' WHERE id_type IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_type').' WHERE id_class IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_class').' WHERE id_category='.$id_category.'))';
-            $this->db->where_in('id_file',$where_in,false);
-            $this->db->update($this->config->item('table_fms_setup_assign_file_user_group'));
 
+            $query='UPDATE '.$this->config->item('table_fms_setup_assign_file_user_group').' afug';
+            $query.=' JOIN '.$this->config->item('table_fms_setup_file_name').' n ON n.id=afug.id_file';
+            $query.=' JOIN '.$this->config->item('table_fms_setup_file_type').' t ON t.id=n.id_type';
+            $query.=' JOIN '.$this->config->item('table_fms_setup_file_class').' cls ON cls.id=t.id_class';
+            $query.=' SET afug.revision=afug.revision+1';
+            $query.=' WHERE cls.id_category='.$id_category;
+            $query.=' AND afug.user_group_id='.$id;
+            $this->db->query($query);
             foreach($data as $id_file=>$actions)
             {
                 $data_add=array();
@@ -262,7 +266,7 @@ class Setup_assign_file_user_group extends Root_Controller
                 $data_add['id_file']=$id_file;
                 $data_add['user_group_id']=$id;
                 $data_add['user_created']=$user->user_id;
-                $data_add['date_created']=time();
+                $data_add['date_created']=$time;
                 Query_helper::add($this->config->item('table_fms_setup_assign_file_user_group'),$data_add);
             }
             $this->db->trans_complete(); //DB Transaction Handle END
