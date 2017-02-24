@@ -1,11 +1,22 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-$CI= & get_instance();
-$action_data=array();
-$action_data['action_back']=site_url($CI->controller_url);
-$action_data['action_refresh']=site_url($CI->controller_url.'/index/edit/'.$item['id']);
-$action_data['action_save']='#save_form';
-$CI->load->view('action_buttons',$action_data);
+$CI=& get_instance();
+$action_buttons=array();
+$action_buttons[]=array(
+    'label'=>$CI->lang->line("ACTION_BACK"),
+    'href'=>site_url($CI->controller_url)
+);
+$action_buttons[]=array(
+    'type'=>'button',
+    'label'=>$CI->lang->line("ACTION_SAVE"),
+    'id'=>'button_action_save',
+    'data-form'=>'#save_form'
+);
+$action_buttons[]=array(
+    'label'=>$CI->lang->line("ACTION_REFRESH"),
+    'href'=>site_url($CI->controller_url.'/index/edit/'.$item['id'])
+);
+$CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
 <form id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
     <input type="hidden" name="id" value="<?php echo $item['id']; ?>">
@@ -112,35 +123,24 @@ $CI->load->view('action_buttons',$action_data);
                     </thead>
                     <tbody>
                     <?php
-                        $location=$this->config->item('system_image_base_url').$this->config->item('system_folder_upload').'/'.$item['id'].'/';
+                        $location=$this->config->item('system_image_base_url');
                         foreach($stored_files as $index=>$file)
                         {
-                            $is_image=false;
-                            if(substr($file['mime_type'],0,5)=='image')
-                            {
-                                $is_image=true;
-                            }
                             ?>
                             <tr>
                                 <td>
-                                    <div class="preview_container_file" id="preview_container_file_<?php echo $index+1;?>">
+                                    <div class="preview_container_file" id="preview_container_file_old_<?php echo $file['id']; ?>">
                                         <?php
-                                        if($is_image)
+                                        if(substr($file['mime_type'],0,5)=='image')
                                         {
                                             ?>
-                                            <img style="max-width: 250px;" src="<?php echo $location.$file['name']; ?>">
-                                            <?php
-                                        }
-                                        elseif(strlen($file['name'])==0)
-                                        {
-                                            ?>
-                                            <img style="max-width: 250px;" src="<?php echo $this->config->item('system_image_base_url').'images/no_image.jpg'; ?>">
+                                            <img style="max-width: 250px;" src="<?php echo $location.$file['file_path']; ?>">
                                             <?php
                                         }
                                         else
                                         {
                                             ?>
-                                            <a href="<?php echo $location.$file['name']; ?>" class="external" target="_blank"><?php echo $file['name']; ?></a>
+                                            <a href="<?php echo $location.$file['file_path']; ?>" class="external" target="_blank"><?php echo $file['name']; ?></a>
                                             <?php
                                         }
                                         ?>
@@ -148,32 +148,32 @@ $CI->load->view('action_buttons',$action_data);
                                 </td>
                                 <td>
                                     <?php
-                                        if($CI->file_permissions['action2']==1)
+                                        if($file_permissions['action2']==1)
                                         {
                                             ?>
-                                            <input type="file" id="file_<?php echo $index+1; ?>" name="file_<?php echo $index+1; ?>" data-current-id="<?php echo $index+1; ?>" data-preview-container="#preview_container_file_<?php echo $index+1;?>" class="browse_button system_fms_file"><br>
+                                            <input type="file" name="file_old_<?php echo $file['id']; ?>" data-current-id="<?php echo $file['id']; ?>" data-preview-container="#preview_container_file_old_<?php echo $file['id']; ?>" class="browse_button_old"><br>
                                             <?php
                                         }
-                                        if($CI->file_permissions['action2']==1 || $CI->file_permissions['action3']==1)
+                                        if($file_permissions['action3']==1)
                                         {
                                             ?>
-                                            <input id="file-<?php echo $index+1; ?>" type="hidden" name="files[<?php echo $file['id']; ?>]" value="">
-                                            <?php
-                                        }
-                                        if($CI->file_permissions['action3']==1)
-                                        {
-                                            ?>
-                                            <button type="button" class="btn btn-danger system_button_delete" data-current-id="<?php echo $index+1; ?>"><?php echo $CI->lang->line('DELETE'); ?></button>
+                                            <button type="button" class="btn btn-danger system_button_add_delete"><?php echo $CI->lang->line('DELETE'); ?></button>
                                             <?php
                                         }
                                     ?>
                                 </td>
                                 <td>
                                     <?php
-                                        if($CI->file_permissions['action2']==1)
+                                        if($file_permissions['action2']==1)
                                         {
                                             ?>
-                                            <input type="text" name="date_entry_old[<?php echo $file['id']; ?>]" class="form-control datepicker date_entry" value="<?php echo System_helper::display_date($file['date_entry']); ?>">
+                                            <input type="text" name="items_old[<?php echo $file['id']; ?>][date_entry]" class="form-control datepicker_old" value="<?php echo System_helper::display_date($file['date_entry']); ?>">
+                                            <?php
+                                        }
+                                        elseif($file_permissions['action3']==1)
+                                        {
+                                            ?>
+                                            <input type="hidden" name="items_old[<?php echo $file['id']; ?>][date_entry]" value="<?php echo System_helper::display_date($file['date_entry']); ?>">
                                             <?php
                                         }
                                         else
@@ -184,10 +184,16 @@ $CI->load->view('action_buttons',$action_data);
                                 </td>
                                 <td>
                                     <?php
-                                    if($CI->file_permissions['action2']==1)
+                                    if($file_permissions['action2']==1)
                                     {
                                         ?>
-                                        <textarea name="remarks_old[<?php echo $file['id']; ?>]" class="form-control remarks"><?php echo $file['remarks']; ?></textarea>
+                                        <textarea  name="items_old[<?php echo $file['id']; ?>][remarks]" class="form-control"><?php echo $file['remarks']; ?></textarea>
+                                        <?php
+                                    }
+                                    elseif($file_permissions['action3']==1)
+                                    {
+                                        ?>
+                                        <input type="hidden" name="items_old[<?php echo $file['id']; ?>][remarks]" value="<?php echo $file['remarks']; ?>">
                                         <?php
                                     }
                                     else
@@ -204,13 +210,13 @@ $CI->load->view('action_buttons',$action_data);
                 </table>
             </div>
             <?php
-                if($CI->file_permissions['action1']==1)
+                if($file_permissions['action1']==1)
                 {
                     ?>
                     <div class="row show-grid">
                         <div class="col-xs-4"></div>
                         <div class="col-xs-4">
-                            <button type="button" class="btn btn-warning system_button_add" data-current-id="<?php echo sizeof($stored_files); ?>">
+                            <button type="button" class="btn btn-warning system_button_add_more" data-current-id="0">
                                 <?php echo $CI->lang->line('LABEL_ADD_MORE'); ?>
                             </button>
                         </div>
@@ -224,7 +230,7 @@ $CI->load->view('action_buttons',$action_data);
     <div class="clearfix"></div>
 </form>
 
-<div id="system_content_add" style="display: none;">
+<div id="system_content_add_more" style="display: none;">
     <table>
         <tbody>
             <tr>
@@ -233,8 +239,8 @@ $CI->load->view('action_buttons',$action_data);
                     </div>
                 </td>
                 <td>
-                    <input type="file" class="browse_button_new system_fms_file"><br>
-                    <button type="button" class="btn btn-danger system_button_delete"><?php echo $CI->lang->line('DELETE'); ?></button>
+                    <input type="file" class="browse_button_new"><br>
+                    <button type="button" class="btn btn-danger system_button_add_delete"><?php echo $CI->lang->line('DELETE'); ?></button>
                 </td>
                 <td>
                     <input type="text" class="form-control date_entry" value="<?php echo System_helper::display_date(time()); ?>">
@@ -250,47 +256,53 @@ $CI->load->view('action_buttons',$action_data);
 <script type="text/javascript">
     jQuery(document).ready(function()
     {
-        $(document).off("click",".system_button_add");
-        $(document).off("click",".system_button_delete");
-        $(document).off("change",".system_fms_file");
+        $(document).off("click",".system_button_add_more");
+        $(document).off("click",".system_button_add_delete");
+        //$(document).off("change",".system_fms_file");
 
-        $('.datepicker').datepicker({dateFormat : display_date_format});
-        $('.browse_button').filestyle({input: false,icon: false,buttonText: "Edit",buttonName: "btn-primary"});
-        $(document).on("click", ".system_button_add", function(event)
+        $('.datepicker_old').datepicker({dateFormat : display_date_format});
+        $('.browse_button_old').filestyle({input: false,icon: false,buttonText: "Edit",buttonName: "btn-primary"});
+        $(document).on("click", ".system_button_add_more", function(event)
         {
-            var current_id=parseInt($('.system_button_add').attr('data-current-id'))+1;
-            $('.system_button_add').attr('data-current-id',current_id);
-            var content_id='#system_content_add table tbody';
+            var current_id=parseInt($('.system_button_add_more').attr('data-current-id'))+1;
+            $('.system_button_add_more').attr('data-current-id',current_id);
+            var content_id='#system_content_add_more table tbody';
+
+            $(content_id+' .preview_container_file').attr('id','preview_container_file_'+current_id);
 
             $(content_id+' .browse_button_new').attr('data-preview-container','#preview_container_file_'+current_id);
-            $(content_id+' .browse_button_new').attr('name','file_'+current_id);
-            $(content_id+' .browse_button_new').attr('id','file_'+current_id);
+            $(content_id+' .browse_button_new').attr('name','file_new_'+current_id);
+            $(content_id+' .browse_button_new').attr('id','file_new_'+current_id);
             $(content_id+' .browse_button_new').attr('data-current-id',current_id);
-            $(content_id+' .preview_container_file').attr('id','preview_container_file_'+current_id);
-            $(content_id+' .date_entry').attr('name','date_entry_new['+current_id+']');
+
+            $(content_id+' .date_entry').attr('name','items_new['+current_id+'][date_entry]');
             $(content_id+' .date_entry').attr('id','date_entry_'+current_id);
-            $(content_id+' .remarks').attr('name','remarks_new['+current_id+']');
+
+            $(content_id+' .remarks').attr('name','items_new['+current_id+'][remarks]');
 
             var html=$(content_id).html();
             $('#files_container table tbody').append(html);
 
-            $(content_id+' .browse_button_new').removeAttr('name');
+            $(content_id+' .preview_container_file').removeAttr('id');
+
+
             $(content_id+' .browse_button_new').removeAttr('data-preview-container');
+            $(content_id+' .browse_button_new').removeAttr('name');
             $(content_id+' .browse_button_new').removeAttr('id');
             $(content_id+' .browse_button_new').removeAttr('data-current-id');
-            $(content_id+' .preview_container_file').removeAttr('id');
+
             $(content_id+' .date_entry').removeAttr('name');
             $(content_id+' .date_entry').removeAttr('id');
             $(content_id+' .remarks').removeAttr('name');
 
-            $('#file_'+current_id).filestyle({input: false,icon: false,buttonText: "Upload",buttonName: "btn-primary"});
+            $('#file_new_'+current_id).filestyle({input: false,icon: false,buttonText: "Upload",buttonName: "btn-primary"});
             $('#date_entry_'+current_id).datepicker({dateFormat : display_date_format});
         });
-        $(document).on("click", ".system_button_delete", function(event)
+        $(document).on("click", ".system_button_add_delete", function(event)
         {
             $(this).closest('tr').remove();
         });
-        $(document).on("change", ".system_fms_file", function(event)
+        /*$(document).on("change", ".system_fms_file", function(event)
         {
             var attr_data_current_id=$(this).attr('data-current-id');
             var tr_obj=$(this).closest('tr');
@@ -298,6 +310,6 @@ $CI->load->view('action_buttons',$action_data);
             $("#file-"+attr_data_current_id).remove();
             tr_obj.find('.date_entry').attr("name","date_entry_new["+attr_data_current_id+"]");
             tr_obj.find('.remarks').attr("name","remarks_new["+attr_data_current_id+"]");
-        });
+        });*/
     });
 </script>

@@ -1,13 +1,48 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-$CI= & get_instance();
-$action_data=array();
-$action_data['action_edit']=site_url($CI->controller_url.'/index/edit');
-$action_data['action_details']=site_url($CI->controller_url.'/index/details');
-$action_data['action_refresh']=site_url($CI->controller_url.'/index/list');
-$CI->load->view('action_buttons',$action_data);
-?>
+$CI=& get_instance();
+$action_buttons=array();
+if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
+{
+    $action_buttons[]=array(
+        'type'=>'button',
+        'label'=>$CI->lang->line("ACTION_EDIT"),
+        'class'=>'button_jqx_action',
+        'data-action-link'=>site_url($CI->controller_url.'/index/edit')
+    );
+}
+$action_buttons[]=array(
+    'type'=>'button',
+    'label'=>$CI->lang->line("ACTION_DETAILS"),
+    'class'=>'button_jqx_action',
+    'data-action-link'=>site_url($CI->controller_url.'/index/details')
+);
+if(isset($CI->permissions['action4']) && ($CI->permissions['action4']==1))
+{
+    $action_buttons[]=array(
+        'type'=>'button',
+        'label'=>$CI->lang->line("ACTION_PRINT"),
+        'class'=>'button_action_download',
+        'data-title'=>"Print",
+        'data-print'=>true
+    );
+}
+if(isset($CI->permissions['action5']) && ($CI->permissions['action5']==1))
+{
+    $action_buttons[]=array(
+        'type'=>'button',
+        'label'=>$CI->lang->line("ACTION_DOWNLOAD"),
+        'class'=>'button_action_download',
+        'data-title'=>"Download"
+    );
+}
+$action_buttons[]=array(
+    'label'=>$CI->lang->line("ACTION_REFRESH"),
+    'href'=>site_url($CI->controller_url.'/index/list')
 
+);
+$CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
+?>
 <div class="row widget">
     <div class="widget-header">
         <div class="title">
@@ -88,9 +123,6 @@ $CI->load->view('action_buttons',$action_data);
                 selectionmode: 'singlerow',
                 altrows: true,
                 enabletooltips: true,
-                //showaggregates: true,
-                //showstatusbar: true,
-                //rowsheight: 45,
                 autoheight: true,
                 columns:[
                     { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'name',width:'300',pinned:true,rendered: tooltiprenderer},

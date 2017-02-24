@@ -6,10 +6,13 @@ $action_buttons[]=array(
     'label'=>$CI->lang->line("ACTION_BACK"),
     'href'=>site_url($CI->controller_url)
 );
-$action_buttons[]=array(
-    'label'=>$CI->lang->line("ACTION_EDIT"),
-    'href'=>site_url($CI->controller_url.'/index/search/'.$item_id)
-);
+if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
+{
+    $action_buttons[]=array(
+        'label'=>$CI->lang->line("ACTION_EDIT"),
+        'href'=>site_url($CI->controller_url.'/index/search/'.$item_id)
+    );
+}
 $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
     <div class="row widget">

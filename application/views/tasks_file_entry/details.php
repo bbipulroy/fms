@@ -1,14 +1,25 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-$CI= & get_instance();
-$action_data=array();
-$action_data['action_back']=site_url($CI->controller_url);
-$CI->load->view('action_buttons',$action_data);
+
+$CI=& get_instance();
+$action_buttons=array();
+$action_buttons[]=array(
+    'label'=>$CI->lang->line("ACTION_BACK"),
+    'href'=>site_url($CI->controller_url)
+);
+if($file_permissions['action2']==1)
+{
+    $action_buttons[]=array(
+        'label'=>$CI->lang->line("ACTION_EDIT"),
+        'href'=>site_url($CI->controller_url.'/index/edit/'.$item['id'])
+    );
+}
+$CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
 <div class="row widget">
     <div class="widget-header">
         <div class="title">
-            Details for <?php echo $details['name']; ?>
+            Details for <?php echo $item['name']; ?>
         </div>
         <div class="clearfix"></div>
     </div>
@@ -17,7 +28,7 @@ $CI->load->view('action_buttons',$action_data);
             <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label><?php echo $details['name'] ?></label>
+            <label><?php echo $item['name'] ?></label>
         </div>
     </div>
     <div class="row show-grid">
@@ -25,7 +36,7 @@ $CI->load->view('action_buttons',$action_data);
             <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label><?php echo $details['employee_name'] ?></label>
+            <label><?php echo $item['employee_name'] ?></label>
         </div>
     </div>
     <div class="row show-grid">
@@ -33,7 +44,7 @@ $CI->load->view('action_buttons',$action_data);
             <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label><?php echo $details['hardcopy_location'] ?></label>
+            <label><?php echo $item['hardcopy_location'] ?></label>
         </div>
     </div>
     <div class="row show-grid">
@@ -41,7 +52,7 @@ $CI->load->view('action_buttons',$action_data);
             <label class="control-label pull-right">Opening Date:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label><?php echo System_helper::display_date($details['date_start']); ?></label>
+            <label><?php echo System_helper::display_date($item['date_start']); ?></label>
         </div>
     </div>
     <div class="row show-grid">
@@ -49,7 +60,7 @@ $CI->load->view('action_buttons',$action_data);
             <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label><?php echo $details['category_name'] ?></label>
+            <label><?php echo $item['category_name'] ?></label>
         </div>
     </div>
     <div class="row show-grid">
@@ -57,7 +68,7 @@ $CI->load->view('action_buttons',$action_data);
             <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label><?php echo $details['class_name'] ?></label>
+            <label><?php echo $item['class_name'] ?></label>
         </div>
     </div>
     <div class="row show-grid">
@@ -65,7 +76,7 @@ $CI->load->view('action_buttons',$action_data);
             <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label><?php echo $details['type_name'] ?></label>
+            <label><?php echo $item['type_name'] ?></label>
         </div>
     </div>
     <div class="row show-grid">
@@ -73,7 +84,7 @@ $CI->load->view('action_buttons',$action_data);
             <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_OFFICE'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label><?php echo $details['office_name'] ?></label>
+            <label><?php echo $item['office_name'] ?></label>
         </div>
     </div>
     <div class="row show-grid">
@@ -81,7 +92,7 @@ $CI->load->view('action_buttons',$action_data);
             <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label><?php echo $details['department_name'] ?></label>
+            <label><?php echo $item['department_name'] ?></label>
         </div>
     </div>
     <div class="row show-grid">
@@ -89,7 +100,7 @@ $CI->load->view('action_buttons',$action_data);
             <label class="control-label pull-right">Number of Pages:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <label><?php echo $details['number_of_page'] ?></label>
+            <label><?php echo $item['number_of_page'] ?></label>
         </div>
     </div>
 </div>
@@ -105,8 +116,8 @@ $CI->load->view('action_buttons',$action_data);
     </thead>
     <tbody>
         <?php
-        $location=$this->config->item('system_image_base_url').$this->config->item('system_folder_upload').'/'.$details['id'].'/';
-        foreach($files_info as $file)
+        $location=$this->config->item('system_image_base_url').$this->config->item('system_folder_upload').'/'.$item['id'].'/';
+        foreach($stored_files as $file)
         {
             ?>
             <tr>
