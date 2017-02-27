@@ -116,7 +116,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
     </thead>
     <tbody>
         <?php
-        $location=$this->config->item('system_image_base_url').$this->config->item('system_folder_upload').'/'.$item['id'].'/';
+        $location=$this->config->item('system_image_base_url');
         foreach($stored_files as $file)
         {
             ?>
@@ -126,13 +126,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             if(substr($file['mime_type'],0,5)=='image')
             {
                 ?>
-                <td><img src="<?php echo $location.$file['name']; ?>" style="max-width: 250px;max-height:150px"></td>
-                <?php
-            }
-            elseif(strlen($file['name'])==0)
-            {
-                ?>
-                <td><img style="max-width: 250px;max-height:150px" src="<?php echo $this->config->item('system_image_base_url').'images/no_image.jpg'; ?>"></td>
+                <td><img src="<?php echo $location.$file['file_path']; ?>" style="max-width: 250px;max-height:150px"></td>
                 <?php
             }
             else
@@ -147,7 +141,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     $href_text='Download the '.strtoupper($extension).' File';
                 }
                 ?>
-                <td><a href="<?php echo $location.$file['name']; ?>" class="btn btn-success external" target="_blank"><?php echo $href_text; ?></a></td>
+                <td><a href="<?php echo $location.$file['file_path']; ?>" class="btn btn-success external" target="_blank"><?php echo $href_text; ?></a></td>
                 <?php
             }
             ?>
