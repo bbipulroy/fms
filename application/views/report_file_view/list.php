@@ -2,15 +2,26 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 $CI= & get_instance();
 $action_data=array();
-if(isset($CI->permissions['action4'])&&($CI->permissions['action4']==1))
+if(isset($CI->permissions['action4']) && ($CI->permissions['action4']==1))
 {
-    $action_data["action_print"]='print';
+    $action_buttons[]=array(
+        'type'=>'button',
+        'label'=>$CI->lang->line("ACTION_PRINT"),
+        'class'=>'button_action_download',
+        'data-title'=>"Print",
+        'data-print'=>true
+    );
 }
-if(isset($CI->permissions['action5'])&&($CI->permissions['action5']==1))
+if(isset($CI->permissions['action5']) && ($CI->permissions['action5']==1))
 {
-    $action_data["action_download"]='download';
+    $action_buttons[]=array(
+        'type'=>'button',
+        'label'=>$CI->lang->line("ACTION_DOWNLOAD"),
+        'class'=>'button_action_download',
+        'data-title'=>"Download"
+    );
 }
-$CI->load->view("action_buttons",$action_data);
+$CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
 
 <div class="row widget">

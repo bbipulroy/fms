@@ -38,7 +38,7 @@ class Report_file_view extends Root_Controller
     }
     private function system_search()
     {
-        if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
+        if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
             $data['title']='Report View';
             $data['item']=array
@@ -60,17 +60,8 @@ class Report_file_view extends Root_Controller
             $data['types']=array();
             $data['names']=array();
 
-            $this->db->select('id value,name text');
-            $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices'));
-            $this->db->where('status',$this->config->item('system_status_active'));
-            $this->db->order_by('ordering');
-            $data['offices']=$this->db->get()->result_array();
-
-            $this->db->select('id value,name text');
-            $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'));
-            $this->db->where('status',$this->config->item('system_status_active'));
-            $this->db->order_by('ordering');
-            $data['departments']=$this->db->get()->result_array();
+            $data['offices']=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
+            $data['departments']=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
 
             $data['employees']=array();
             $ajax['system_page_url']=site_url($this->controller_url.'/index/search');
@@ -97,7 +88,7 @@ class Report_file_view extends Root_Controller
             if($item['id_name']>0)
             {
                 $data=array();
-                $this->get_data($data,$item['id_name'],System_helper::get_time($item['date_from_start_page']),System_helper::get_time($item['date_to_start_page']));
+                $this->get_file_info($data,$item['id_name'],System_helper::get_time($item['date_from_start_page']),System_helper::get_time($item['date_to_start_page']));
                 $ajax['system_content'][]=array('id'=>'#system_report_container','html'=>$this->load->view($this->controller_url.'/details',$data,true));
             }
             else
@@ -134,7 +125,7 @@ class Report_file_view extends Root_Controller
         $date_to_start_page=System_helper::get_time($this->input->post('date_to_start_page'));
 
         $data=array();
-        $this->get_data($data,$id,$date_from_start_page,$date_to_start_page);
+        $this->get_file_info($data,$id,$date_from_start_page,$date_to_start_page);
         $ajax['system_content'][]=array('id'=>$html_id,'html'=>$this->load->view($this->controller_url.'/details',$data,true));
         if($this->message)
         {
@@ -143,10 +134,19 @@ class Report_file_view extends Root_Controller
         $ajax['status']=true;
         $this->json_return($ajax);
     }
-    private function get_data(&$data,$id_file_name,$date_from_start_page,$date_to_start_page)
+    private function get_file_info(&$data,$id_file_name,$date_from_start_page,$date_to_start_page)
     {
-        $this->db->select('n.id,n.name,n.date_start,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(ui.name,\' - \',u.employee_id) employee_name,d.name department_name,o.name office_name');
-        $this->db->select('SUM(CASE WHEN df.status=\''.$this->config->item('system_status_active').'\' AND df.type=\''.$this->config->item('system_digital_file_image').'\' THEN 1 ELSE 0 END) number_of_page');
+        $this->db->select('n.id,n.name,n.date_start');
+        $this->db->select('ctg.name category_name');
+        $this->db->select('cls.name class_name');
+        $this->db->select('cls.name class_name');
+        $this->db->select('t.name type_name');
+        $this->db->select('t.name type_name');
+        $this->db->select('hl.name hardcopy_location');
+        $this->db->select('CONCAT(ui.name," - ",u.employee_id) employee_name');
+        $this->db->select('d.name department_name');
+        $this->db->select('o.name office_name');
+        $this->db->select('SUM(CASE WHEN df.status="'.$this->config->item('system_status_active').'" AND SUBSTRING(df.mime_type,1,5)="image" THEN 1 ELSE 0 END) number_of_page');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
@@ -160,14 +160,14 @@ class Report_file_view extends Root_Controller
         $this->db->where('ui.revision',1);
         $this->db->where('n.id',$id_file_name);
         $this->db->where('n.status',$this->config->item('system_status_active'));
-        $data['details']=$this->db->get()->row_array();
+        $data['item']=$this->db->get()->row_array();
 
-        $this->db->select('name,date_entry,remarks,mime_type');
+        $this->db->select('name,date_entry,remarks,mime_type,file_path');
         $this->db->from($this->config->item('table_fms_tasks_digital_file'));
         $this->db->where('id_file_name',$id_file_name);
         $this->db->where('status',$this->config->item('system_status_active'));
         $this->two_date_between_query_generator($date_from_start_page,$date_to_start_page,'date_entry');
-        $data['files_info']=$this->db->get()->result_array();
+        $data['stored_files']=$this->db->get()->result_array();
     }
     private function system_get_items()
     {
@@ -180,7 +180,15 @@ class Report_file_view extends Root_Controller
         $date_from_start_file=$this->input->post('date_from_start_file');
         $date_to_start_file=$this->input->post('date_to_start_file');
 
-        $this->db->select('n.id,n.name,n.date_start,n.ordering,hl.name hardcopy_location,t.name type_name,cls.name class_name,ctg.name category_name,CONCAT(ui.name,\' - \',u.employee_id) employee_name,d.name department_name,o.name office_name');
+        $this->db->select('n.id,n.name,n.date_start,n.ordering');
+        $this->db->select('hl.name hardcopy_location');
+        $this->db->select('t.name type_name');
+        $this->db->select('t.name type_name');
+        $this->db->select('cls.name class_name');
+        $this->db->select('ctg.name category_name');
+        $this->db->select('CONCAT(ui.name," - ",u.employee_id) employee_name');
+        $this->db->select('d.name department_name');
+        $this->db->select('o.name office_name');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->from($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');
@@ -205,7 +213,6 @@ class Report_file_view extends Root_Controller
             $where_in='SELECT id FROM '.$this->config->item('table_fms_setup_file_type').' WHERE id_class IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_class').' WHERE id_category='.$id_category.')';
             $this->db->where_in('n.id_type',$where_in,false);
         }
-
 
         if($id_office>0 && $id_department>0 && $employee_responsible>0)
         {
@@ -242,13 +249,16 @@ class Report_file_view extends Root_Controller
         $this->two_date_between_query_generator(System_helper::get_time($date_from_start_file),System_helper::get_time($date_to_start_file),'n.date_start');
         $this->db->where('n.status',$this->config->item('system_status_active'));
         $this->db->group_by('n.id');
+        $this->db->order_by('ctg.ordering');
+        $this->db->order_by('cls.ordering');
+        $this->db->order_by('t.ordering');
         $this->db->order_by('n.ordering');
-        $temp=$this->db->get()->result_array();
-        foreach($temp as &$value)
+        $items=$this->db->get()->result_array();
+        foreach($items as &$item)
         {
-            $value['date_start']=System_helper::display_date($value['date_start']);
+            $value['date_start']=System_helper::display_date($item['date_start']);
         }
-        $this->json_return($temp);
+        $this->json_return($items);
     }
     private function two_date_between_query_generator($start_date,$end_date,$field)
     {
