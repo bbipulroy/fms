@@ -48,9 +48,9 @@ class Common_controller extends Root_Controller
         $ajax['status']=true;
         $this->json_return($ajax);
     }
-    public function get_employees()
+    public function get_employees_by_office_department_together()
     {
-        $html_container_id='#employee_responsible';
+        $html_container_id='#employee_responsible_id';
         if($this->input->post('html_container_id'))
         {
             $html_container_id=$this->input->post('html_container_id');

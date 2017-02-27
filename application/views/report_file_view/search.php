@@ -136,7 +136,7 @@ $CI= & get_instance();
 
                 <div style="<?php if(!($item['employee_responsible']>0)){echo 'display: none';} ?>" class="row show-grid" id="employee_responsible_container">
                     <div class="col-xs-6">
-                        <select name="item[employee_responsible]" id="employee_responsible" class="form-control" tabindex="-1">
+                        <select name="item[employee_responsible]" id="employee_responsible_id" class="form-control" tabindex="-1">
                             <option value=""><?php echo $this->lang->line('SELECT');?></option>
                             <?php
                             foreach($employees as $employee)
@@ -148,7 +148,7 @@ $CI= & get_instance();
                         </select>
                     </div>
                     <div class="col-xs-6">
-                        <label for="employee_responsible" class="control-label pull-left">
+                        <label for="employee_responsible_id" class="control-label pull-left">
                             <?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>
                     </div>
                 </div>
@@ -228,7 +228,7 @@ $CI= & get_instance();
     {
         $(document).off("change","#id_office");
         $(document).off("change","#id_department");
-        $(document).off("change","#employee_responsible");
+        $(document).off("change","#employee_responsible_id");
         $(document).off("change","#id_category");
         $(document).off("change","#id_class");
         $(document).off("change","#id_type");
@@ -239,7 +239,7 @@ $CI= & get_instance();
         $(".datepicker").datepicker({dateFormat : display_date_format});
         $(document).on("change","#id_office,#id_department",function()
         {
-            $("#employee_responsible").val("");
+            $("#employee_responsible_id").val("");
             var id_department=$('#id_department').val();
             var id_office=$('#id_office').val();
             if(id_office>0 || id_department>0)
@@ -247,12 +247,12 @@ $CI= & get_instance();
                 $('#employee_responsible_container').show();
                 $.ajax(
                     {
-                        url: "<?php echo site_url('common_controller/get_employees'); ?>",
+                        url: "<?php echo site_url('common_controller/get_employees_by_office_department_together'); ?>",
                         type: 'POST',
                         datatype: "JSON",
                         data:
                         {
-                            html_container_id:'#employee_responsible',
+                            html_container_id:'#employee_responsible_id',
                             id_department:id_department,
                             id_office:id_office
                         },
