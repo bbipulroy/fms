@@ -363,6 +363,9 @@ class Tasks_file_entry extends Root_Controller
         $this->db->where('ui.revision',1);
         $this->db->where('fug.user_group_id',$user->user_group);
         $this->db->where('fug.revision',1);
+        $this->db->order_by('ctg.ordering');
+        $this->db->order_by('cls.ordering');
+        $this->db->order_by('t.ordering');
         $this->db->order_by('n.ordering');
         $this->db->group_by('n.id');
         $items=$this->db->get()->result_array();
