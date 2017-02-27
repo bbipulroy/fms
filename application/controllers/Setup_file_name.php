@@ -87,18 +87,8 @@ class Setup_file_name extends Root_Controller
             $data['types']=array();
             $data['hc_locations']=Query_helper::get_info($this->config->item('table_fms_setup_file_hc_location'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
 
-            $this->db->select('id value,name text');
-            $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices'));
-            $this->db->where('status',$this->config->item('system_status_active'));
-            $this->db->order_by('ordering');
-            $data['offices']=$this->db->get()->result_array();
-
-            $this->db->select('id value,name text');
-            $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'));
-            $this->db->where('status',$this->config->item('system_status_active'));
-            $this->db->order_by('ordering');
-            $data['departments']=$this->db->get()->result_array();
-
+            $data['offices']=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
+            $data['departments']=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
             $data['employees']=array();
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
@@ -142,17 +132,8 @@ class Setup_file_name extends Root_Controller
             $data['types']=Query_helper::get_info($this->config->item('table_fms_setup_file_type'),array('id value','name text'),array('id_class='.$data['item']['id_class'],'status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
             $data['hc_locations']=Query_helper::get_info($this->config->item('table_fms_setup_file_hc_location'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
 
-            $this->db->select('id value,name text');
-            $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices'));
-            $this->db->where('status',$this->config->item('system_status_active'));
-            $this->db->order_by('ordering');
-            $data['offices']=$this->db->get()->result_array();
-
-            $this->db->select('id value,name text');
-            $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'));
-            $this->db->where('status',$this->config->item('system_status_active'));
-            $this->db->order_by('ordering');
-            $data['departments']=$this->db->get()->result_array();
+            $data['offices']=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
+            $data['departments']=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
 
             $this->db->select("u.id value,CONCAT(ui.name,' - ',u.employee_id) AS text");
             $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u');
@@ -264,8 +245,16 @@ class Setup_file_name extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('n.id,n.name,n.date_start,n.ordering,ctg.name category_name,cls.name class_name,t.name type_name,hl.name hardcopy_location,CONCAT(ui.name," - ",u.employee_id) employee_name,d.name department_name,o.name office_name');
-        $this->db->select('SUM(CASE WHEN df.status="'.$this->config->item('system_status_active').'" AND MID(df.mime_type,1,5)="image" THEN 1 ELSE 0 END) number_of_page');
+        $this->db->select('n.id,n.name,n.date_start,n.ordering');
+        $this->db->select('ctg.name category_name');
+        $this->db->select('cls.name class_name');
+        $this->db->select('cls.name class_name');
+        $this->db->select('t.name type_name');
+        $this->db->select('hl.name hardcopy_location');
+        $this->db->select('CONCAT(ui.name," - ",u.employee_id) employee_name');
+        $this->db->select('d.name department_name');
+        $this->db->select('o.name office_name');
+        $this->db->select('SUM(CASE WHEN df.status="'.$this->config->item('system_status_active').'" AND SUBSTRING(df.mime_type,1,5)="image" THEN 1 ELSE 0 END) number_of_page');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
@@ -278,6 +267,9 @@ class Setup_file_name extends Root_Controller
         $this->db->join($this->config->item('table_fms_tasks_digital_file').' df','df.id_file_name=n.id','left');
         $this->db->where('n.status!=',$this->config->item('system_status_delete'));
         $this->db->where('ui.revision',1);
+        $this->db->order_by('ctg.ordering');
+        $this->db->order_by('cls.ordering');
+        $this->db->order_by('t.ordering');
         $this->db->order_by('n.ordering');
         $this->db->group_by('n.id');
         $items=$this->db->get()->result_array();
