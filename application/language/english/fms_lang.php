@@ -5,6 +5,7 @@ $lang['SELECT']='Select';
 $lang['DELETE']='Delete';
 $lang['ACTIVE']='Active';
 $lang['INACTIVE']='In-active';
+$lang['YOU_DONT_HAVE_ACCESS']="You don't have access.";
 //login
 $lang['MSG_USERNAME_PASSWORD_INVALID'] = 'Username and Password did not match or Invalid';
 $lang['MSG_LOGIN_SUCCESS'] = 'Successfully Logged In';
