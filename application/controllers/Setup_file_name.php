@@ -80,7 +80,7 @@ class Setup_file_name extends Root_Controller
                 'remarks'=>'',
                 'id_office'=>'',
                 'id_department'=>'',
-                'employee_responsible'=>''
+                'employee_id'=>''
             );
             $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
             $data['classes']=array();
@@ -140,8 +140,10 @@ class Setup_file_name extends Root_Controller
             $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','u.id=ui.user_id');
             $this->db->where('u.status',$this->config->item('system_status_active'));
             $this->db->where('ui.revision',1);
-            $where='(ui.office_id='.$data['item']['id_office'].' OR '.'ui.department_id='.$data['item']['id_department'].')';
-            $this->db->where($where,'',false);
+            $this->db->where('ui.office_id',$data['item']['id_office']);
+            $this->db->where('ui.department_id',$data['item']['id_department']);
+            #$where='(ui.office_id='.$data['item']['id_office'].' OR '.'ui.department_id='.$data['item']['id_department'].')';
+            #$this->db->where($where,'',false);
             $this->db->order_by('u.employee_id');
             $this->db->group_by('u.id');
             $data['employees']=$this->db->get()->result_array();
@@ -235,7 +237,7 @@ class Setup_file_name extends Root_Controller
         $this->form_validation->set_rules('item[id_type]',$this->lang->line('LABEL_FILE_TYPE'),'required');
         $this->form_validation->set_rules('item[id_hc_location]',$this->lang->line('LABEL_HC_LOCATION'),'required');
         $this->form_validation->set_rules('item[date_start]',$this->lang->line('LABEL_DATE_START'),'required');
-        $this->form_validation->set_rules('item[employee_responsible]',$this->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'),'required');
+        $this->form_validation->set_rules('item[employee_id]',$this->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'),'required');
         if($this->form_validation->run()==false)
         {
             $this->message=validation_errors();
@@ -260,7 +262,7 @@ class Setup_file_name extends Root_Controller
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
         $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','cls.id_category=ctg.id');
         $this->db->join($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
-        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_id','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');

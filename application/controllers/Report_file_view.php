@@ -53,7 +53,7 @@ class Report_file_view extends Root_Controller
                 'date_to_start_page'=>'',
                 'id_office'=>'',
                 'id_department'=>'',
-                'employee_responsible'=>''
+                'employee_id'=>''
             );
             $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
             $data['classes']=array();
@@ -152,7 +152,7 @@ class Report_file_view extends Root_Controller
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
         $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','cls.id_category=ctg.id');
         $this->db->join($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
-        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_id','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');
@@ -174,8 +174,8 @@ class Report_file_view extends Root_Controller
         $id_category=$this->input->post('id_category');
         $id_class=$this->input->post('id_class');
         $id_type=$this->input->post('id_type');
-        $employee_responsible=$this->input->post('employee_responsible');
-        $id_department=$this->input->post('id_department');
+        $employee_id=$this->input->post('employee_id');
+        $id_department=$this->input->post('id_department');#echo $id_department;die();
         $id_office=$this->input->post('id_office');
         $date_from_start_file=$this->input->post('date_from_start_file');
         $date_to_start_file=$this->input->post('date_to_start_file');
@@ -194,7 +194,7 @@ class Report_file_view extends Root_Controller
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','cls.id=t.id_class');
         $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=cls.id_category');
-        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_responsible','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_id','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');
@@ -214,38 +214,22 @@ class Report_file_view extends Root_Controller
             $this->db->where_in('n.id_type',$where_in,false);
         }
 
-        if($id_office>0 && $id_department>0 && $employee_responsible>0)
+        if($employee_id>0)
         {
-            $where='(n.id_office='.$id_office.' OR '.'n.id_department='.$id_department.' OR '.'n.employee_responsible='.$employee_responsible.')';
-            $this->db->where($where,'',false);
+            $this->db->where('n.employee_id',$employee_id);
         }
-        elseif($id_office>0 && $id_department>0)
+        else
         {
-            $where='(n.id_office='.$id_office.' OR '.'n.id_department='.$id_department.')';
-            $this->db->where($where,'',false);
+            if($id_office>0)
+            {
+                $this->db->where('n.id_office',$id_office);
+            }
+            if($id_department>0)
+            {
+                $this->db->where('n.id_department',$id_department);
+            }
         }
-        elseif($id_office>0 && $employee_responsible>0)
-        {
-            $where='(n.id_office='.$id_office.' OR '.'n.employee_responsible='.$employee_responsible.')';
-            $this->db->where($where,'',false);
-        }
-        elseif($id_department>0 && $employee_responsible>0)
-        {
-            $where='(n.id_department='.$id_department.' OR '.'n.employee_responsible='.$employee_responsible.')';
-            $this->db->where($where,'',false);
-        }
-        elseif($id_office>0)
-        {
-            $this->db->where('n.id_office',$id_office);
-        }
-        elseif($id_department>0)
-        {
-            $this->db->where('n.id_department',$id_department);
-        }
-        elseif($employee_responsible>0)
-        {
-            $this->db->where('n.employee_responsible',$employee_responsible);
-        }
+
         $this->two_date_between_query_generator(System_helper::get_time($date_from_start_file),System_helper::get_time($date_to_start_file),'n.date_start');
         $this->db->where('n.status',$this->config->item('system_status_active'));
         $this->db->group_by('n.id');
@@ -256,7 +240,7 @@ class Report_file_view extends Root_Controller
         $items=$this->db->get()->result_array();
         foreach($items as &$item)
         {
-            $value['date_start']=System_helper::display_date($item['date_start']);
+            $item['date_start']=System_helper::display_date($item['date_start']);
         }
         $this->json_return($items);
     }

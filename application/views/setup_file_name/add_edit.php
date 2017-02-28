@@ -78,19 +78,19 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             </div>
         </div>
 
-        <div style="<?php if(!($item['employee_responsible']>0)){echo 'display: none';} ?>" class="row show-grid" id="employee_responsible_container">
+        <div style="<?php if(!($item['employee_id']>0)){echo 'display: none';} ?>" class="row show-grid" id="employee_id_container">
             <div class="col-xs-4">
-                <label for="employee_responsible_id" class="control-label pull-right">
+                <label for="employee_id" class="control-label pull-right">
                     <?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>
                     <span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="employee_responsible_id" name="item[employee_responsible]" class="form-control" tabindex="-1">
+                <select id="employee_id" name="item[employee_id]" class="form-control" tabindex="-1">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
                     foreach($employees as $employee)
                     {?>
-                        <option value="<?php echo $employee['value']?>" <?php if($employee['value']==$item['employee_responsible']){ echo 'selected';}?>><?php echo $employee['text'];?></option>
+                        <option value="<?php echo $employee['value']?>" <?php if($employee['value']==$item['employee_id']){ echo 'selected';}?>><?php echo $employee['text'];?></option>
                     <?php
                     }
                     ?>
@@ -233,7 +233,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 <script type="text/javascript">
     $(document).off("change", "#id_office");
     $(document).off("change", "#id_department");
-    $(document).off("change", "#employee_responsible_id");
+    $(document).off("change", "#employee_id");
     $(document).off("change", "#id_category");
     $(document).off("change", "#id_class");
     $(document).off("change", "#id_type");
@@ -244,35 +244,35 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         $(document).on("change","#id_office",function()
         {
             $("#id_department").val("");
-            $("#employee_responsible_id").val("");
+            $("#employee_id").val("");
             var id_office=$('#id_office').val();
             if(id_office>0)
             {
                 $('#department_container').show();
-                $('#employee_responsible_container').hide();
+                $('#employee_id_container').hide();
             }
             else
             {
                 $('#department_container').hide();
-                $('#employee_responsible_container').hide();
+                $('#employee_id_container').hide();
             }
         });
         $(document).on("change","#id_department",function()
         {
-            $("#employee_responsible_id").val("");
+            $("#employee_id").val("");
             var id_office=$('#id_office').val();
             var id_department=$('#id_department').val();
             if(id_department>0)
             {
-                $('#employee_responsible_container').show();
+                $('#employee_id_container').show();
                 $.ajax(
                     {
-                        url: "<?php echo site_url('common_controller/get_employees_by_office_department_together'); ?>",
+                        url: "<?php echo site_url('common_controller/get_employees_by_office_department'); ?>",
                         type: 'POST',
                         datatype: "JSON",
                         data:
                         {
-                            html_container_id:'#employee_responsible_id',
+                            html_container_id:'#employee_id',
                             id_department:id_department,
                             id_office:id_office
                         },
@@ -288,7 +288,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             }
             else
             {
-                $('#employee_responsible_container').hide();
+                $('#employee_id_container').hide();
             }
         });
         $(document).on("change","#id_category",function()
