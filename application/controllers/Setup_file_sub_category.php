@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Setup_file_class extends Root_Controller
+class Setup_file_sub_category extends Root_Controller
 {
     private $message;
     public $permissions;
@@ -10,8 +10,8 @@ class Setup_file_class extends Root_Controller
     {
         parent::__construct();
         $this->message='';
-        $this->permissions=User_helper::get_permission('Setup_file_class');
-        $this->controller_url='setup_file_class';
+        $this->permissions=User_helper::get_permission('Setup_file_sub_category');
+        $this->controller_url='setup_file_sub_category';
     }
     public function index($action='list',$id=0)
     {
@@ -44,7 +44,7 @@ class Setup_file_class extends Root_Controller
     {
         if(isset($this->permissions['action0']) && ($this->permissions['action0']==1))
         {
-            $data['title']=$this->lang->line('LABEL_FILE_CLASS').' List';
+            $data['title']=$this->lang->line('LABEL_FILE_SUB_CATEGORY').' List';
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/list',$data,true));
             if($this->message)
             {
@@ -65,19 +65,17 @@ class Setup_file_class extends Root_Controller
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
         {
-            $data['title']='Create New '.$this->lang->line('LABEL_FILE_CLASS');
+            $data['title']='Create New '.$this->lang->line('LABEL_FILE_SUB_CATEGORY');
             $data['item']=array
             (
                 'id'=>0,
                 'name'=>'',
-                'id_sub_category'=>'',
                 'id_category'=>'',
                 'ordering'=>99,
                 'status'=>$this->config->item('system_status_active'),
                 'remarks'=>''
             );
             $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
-            $data['sub_categories']=array();
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
@@ -106,15 +104,9 @@ class Setup_file_class extends Root_Controller
             {
                 $item_id=$id;
             }
-            $this->db->select('cls.*');
-            $this->db->select('sctg.id_category');
-            $this->db->from($this->config->item('table_fms_setup_file_class').' cls');
-            $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','sctg.id=cls.id_sub_category');
-            $this->db->where('cls.id',$item_id);
-            $data['item']=$this->db->get()->row_array();
-            $data['title']='Edit '.$this->lang->line('LABEL_FILE_CLASS').' ('.$data['item']['name'].')';
+            $data['item']=Query_helper::get_info($this->config->item('table_fms_setup_file_sub_category'),'*',array('id ='.$item_id),1);
+            $data['title']='Edit '.$this->lang->line('LABEL_FILE_SUB_CATEGORY').' ('.$data['item']['name'].')';
             $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
-            $data['sub_categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_sub_category'),array('id value','name text'),array('id_category='.$data['item']['id_category'],'status ="'.$this->config->item('system_status_active').'"'));
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
@@ -167,13 +159,13 @@ class Setup_file_class extends Root_Controller
             {
                 $data['user_updated']=$user->user_id;
                 $data['date_updated']=time();
-                Query_helper::update($this->config->item('table_fms_setup_file_class'),$data,array('id='.$id));
+                Query_helper::update($this->config->item('table_fms_setup_file_sub_category'),$data,array('id='.$id));
             }
             else
             {
                 $data['user_created']=$user->user_id;
                 $data['date_created']=time();
-                Query_helper::add($this->config->item('table_fms_setup_file_class'),$data);
+                Query_helper::add($this->config->item('table_fms_setup_file_sub_category'),$data);
             }
             $this->db->trans_complete(); //DB Transaction Handle END
             if($this->db->trans_status()===true)
@@ -201,7 +193,7 @@ class Setup_file_class extends Root_Controller
     {
         $this->load->library('form_validation');
         $this->form_validation->set_rules('item[name]',$this->lang->line('LABEL_NAME'),'required');
-        $this->form_validation->set_rules('item[id_sub_category]',$this->lang->line('LABEL_FILE_SUB_CATEGORY'),'required');
+        $this->form_validation->set_rules('item[id_category]',$this->lang->line('LABEL_FILE_CATEGORY'),'required');
         if($this->form_validation->run()==false)
         {
             $this->message=validation_errors();
@@ -211,16 +203,13 @@ class Setup_file_class extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('cls.*');
-        $this->db->select('sctg.name sub_category_name');
+        $this->db->select('sctg.*');
         $this->db->select('ctg.name category_name');
-        $this->db->from($this->config->item('table_fms_setup_file_class').' cls');
-        $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','sctg.id=cls.id_sub_category');
+        $this->db->from($this->config->item('table_fms_setup_file_sub_category').' sctg');
         $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=sctg.id_category');
-        $this->db->where('cls.status!=',$this->config->item('system_status_delete'));
+        $this->db->where('sctg.status!=',$this->config->item('system_status_delete'));
         $this->db->order_by('ctg.ordering');
         $this->db->order_by('sctg.ordering');
-        $this->db->order_by('cls.ordering');
         $items=$this->db->get()->result_array();
         $this->json_return($items);
     }

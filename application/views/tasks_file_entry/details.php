@@ -65,6 +65,14 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
+            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?>:</label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label><?php echo $item['sub_category_name'] ?></label>
+        </div>
+    </div>
+    <div class="row show-grid">
+        <div class="col-xs-4">
             <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">

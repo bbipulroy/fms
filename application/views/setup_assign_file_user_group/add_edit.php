@@ -24,7 +24,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
 <form id="save_form" action="<?php echo site_url($CI->controller_url.'/index/save');?>" method="post">
     <input type="hidden" name="id" value="<?php echo $item_id; ?>">
-    <input type="hidden" name="id_category" value="<?php echo $id_category; ?>">
+    <input type="hidden" name="id_sub_category" value="<?php echo $id_sub_category; ?>">
     <input type="hidden" id="system_save_new_status" name="system_save_new_status" value="0">
     <div class="row show-grid">
         <table class="table table-bordered table-responsive">

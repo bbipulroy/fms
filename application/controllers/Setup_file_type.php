@@ -71,12 +71,14 @@ class Setup_file_type extends Root_Controller
                 'id'=>0,
                 'name'=>'',
                 'id_category'=>'',
+                'id_sub_category'=>'',
                 'id_class'=>'',
                 'ordering'=>99,
                 'status'=>$this->config->item('system_status_active'),
                 'remarks'=>''
             );
             $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
+            $data['sub_categories']=array();
             $data['classes']=array();
             $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
@@ -106,14 +108,18 @@ class Setup_file_type extends Root_Controller
             {
                 $item_id=$id;
             }
-            $this->db->select('t.*,cls.id_category');
+            $this->db->select('t.*');
+            $this->db->select('cls.id_sub_category');
+            $this->db->select('sctg.id_category');
             $this->db->from($this->config->item('table_fms_setup_file_type').' t');
-            $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
+            $this->db->join($this->config->item('table_fms_setup_file_class').' cls','cls.id=t.id_class');
+            $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','sctg.id=cls.id_sub_category');
             $this->db->where('t.id',$item_id);
             $data['item']=$this->db->get()->row_array();
             $data['title']='Edit '.$this->lang->line('LABEL_FILE_TYPE').' ('.$data['item']['name'].')';
             $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'));
-            $data['classes']=Query_helper::get_info($this->config->item('table_fms_setup_file_class'),array('id value','name text'),array('id_category='.$data['item']['id_category'],'status ="'.$this->config->item('system_status_active').'"'));
+            $data['sub_categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_sub_category'),array('id value','name text'),array('id_category='.$data['item']['id_category'],'status ="'.$this->config->item('system_status_active').'"'));
+            $data['classes']=Query_helper::get_info($this->config->item('table_fms_setup_file_class'),array('id value','name text'),array('id_sub_category='.$data['item']['id_sub_category'],'status ="'.$this->config->item('system_status_active').'"'));
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add_edit',$data,true));
             if($this->message)
             {
@@ -210,12 +216,17 @@ class Setup_file_type extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('t.id,t.name type_name,t.status,t.ordering,ctg.name category_name,cls.name class_name');
+        $this->db->select('t.*');
+        $this->db->select('cls.name class_name');
+        $this->db->select('sctg.name sub_category_name');
+        $this->db->select('ctg.name category_name');
         $this->db->from($this->config->item('table_fms_setup_file_type').' t');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
-        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','sctg.id=cls.id_sub_category');
+        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=sctg.id_category');
         $this->db->where('t.status!=',$this->config->item('system_status_delete'));
         $this->db->order_by('ctg.ordering');
+        $this->db->order_by('sctg.ordering');
         $this->db->order_by('cls.ordering');
         $this->db->order_by('t.ordering');
         $items=$this->db->get()->result_array();

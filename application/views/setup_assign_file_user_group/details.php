@@ -28,6 +28,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <thead>
                     <tr>
                         <th><?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?></th>
+                        <th><?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?></th>
                         <th><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?></th>
                         <th><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?></th>
                         <th><?php echo $CI->lang->line('LABEL_FILE_NAME'); ?></th>
@@ -47,6 +48,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 foreach($all_files as $file)
                 {
                     $is_first_category=false;
+                    $is_first_sub_category=false;
                     $is_first_class=false;
                     $is_first_type=false;
                     if(isset($check_array['category'][$file['category_id']]))
@@ -57,6 +59,15 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     {
                         $is_first_category='_first';
                         $check_array['category'][$file['category_id']]=1;
+                    }
+                    if(isset($check_array['sub_category'][$file['sub_category_id']]))
+                    {
+                        $check_array['sub_category'][$file['sub_category_id']]+=1;
+                    }
+                    else
+                    {
+                        $is_first_sub_category='_first';
+                        $check_array['sub_category'][$file['sub_category_id']]=1;
                     }
                     if(isset($check_array['class'][$file['class_id']]))
                     {
@@ -94,6 +105,9 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                         <td class="category-<?php echo $file['category_id'].$is_first_category; ?>">
                             <label><?php echo $file['category_name']; ?></label>
                         </td>
+                        <td class="sub_category-<?php echo $file['sub_category_id'].$is_first_sub_category; ?>">
+                            <label><?php echo $file['sub_category_name']; ?></label>
+                        </td>
                         <td class="class-<?php echo $file['class_id'].$is_first_class; ?>">
                             <label><?php echo $file['class_name']; ?></label>
                         </td>
@@ -122,7 +136,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     $check_array['category']=array();
                     $check_array['class']=array();
                     $check_array['type']=array();
-                    echo '<tr style="text-align: center;font-size: 18px;"><td colspan="8">No data to display.</td></tr>';
+                    echo '<tr style="text-align: center;font-size: 18px;"><td colspan="9">No data to display.</td></tr>';
                 }
                 ?>
                 </tbody>

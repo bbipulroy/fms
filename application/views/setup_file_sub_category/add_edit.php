@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+
 $CI=& get_instance();
 $action_buttons=array();
 $action_buttons[]=array(
@@ -45,34 +46,13 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_category" class="form-control" tabindex="-1">
+                <select id="id_category" name="item[id_category]" class="form-control" tabindex="-1">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
                     foreach($categories as $category)
                     {?>
                         <option value="<?php echo $category['value']?>" <?php if($category['value']==$item['id_category']){ echo 'selected';}?>><?php echo $category['text'];?></option>
                     <?php
-                    }
-                    ?>
-                </select>
-            </div>
-        </div>
-
-        <div style="<?php if(!($item['id_sub_category']>0)){echo 'display:none';} ?>" class="row show-grid" id="id_sub_category_container">
-            <div class="col-xs-4">
-                <label for="id_sub_category" class="control-label pull-right">
-                    <?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY');?>
-                    <span style="color:#FF0000">*</span>
-                </label>
-            </div>
-            <div class="col-sm-4 col-xs-8">
-                <select id="id_sub_category" name="item[id_sub_category]" class="form-control">
-                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
-                    <?php
-                    foreach($sub_categories as $sub_category)
-                    {?>
-                        <option value="<?php echo $sub_category['value']?>" <?php if($sub_category['value']==$item['id_sub_category']){echo "selected";}?>><?php echo $sub_category['text'];?></option>
-                     <?php
                     }
                     ?>
                 </select>
@@ -106,7 +86,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         <div style="" class="row show-grid">
             <div class="col-xs-4">
                 <label for="remarks" class="control-label pull-right">
-                    <?php echo $CI->lang->line('LABEL_REMARKS');?>
+                    <?php echo $CI->lang->line('LABEL_REMARKS'); ?>
                     <span style="color:#FF0000">*</span>
                 </label>
             </div>
@@ -120,39 +100,6 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 <script>
     jQuery(document).ready(function()
     {
-        $(document).off("change", "#id_category");
-        $(document).off("change", "#id_sub_category");
-        $(document).on("change","#id_category",function()
-        {
-            $("#id_sub_category").val("");
-            var id_category=$("#id_category").val();
-            if(id_category>0)
-            {
-                $("#id_sub_category_container").show();
-                $.ajax(
-                    {
-                        url: '<?php echo site_url('common_controller/get_sub_categories_by_category_id'); ?>',
-                        type: 'POST',
-                        datatype: "JSON",
-                        data:
-                        {
-                            html_container_id:'#id_sub_category',
-                            id_category:id_category
-                        },
-                        success: function (data, status)
-                        {
-
-                        },
-                        error: function (xhr, desc, err)
-                        {
-                            console.log("error");
-                        }
-                    });
-            }
-            else
-            {
-                $("#id_sub_category_container").hide();
-            }
-        });
+        $(document).off('change','#id_category');
     });
 </script>

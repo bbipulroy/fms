@@ -9,15 +9,28 @@ class Common_controller extends Root_Controller
         parent::__construct();
         $this->message='';
     }
-    public function get_classes_by_category_id()
+    public function get_sub_categories_by_category_id()
+    {
+        $html_container_id='#id_sub_category';
+        if($this->input->post('html_container_id'))
+        {
+            $html_container_id=$this->input->post('html_container_id');
+        }
+        $id_category=$this->input->post('id_category');
+        $data['items']=Query_helper::get_info($this->config->item('table_fms_setup_file_sub_category'),array('id value','name text'),array('id_category='.$id_category,'status="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
+        $ajax['system_content'][]=array('id'=>$html_container_id,'html'=>$this->load->view('dropdown_with_select',$data,true));
+        $ajax['status']=true;
+        $this->json_return($ajax);
+    }
+    public function get_classes_by_sub_category_id()
     {
         $html_container_id='#id_class';
         if($this->input->post('html_container_id'))
         {
             $html_container_id=$this->input->post('html_container_id');
         }
-        $id_category=$this->input->post('id_category');
-        $data['items']=Query_helper::get_info($this->config->item('table_fms_setup_file_class'),array('id value','name text'),array('id_category='.$id_category,'status="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
+        $id_sub_category=$this->input->post('id_sub_category');
+        $data['items']=Query_helper::get_info($this->config->item('table_fms_setup_file_class'),array('id value','name text'),array('id_sub_category='.$id_sub_category,'status="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
         $ajax['system_content'][]=array('id'=>$html_container_id,'html'=>$this->load->view('dropdown_with_select',$data,true));
         $ajax['status']=true;
         $this->json_return($ajax);

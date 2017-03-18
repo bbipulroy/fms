@@ -42,6 +42,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="date_start">Opening Date</label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="hardcopy_location"><?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="category_name"><?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="sub_category_name"><?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="class_name"><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="type_name"><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="office_name"><?php echo $CI->lang->line('LABEL_OFFICE'); ?></label>
@@ -73,6 +74,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 {name: 'type_name', type: 'string'},
                 {name: 'class_name', type: 'string'},
                 {name: 'category_name', type: 'string'},
+                {name: 'sub_category_name', type: 'string'},
                 {name: 'employee_name', type: 'string'},
                 {name: 'department_name', type: 'string'},
                 {name: 'office_name', type: 'string'},
@@ -123,6 +125,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { text: 'Opening Date', dataField: 'date_start',width:'100',rendered: tooltiprenderer,hidden:true},
                 { text: '<?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>', dataField: 'hardcopy_location',width:'200',rendered: tooltiprenderer,filtertype:'list'},
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
+                { text: '<?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?>', dataField: 'sub_category_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
                 { text: '<?php echo $CI->lang->line('LABEL_OFFICE'); ?>', dataField: 'office_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},

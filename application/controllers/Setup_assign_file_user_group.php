@@ -86,17 +86,23 @@ class Setup_assign_file_user_group extends Root_Controller
             $user_group_name=$this->db->get()->row_array();
             $data['title']='Details File Permissions for ('.$user_group_name['name'].')';
 
-            $this->db->select('n.id file_id,n.name file_name,t.id type_id,t.name type_name,cls.id class_id,cls.name class_name,ctg.id category_id,ctg.name category_name');
+            $this->db->select('n.id file_id,n.name file_name');
+            $this->db->select('t.id type_id,t.name type_name');
+            $this->db->select('cls.id class_id,cls.name class_name');
+            $this->db->select('sctg.id sub_category_id,sctg.name sub_category_name');
+            $this->db->select('ctg.id category_id,ctg.name category_name');
             $this->db->select('fug.*');
             $this->db->from($this->config->item('table_fms_setup_file_name').' n');
             $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');
             $this->db->join($this->config->item('table_fms_setup_file_class').' cls','cls.id=t.id_class');
-            $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=cls.id_category');
+            $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','sctg.id=cls.id_sub_category');
+            $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=sctg.id_category');
             $this->db->join($this->config->item('table_fms_setup_assign_file_user_group').' fug','fug.id_file=n.id','left');
             $this->db->where('n.status',$this->config->item('system_status_active'));
             $this->db->where('fug.user_group_id',$item_id);
             $this->db->where('fug.revision',1);
             $this->db->order_by('ctg.id');
+            $this->db->order_by('sctg.id');
             $this->db->order_by('cls.id');
             $this->db->order_by('t.id');
             $this->db->order_by('n.id');
@@ -159,8 +165,8 @@ class Setup_assign_file_user_group extends Root_Controller
         if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
         {
             $data['item_id']=$this->input->post('id_user_group');
-            $data['id_category']=$this->input->post('id_category');
-            if($data['item_id']>0 && $data['id_category']>0)
+            $data['id_sub_category']=$this->input->post('id_sub_category');
+            if($data['item_id']>0 && $data['id_sub_category']>0)
             {
                 $data['permitted_files']=array();
                 $this->db->from($this->config->item('table_fms_setup_assign_file_user_group'));
@@ -178,7 +184,7 @@ class Setup_assign_file_user_group extends Root_Controller
                 $this->db->from($this->config->item('table_fms_setup_file_name').' n');
                 $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');
                 $this->db->join($this->config->item('table_fms_setup_file_class').' cls','cls.id=t.id_class');
-                $this->db->where('cls.id_category',$data['id_category']);
+                $this->db->where('cls.id_sub_category',$data['id_sub_category']);
                 $this->db->where('n.status',$this->config->item('system_status_active'));
 
                 $this->db->order_by('cls.id');
@@ -219,7 +225,7 @@ class Setup_assign_file_user_group extends Root_Controller
         $user=User_helper::get_user();
         $time=time();
         $id=$this->input->post('id');
-        $id_category=$this->input->post('id_category');
+        $id_sub_category=$this->input->post('id_sub_category');
         $data=$this->input->post('items');
         if(!is_array($data))
         {
@@ -251,7 +257,7 @@ class Setup_assign_file_user_group extends Root_Controller
             $query.=' JOIN '.$this->config->item('table_fms_setup_file_type').' t ON t.id=n.id_type';
             $query.=' JOIN '.$this->config->item('table_fms_setup_file_class').' cls ON cls.id=t.id_class';
             $query.=' SET afug.revision=afug.revision+1';
-            $query.=' WHERE cls.id_category='.$id_category;
+            $query.=' WHERE cls.id_sub_category='.$id_sub_category;
             $query.=' AND afug.user_group_id='.$id;
             $this->db->query($query);
             foreach($data as $id_file=>$actions)

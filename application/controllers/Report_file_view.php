@@ -44,6 +44,7 @@ class Report_file_view extends Root_Controller
             $data['item']=array
             (
                 'id_category'=>'',
+                'id_sub_category'=>'',
                 'id_class'=>'',
                 'id_type'=>'',
                 'id_name'=>'',
@@ -56,6 +57,7 @@ class Report_file_view extends Root_Controller
                 'employee_id'=>''
             );
             $data['categories']=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
+            $data['sub_categories']=array();
             $data['classes']=array();
             $data['types']=array();
             $data['names']=array();
@@ -138,6 +140,7 @@ class Report_file_view extends Root_Controller
     {
         $this->db->select('n.id,n.name,n.date_start');
         $this->db->select('ctg.name category_name');
+        $this->db->select('sctg.name sub_category_name');
         $this->db->select('cls.name class_name');
         $this->db->select('cls.name class_name');
         $this->db->select('t.name type_name');
@@ -150,7 +153,8 @@ class Report_file_view extends Root_Controller
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
-        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','cls.id_category=ctg.id');
+        $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','cls.id_sub_category=sctg.id');
+        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','sctg.id_category=ctg.id');
         $this->db->join($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_id','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
@@ -172,10 +176,11 @@ class Report_file_view extends Root_Controller
     private function system_get_items()
     {
         $id_category=$this->input->post('id_category');
+        $id_sub_category=$this->input->post('id_sub_category');
         $id_class=$this->input->post('id_class');
         $id_type=$this->input->post('id_type');
         $employee_id=$this->input->post('employee_id');
-        $id_department=$this->input->post('id_department');#echo $id_department;die();
+        $id_department=$this->input->post('id_department');
         $id_office=$this->input->post('id_office');
         $date_from_start_file=$this->input->post('date_from_start_file');
         $date_to_start_file=$this->input->post('date_to_start_file');
@@ -185,6 +190,7 @@ class Report_file_view extends Root_Controller
         $this->db->select('t.name type_name');
         $this->db->select('t.name type_name');
         $this->db->select('cls.name class_name');
+        $this->db->select('sctg.name sub_category_name');
         $this->db->select('ctg.name category_name');
         $this->db->select('CONCAT(ui.name," - ",u.employee_id) employee_name');
         $this->db->select('d.name department_name');
@@ -193,12 +199,14 @@ class Report_file_view extends Root_Controller
         $this->db->from($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');
         $this->db->join($this->config->item('table_fms_setup_file_class').' cls','cls.id=t.id_class');
-        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=cls.id_category');
+        $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','sctg.id=cls.id_sub_category');
+        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=sctg.id_category');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_id','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');
         $this->db->where('ui.revision',1);
+        $where_in=false;
         if($id_type>0)
         {
             $this->db->where('n.id_type',$id_type);
@@ -206,11 +214,18 @@ class Report_file_view extends Root_Controller
         elseif($id_class>0)
         {
             $where_in='SELECT id FROM '.$this->config->item('table_fms_setup_file_type').' WHERE id_class='.$id_class;
-            $this->db->where_in('n.id_type',$where_in,false);
+        }
+        elseif($id_sub_category>0)
+        {
+            $where_in='SELECT id FROM '.$this->config->item('table_fms_setup_file_type').' WHERE id_class IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_class').' WHERE id_sub_category='.$id_sub_category.')';
         }
         elseif($id_category>0)
         {
-            $where_in='SELECT id FROM '.$this->config->item('table_fms_setup_file_type').' WHERE id_class IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_class').' WHERE id_category='.$id_category.')';
+            $where_in='SELECT id FROM '.$this->config->item('table_fms_setup_file_type').' WHERE id_class IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_class').' WHERE id_sub_category IN (SELECT id FROM '.$this->config->item('table_fms_setup_file_sub_category').' WHERE id_category='.$id_category.'))';
+        }
+
+        if($where_in!==false)
+        {
             $this->db->where_in('n.id_type',$where_in,false);
         }
 
@@ -234,6 +249,7 @@ class Report_file_view extends Root_Controller
         $this->db->where('n.status',$this->config->item('system_status_active'));
         $this->db->group_by('n.id');
         $this->db->order_by('ctg.ordering');
+        $this->db->order_by('sctg.ordering');
         $this->db->order_by('cls.ordering');
         $this->db->order_by('t.ordering');
         $this->db->order_by('n.ordering');

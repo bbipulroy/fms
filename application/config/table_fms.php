@@ -2,6 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 $config['table_fms_setup_file_category']='fms_setup_file_category';
+$config['table_fms_setup_file_sub_category']='fms_setup_file_sub_category';
 $config['table_fms_setup_file_class']='fms_setup_file_class';
 $config['table_fms_setup_file_type']='fms_setup_file_type';
 $config['table_fms_setup_file_name']='fms_setup_file_name';

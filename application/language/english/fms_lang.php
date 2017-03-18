@@ -114,9 +114,10 @@ $lang['LABEL_TRANSPORT_BILL'] = 'Transport';
 $lang['LABEL_LOCAL_TRANSPORT_BILL'] = 'Local Conveyance';
 $lang['LABEL_OTHER_BILL'] = 'MISC';
 
-$lang['LABEL_FILE_CATEGORY']='File Category';
-$lang['LABEL_FILE_CLASS']='File Class';
-$lang['LABEL_FILE_TYPE']='File Type';
+$lang['LABEL_FILE_CATEGORY']='Category';
+$lang['LABEL_FILE_SUB_CATEGORY']='Sub Category';
+$lang['LABEL_FILE_CLASS']='Class';
+$lang['LABEL_FILE_TYPE']='Type';
 $lang['LABEL_FILE_NAME']='File Name';
 $lang['LABEL_RESPONSIBLE_EMPLOYEE']='Responsible Employee';
 $lang['LABEL_OPENING_DATE']='Opening Date';

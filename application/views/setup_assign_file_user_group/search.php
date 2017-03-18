@@ -24,7 +24,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             </label>
         </div>
         <div class="col-sm-4 col-xs-8">
-            <select id="id_category" class="form-control" data-id-user-group="<?php echo $item_id; ?>" tabindex="-1">
+            <select id="id_category" class="form-control" tabindex="-1">
                 <option value=""><?php echo $this->lang->line('SELECT');?></option>
                 <?php
                 foreach($categories as $category)
@@ -37,6 +37,20 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             </select>
         </div>
     </div>
+
+    <div style="display: none;" class="row show-grid" id="sub_category_container">
+        <div class="col-xs-4">
+            <label for="id_sub_category" class="control-label pull-right">
+                <?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY');?>
+                <span style="color:#FF0000">*</span>
+            </label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <select id="id_sub_category" class="form-control" data-id-user-group="<?php echo $item_id; ?>" tabindex="-1">
+                <option value=""><?php echo $this->lang->line('SELECT');?></option>
+            </select>
+        </div>
+    </div>
     <br/>
     <div id="edit_form"></div>
 </div>
@@ -45,11 +59,45 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
     jQuery(document).ready(function()
     {
         $(document).off("change", "#id_category");
+        $(document).off("change", "#id_sub_category");
         $(document).off("click", ".system-prevent-click");
         $(document).on("change","#id_category",function()
         {
+            $("#id_sub_category").val("");
+            $('#edit_form').empty();
             var id_category=$('#id_category').val();
             if(id_category>0)
+            {
+                $('#sub_category_container').show();
+                $.ajax(
+                    {
+                        url: '<?php echo site_url('common_controller/get_sub_categories_by_category_id'); ?>',
+                        type: 'POST',
+                        datatype: "JSON",
+                        data:
+                        {
+                            id_category:id_category,
+                            html_container_id:"#id_sub_category"
+                        },
+                        success: function (data, status)
+                        {
+
+                        },
+                        error: function (xhr, desc, err)
+                        {
+                            console.log("error");
+                        }
+                    });
+            }
+            else
+            {
+                $('#sub_category_container').hide();
+            }
+        });
+        $(document).on("change","#id_sub_category",function()
+        {
+            var id_sub_category=$('#id_sub_category').val();
+            if(id_sub_category>0)
             {
                 $.ajax(
                     {
@@ -58,7 +106,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                         datatype: "JSON",
                         data:
                         {
-                            id_category:id_category,
+                            id_sub_category:id_sub_category,
                             id_user_group:$(this).attr("data-id-user-group")
                         },
                         success: function (data, status)

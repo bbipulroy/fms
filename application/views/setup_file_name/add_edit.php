@@ -62,7 +62,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             <div class="col-xs-4">
                 <label for="id_department" class="control-label pull-right">
                     <?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>
-                    <span style="color:#FF0000">*</span></label>
+                    <span style="color:#FF0000">*</span>
+                </label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <select id="id_department" name="item[id_department]" class="form-control" tabindex="-1">
@@ -82,7 +83,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             <div class="col-xs-4">
                 <label for="employee_id" class="control-label pull-right">
                     <?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>
-                    <span style="color:#FF0000">*</span></label>
+                    <span style="color:#FF0000">*</span>
+                </label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <select id="employee_id" name="item[employee_id]" class="form-control" tabindex="-1">
@@ -119,11 +121,33 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             </div>
         </div>
 
+        <div style="<?php if(!($item['id_sub_category']>0)){echo 'display:none';} ?>" class="row show-grid" id="sub_category_container">
+            <div class="col-xs-4">
+                <label for="id_sub_category" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY');?>
+                    <span style="color:#FF0000">*</span>
+                </label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <select id="id_sub_category" class="form-control">
+                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
+                    <?php
+                    foreach($sub_categories as $sub_category)
+                    {?>
+                        <option value="<?php echo $sub_category['value']?>" <?php if($sub_category['value']==$item['id_sub_category']){echo "selected";}?>><?php echo $sub_category['text'];?></option>
+                    <?php
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+
         <div style="<?php if(!($item['id_class']>0)){echo 'display:none';} ?>" class="row show-grid" id="class_container">
             <div class="col-xs-4">
                 <label for="id_class" class="control-label pull-right">
                     <?php echo $CI->lang->line('LABEL_FILE_CLASS');?>
-                    <span style="color:#FF0000">*</span></label>
+                    <span style="color:#FF0000">*</span>
+                </label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <select id="id_class" class="form-control" tabindex="-1">
@@ -185,7 +209,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             <div class="col-xs-4">
                 <label for="name" class="control-label pull-right">
                     <?php echo $this->lang->line('LABEL_NAME');?>
-                    <span style="color:#FF0000">*</span></label>
+                    <span style="color:#FF0000">*</span
+                </label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <input type="text" name="item[name]" id="name" class="form-control" value="<?php echo $item['name'];?>"/>
@@ -235,6 +260,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
     $(document).off("change", "#id_department");
     $(document).off("change", "#employee_id");
     $(document).off("change", "#id_category");
+    $(document).off("change", "#id_sub_category");
     $(document).off("change", "#id_class");
     $(document).off("change", "#id_type");
     $(document).off("change", "#id_hc_location");
@@ -293,22 +319,60 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         });
         $(document).on("change","#id_category",function()
         {
+            $("#id_sub_category").val("");
             $("#id_class").val("");
             $("#id_type").val("");
-            var id_category=$('#id_category').val();
+            var id_category=$("#id_category").val();
             if(id_category>0)
+            {
+                $("#sub_category_container").show();
+                $("#class_container").hide();
+                $("#type_container").hide();
+                $.ajax(
+                    {
+                        url: '<?php echo site_url('common_controller/get_sub_categories_by_category_id'); ?>',
+                        type: 'POST',
+                        datatype: "JSON",
+                        data:
+                        {
+                            html_container_id:'#id_sub_category',
+                            id_category:id_category
+                        },
+                        success: function (data, status)
+                        {
+
+                        },
+                        error: function (xhr, desc, err)
+                        {
+                            console.log("error");
+                        }
+                    });
+            }
+            else
+            {
+                $("#sub_category_container").hide();
+                $("#class_container").hide();
+                $("#type_container").hide();
+            }
+        });
+        $(document).on("change","#id_sub_category",function()
+        {
+            $("#id_class").val("");
+            $("#id_type").val("");
+            var id_sub_category=$('#id_sub_category').val();
+            if(id_sub_category>0)
             {
                 $('#class_container').show();
                 $('#type_container').hide();
                 $.ajax(
                     {
-                        url: '<?php echo site_url('common_controller/get_classes_by_category_id'); ?>',
+                        url: '<?php echo site_url('common_controller/get_classes_by_sub_category_id'); ?>',
                         type: 'POST',
                         datatype: "JSON",
                         data:
                         {
                             html_container_id:'#id_class',
-                            id_category:id_category
+                            id_sub_category:id_sub_category
                         },
                         success: function (data, status)
                         {
