@@ -52,7 +52,7 @@ class Report_file_view extends Root_Controller
                 'date_to_start_file'=>'',
                 'date_from_start_page'=>'',
                 'date_to_start_page'=>'',
-                'id_office'=>'',
+                'id_company'=>'',
                 'id_department'=>'',
                 'employee_id'=>''
             );
@@ -62,7 +62,7 @@ class Report_file_view extends Root_Controller
             $data['types']=array();
             $data['names']=array();
 
-            $data['offices']=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
+            $data['companies']=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_company'),array('id value','full_name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
             $data['departments']=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
 
             $data['employees']=array();
@@ -148,7 +148,7 @@ class Report_file_view extends Root_Controller
         $this->db->select('hl.name hardcopy_location');
         $this->db->select('CONCAT(ui.name," - ",u.employee_id) employee_name');
         $this->db->select('d.name department_name');
-        $this->db->select('o.name office_name');
+        $this->db->select('comp.full_name company_name');
         $this->db->select('SUM(CASE WHEN df.status="'.$this->config->item('system_status_active').'" AND SUBSTRING(df.mime_type,1,5)="image" THEN 1 ELSE 0 END) number_of_page');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
@@ -159,7 +159,7 @@ class Report_file_view extends Root_Controller
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_id','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
-        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_company').' comp','comp.id=n.id_company','left');
         $this->db->join($this->config->item('table_fms_tasks_digital_file').' df','df.id_file_name=n.id','left');
         $this->db->where('ui.revision',1);
         $this->db->where('n.id',$id_file_name);
@@ -181,7 +181,7 @@ class Report_file_view extends Root_Controller
         $id_type=$this->input->post('id_type');
         $employee_id=$this->input->post('employee_id');
         $id_department=$this->input->post('id_department');
-        $id_office=$this->input->post('id_office');
+        $id_company=$this->input->post('id_company');
         $date_from_start_file=$this->input->post('date_from_start_file');
         $date_to_start_file=$this->input->post('date_to_start_file');
 
@@ -194,7 +194,7 @@ class Report_file_view extends Root_Controller
         $this->db->select('ctg.name category_name');
         $this->db->select('CONCAT(ui.name," - ",u.employee_id) employee_name');
         $this->db->select('d.name department_name');
-        $this->db->select('o.name office_name');
+        $this->db->select('comp.full_name company_name');
         $this->db->from($this->config->item('table_fms_setup_file_name').' n');
         $this->db->from($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
         $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');
@@ -204,7 +204,7 @@ class Report_file_view extends Root_Controller
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_id','left');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
         $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
-        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_offices').' o','o.id=n.id_office','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_company').' comp','comp.id=n.id_company','left');
         $this->db->where('ui.revision',1);
         $where_in=false;
         if($id_type>0)
@@ -235,9 +235,9 @@ class Report_file_view extends Root_Controller
         }
         else
         {
-            if($id_office>0)
+            if($id_company>0)
             {
-                $this->db->where('n.id_office',$id_office);
+                $this->db->where('n.id_company',$id_company);
             }
             if($id_department>0)
             {

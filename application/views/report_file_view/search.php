@@ -117,20 +117,20 @@ $CI= & get_instance();
             <div class="col-xs-6">
                 <div style="" class="row show-grid">
                     <div class="col-xs-6">
-                        <select name="item[id_office]" id="id_office" class="form-control" tabindex="-1">
+                        <select name="item[id_company]" id="id_company" class="form-control" tabindex="-1">
                             <option value=""><?php echo $this->lang->line('SELECT');?></option>
                             <?php
-                            foreach($offices as $office)
+                            foreach($companies as $company)
                             {?>
-                                <option value="<?php echo $office['value']?>" <?php if($office['value']==$item['id_office']){ echo 'selected';}?>><?php echo $office['text'];?></option>
+                                <option value="<?php echo $company['value']?>" <?php if($company['value']==$item['id_company']){ echo 'selected';}?>><?php echo $company['text'];?></option>
                             <?php
                             }
                             ?>
                         </select>
                     </div>
                     <div class="col-xs-6">
-                        <label for="id_office" class="control-label pull-left">
-                            <?php echo $CI->lang->line('LABEL_OFFICE'); ?>
+                        <label for="id_company" class="control-label pull-left">
+                            <?php echo $CI->lang->line('LABEL_COMPANY_NAME'); ?>
                         </label>
                     </div>
                 </div>
@@ -171,7 +171,6 @@ $CI= & get_instance();
                     <div class="col-xs-6">
                         <label for="employee_id" class="control-label pull-left">
                             <?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>
-                        </label>
                     </div>
                 </div>
             </div>
@@ -248,7 +247,7 @@ $CI= & get_instance();
 <script type="text/javascript">
     jQuery(document).ready(function()
     {
-        $(document).off("change","#id_office");
+        $(document).off("change","#id_company");
         $(document).off("change","#id_department");
         $(document).off("change","#employee_id");
         $(document).off("change","#id_category");
@@ -260,24 +259,24 @@ $CI= & get_instance();
         $(document).off("click", ".pop_up");
 
         $(".datepicker").datepicker({dateFormat : display_date_format});
-        $(document).on("change","#id_office,#id_department",function()
+        $(document).on("change","#id_company,#id_department",function()
         {
             $("#employee_id").val("");
             var id_department=$('#id_department').val();
-            var id_office=$('#id_office').val();
-            if(id_office>0 || id_department>0)
+            var id_company=$('#id_company').val();
+            if(id_company>0 || id_department>0)
             {
                 $('#employee_id_container').show();
                 $.ajax(
                     {
-                        url: "<?php echo site_url('common_controller/get_employees_by_office_department'); ?>",
+                        url: "<?php echo site_url('common_controller/get_employees_by_company_department'); ?>",
                         type: 'POST',
                         datatype: "JSON",
                         data:
                         {
                             html_container_id:'#employee_id',
                             id_department:id_department,
-                            id_office:id_office
+                            id_company:id_company
                         },
                         success: function (data, status)
                         {
@@ -442,7 +441,7 @@ $CI= & get_instance();
         });
         $(document).on("click", ".pop_up", function(event)
         {
-            var left=((($(window).width()-550)/2)+$(window).scrollLeft());
+            var left=((($(window).width()-450)/2)+$(window).scrollLeft());
             var top=((($(window).height()-550)/2)+$(window).scrollTop());
             $("#popup_window").jqxWindow({width: 1200,height:550,position:{x:left,y:top}}); //to change position always
             //$("#popup_window").jqxWindow({position:{x:left,y:top}});

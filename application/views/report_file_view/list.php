@@ -45,7 +45,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="sub_category_name"><?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="class_name"><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="type_name"><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?></label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="office_name"><?php echo $CI->lang->line('LABEL_OFFICE'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="company_name"><?php echo $CI->lang->line('LABEL_COMPANY_NAME'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="department_name"><?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="ordering"><?php echo $CI->lang->line('LABEL_ORDER'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="details_button"><?php echo $CI->lang->line('ACTION_DETAILS'); ?></label>
@@ -77,7 +77,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 {name: 'sub_category_name', type: 'string'},
                 {name: 'employee_name', type: 'string'},
                 {name: 'department_name', type: 'string'},
-                {name: 'office_name', type: 'string'},
+                {name: 'company_name', type: 'string'},
                 {name: 'ordering', type: 'string'},
                 {name: 'details_button', type: 'string'}
             ],
@@ -104,7 +104,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         $("#system_jqx_container").jqxGrid(
         {
             width: '100%',
-            height:'350px',
+            //height:'350px',
             source: dataAdapter,
             columnsresize: true,
             columnsreorder: true,
@@ -117,7 +117,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             selectionmode: 'singlerow',
             altrows: true,
             enabletooltips: true,
-            showaggregates: true,
+            //showaggregates: true,
             rowsheight: 45,
             columns:[
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'name',width:'300',pinned:true,rendered: tooltiprenderer},
@@ -128,7 +128,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?>', dataField: 'sub_category_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
                 { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
-                { text: '<?php echo $CI->lang->line('LABEL_OFFICE'); ?>', dataField: 'office_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},
+                { text: '<?php echo $CI->lang->line('LABEL_COMPANY_NAME'); ?>', dataField: 'company_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},
                 { text: '<?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>', dataField: 'department_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},
                 { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'60',rendered: tooltiprenderer,hidden:true},
                 { text: '<?php echo $CI->lang->line('ACTION_DETAILS'); ?>', dataField: 'details_button',width:'85',cellsrenderer:cellsrenderer}

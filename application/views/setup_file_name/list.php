@@ -66,7 +66,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="sub_category_name"><?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="class_name"><?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="type_name"><?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?></label>
-                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="office_name"><?php echo $CI->lang->line('LABEL_OFFICE'); ?></label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="company_name"><?php echo $CI->lang->line('LABEL_COMPANY_NAME'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="department_name"><?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="ordering"><?php echo $CI->lang->line('LABEL_ORDER'); ?></label>
             </div>
@@ -99,7 +99,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { name: 'date_start', type: 'string' },
                 { name: 'number_of_page', type: 'int' },
                 { name: 'hardcopy_location', type: 'string' },
-                { name: 'office_name', type: 'string' },
+                { name: 'company_name', type: 'string' },
                 { name: 'department_name', type: 'string' },
                 { name: 'employee_name', type: 'string' }
             ],
@@ -142,7 +142,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { text: '<?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?>', dataField: 'sub_category_name',width:200,rendered: tooltiprenderer,filtertype:'list'},
                     { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',width:200,rendered: tooltiprenderer,filtertype:'list'},
                     { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',width:200,rendered: tooltiprenderer,filtertype:'list'},
-                    { text: '<?php echo $CI->lang->line('LABEL_OFFICE'); ?>', dataField: 'office_name',width:200,rendered: tooltiprenderer,filtertype:'list',hidden:true},
+                    { text: '<?php echo $CI->lang->line('LABEL_COMPANY_NAME'); ?>', dataField: 'company_name',width:200,rendered: tooltiprenderer,filtertype:'list',hidden:true},
                     { text: '<?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>', dataField: 'department_name',width:200,rendered: tooltiprenderer,filtertype:'list',hidden:true},
                     { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:60,rendered: tooltiprenderer,hidden:true}
                 ]

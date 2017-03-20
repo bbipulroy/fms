@@ -39,18 +39,18 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 
         <div style="" class="row show-grid">
             <div class="col-xs-4">
-                <label for="id_office" class="control-label pull-right">
-                    <?php echo $CI->lang->line('LABEL_OFFICE'); ?>
+                <label for="id_company" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_COMPANY_NAME'); ?>
                     <span style="color:#FF0000">*</span>
                 </label>
             </div>
             <div class="col-sm-4 col-xs-8">
-                <select id="id_office" name="item[id_office]" class="form-control" tabindex="-1">
+                <select id="id_company" name="item[id_company]" class="form-control" tabindex="-1">
                     <option value=""><?php echo $this->lang->line('SELECT');?></option>
                     <?php
-                    foreach($offices as $office)
+                    foreach($companies as $company)
                     {?>
-                        <option value="<?php echo $office['value']?>" <?php if($office['value']==$item['id_office']){ echo 'selected';}?>><?php echo $office['text'];?></option>
+                        <option value="<?php echo $company['value']?>" <?php if($company['value']==$item['id_company']){ echo 'selected';}?>><?php echo $company['text'];?></option>
                     <?php
                     }
                     ?>
@@ -62,8 +62,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             <div class="col-xs-4">
                 <label for="id_department" class="control-label pull-right">
                     <?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>
-                    <span style="color:#FF0000">*</span>
-                </label>
+                    <span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <select id="id_department" name="item[id_department]" class="form-control" tabindex="-1">
@@ -83,8 +82,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             <div class="col-xs-4">
                 <label for="employee_id" class="control-label pull-right">
                     <?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>
-                    <span style="color:#FF0000">*</span>
-                </label>
+                    <span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <select id="employee_id" name="item[employee_id]" class="form-control" tabindex="-1">
@@ -146,8 +144,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             <div class="col-xs-4">
                 <label for="id_class" class="control-label pull-right">
                     <?php echo $CI->lang->line('LABEL_FILE_CLASS');?>
-                    <span style="color:#FF0000">*</span>
-                </label>
+                    <span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <select id="id_class" class="form-control" tabindex="-1">
@@ -209,8 +206,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             <div class="col-xs-4">
                 <label for="name" class="control-label pull-right">
                     <?php echo $this->lang->line('LABEL_NAME');?>
-                    <span style="color:#FF0000">*</span
-                </label>
+                    <span style="color:#FF0000">*</span></label>
             </div>
             <div class="col-sm-4 col-xs-8">
                 <input type="text" name="item[name]" id="name" class="form-control" value="<?php echo $item['name'];?>"/>
@@ -256,23 +252,23 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
     <div class="clearfix"></div>
 </form>
 <script type="text/javascript">
-    $(document).off("change", "#id_office");
-    $(document).off("change", "#id_department");
-    $(document).off("change", "#employee_id");
-    $(document).off("change", "#id_category");
-    $(document).off("change", "#id_sub_category");
-    $(document).off("change", "#id_class");
-    $(document).off("change", "#id_type");
-    $(document).off("change", "#id_hc_location");
+    $(document).off("change","#id_company");
+    $(document).off("change","#id_department");
+    $(document).off("change","#employee_id");
+    $(document).off("change","#id_category");
+    $(document).off("change","#id_sub_category");
+    $(document).off("change","#id_class");
+    $(document).off("change","#id_type");
+    $(document).off("change","#id_hc_location");
     jQuery(document).ready(function()
     {
         $(".datepicker").datepicker({dateFormat : display_date_format});
-        $(document).on("change","#id_office",function()
+        $(document).on("change","#id_company",function()
         {
             $("#id_department").val("");
             $("#employee_id").val("");
-            var id_office=$('#id_office').val();
-            if(id_office>0)
+            var id_company=$('#id_company').val();
+            if(id_company>0)
             {
                 $('#department_container').show();
                 $('#employee_id_container').hide();
@@ -286,21 +282,21 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         $(document).on("change","#id_department",function()
         {
             $("#employee_id").val("");
-            var id_office=$('#id_office').val();
+            var id_company=$('#id_company').val();
             var id_department=$('#id_department').val();
             if(id_department>0)
             {
                 $('#employee_id_container').show();
                 $.ajax(
                     {
-                        url: "<?php echo site_url('common_controller/get_employees_by_office_department'); ?>",
+                        url: "<?php echo site_url('common_controller/get_employees_by_company_department'); ?>",
                         type: 'POST',
                         datatype: "JSON",
                         data:
                         {
                             html_container_id:'#employee_id',
                             id_department:id_department,
-                            id_office:id_office
+                            id_company:id_company
                         },
                         success: function (data, status)
                         {
