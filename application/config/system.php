@@ -15,5 +15,8 @@ $config['system_status_active']='Active';
 $config['system_status_inactive']='In-Active';
 $config['system_status_delete']='Deleted';
 
+$config['system_status_file_open']='Open';
+$config['system_status_file_close']='Close';
+
 $config['system_image_base_url']='http://localhost/fms/';
 $config['system_folder_upload']='files';

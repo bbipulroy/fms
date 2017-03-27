@@ -262,3 +262,6 @@ footer a{
     width: 8.27in;
     margin: .5in;
 }
+.panel-default > .panel-heading {
+    background-color: #C8E6C9;
+}
