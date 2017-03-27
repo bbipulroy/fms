@@ -85,7 +85,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                             {
                                 ?>
                                 <td>
-                                    <input name="items[<?php echo $file_id; ?>][action<?php echo $index; ?>]" class="action<?php echo $index;?> file class<?php echo $class_id; ?> type<?php echo $type_id; ?> file<?php echo $file_id; ?>" type="checkbox" <?php if(isset($permitted_files[$file_id]) && ($permitted_files[$file_id]['action'.$index]==1) ){echo 'checked';} ?>>
+                                    <input name="items[<?php echo $file_id; ?>][action<?php echo $index; ?>]" class="action<?php echo $index;?> file class<?php echo $class_id; ?> type<?php echo $type_id; ?> file<?php echo $file_id; ?>" type="checkbox" <?php if(isset($permitted_files[$file_id]) && ($permitted_files[$file_id]['action'.$index]==1) ){echo 'checked';} ?> title="<?php echo $CI->lang->line('LABEL_ACTION'.$index); ?>">
                                 </td>
                                 <?php
                             }
