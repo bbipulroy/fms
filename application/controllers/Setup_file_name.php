@@ -77,6 +77,7 @@ class Setup_file_name extends Root_Controller
                 'id_hc_location'=>'',
                 'date_start'=>System_helper::display_date(time()),
                 'ordering'=>99,
+                'status_file'=>$this->config->item('system_status_file_open'),
                 'status'=>$this->config->item('system_status_active'),
                 'remarks'=>'',
                 'id_company'=>'',
@@ -246,6 +247,7 @@ class Setup_file_name extends Root_Controller
         $this->form_validation->set_rules('item[id_type]',$this->lang->line('LABEL_FILE_TYPE'),'required');
         $this->form_validation->set_rules('item[id_hc_location]',$this->lang->line('LABEL_HC_LOCATION'),'required');
         $this->form_validation->set_rules('item[date_start]',$this->lang->line('LABEL_DATE_START'),'required');
+        $this->form_validation->set_rules('item[status_file]',$this->lang->line('LABEL_FILE_STATUS'),'required');
         $this->form_validation->set_rules('item[employee_id]',$this->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'),'required');
         $this->form_validation->set_rules('item[id_company]',$this->lang->line('LABEL_COMPANY_NAME'),'required');
         $this->form_validation->set_rules('item[id_department]',$this->lang->line('LABEL_DEPARTMENT'),'required');
@@ -258,7 +260,7 @@ class Setup_file_name extends Root_Controller
     }
     private function system_get_items()
     {
-        $this->db->select('n.id,n.name,n.date_start,n.ordering');
+        $this->db->select('n.*');
         $this->db->select('ctg.name category_name');
         $this->db->select('sctg.name sub_category_name');
         $this->db->select('cls.name class_name');

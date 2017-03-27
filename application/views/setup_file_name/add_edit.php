@@ -190,7 +190,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             </div>
             <div class="col-sm-4 col-xs-8">
                 <select id="id_hc_location" name="item[id_hc_location]" class="form-control">
-                    <option value=""><?php echo $this->lang->line('SELECT');?></option>
+                    <option value=""><?php echo $CI->lang->line('SELECT');?></option>
                     <?php
                     foreach($hc_locations as $hc_location)
                     {?>
@@ -210,6 +210,21 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             </div>
             <div class="col-sm-4 col-xs-8">
                 <input type="text" name="item[name]" id="name" class="form-control" value="<?php echo $item['name'];?>"/>
+            </div>
+        </div>
+
+        <div class="row show-grid">
+            <div class="col-xs-4">
+                <label for="status_file" class="control-label pull-right">
+                    <?php echo $CI->lang->line('LABEL_FILE_STATUS');?>
+                    <span style="color:#FF0000">*</span>
+                </label>
+            </div>
+            <div class="col-sm-4 col-xs-8">
+                <select id="status_file" name="item[status_file]" class="form-control">
+                    <option value="<?php echo $CI->config->item('system_status_file_open'); ?>" <?php if($CI->config->item('system_status_file_open')==$item['status_file']){echo "selected";}?>><?php echo $CI->lang->line('FILE_STATUS_OPEN'); ?></option>
+                    <option value="<?php echo $CI->config->item('system_status_file_close'); ?>" <?php if($CI->config->item('system_status_file_close')==$item['status_file']){echo "selected";}?>><?php echo $CI->lang->line('FILE_STATUS_CLOSE'); ?></option>
+                </select>
             </div>
         </div>
 

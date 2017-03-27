@@ -2,6 +2,13 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 $CI=& get_instance();
 $action_buttons=array();
+if(isset($CI->permissions['action1']) && ($CI->permissions['action1']==1))
+{
+    $action_buttons[]=array(
+        'label'=>$CI->lang->line("ACTION_NEW"),
+        'href'=>site_url($CI->controller_url.'/index/add')
+    );
+}
 if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
 {
     $action_buttons[]=array(
@@ -59,6 +66,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="name"><?php echo $CI->lang->line('LABEL_FILE_NAME'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="employee_name"><?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="date_start">Opening Date</label>
+                <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" value="status_file"><?php echo $CI->lang->line('LABEL_FILE_STATUS'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="number_of_page">Number of Page</label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="hardcopy_location"><?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?></label>
                 <label class="checkbox-inline"><input type="checkbox" class="system_jqx_column" checked value="category_name"><?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?></label>
@@ -94,6 +102,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 { name: 'type_name', type: 'string' },
                 { name: 'ordering', type: 'int' },
                 { name: 'date_start', type: 'string' },
+                { name: 'status_file', type: 'string' },
                 { name: 'number_of_page', type: 'int' },
                 { name: 'hardcopy_location', type: 'string' },
                 { name: 'company_name', type: 'string' },
@@ -130,6 +139,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                     { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'name',width:'300',pinned:true,rendered: tooltiprenderer},
                     { text: '<?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>', dataField: 'employee_name',width:'200',pinned:false,rendered: tooltiprenderer},
                     { text: 'Opening Date', dataField: 'date_start',width:'100',pinned:false,rendered: tooltiprenderer},
+                    { text: '<?php echo $CI->lang->line('LABEL_FILE_STATUS'); ?>', dataField: 'status_file',width:'100',rendered: tooltiprenderer,hidden:true,filtertype:'list'},
                     { text: 'Number of Page', dataField: 'number_of_page',width:'60',pinned:false,rendered: tooltiprenderer},
                     { text: '<?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>', dataField: 'hardcopy_location',width:200,pinned:false,rendered: tooltiprenderer,filtertype:'list'},
                     { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',width:200,pinned:false,rendered: tooltiprenderer,filtertype:'list'},

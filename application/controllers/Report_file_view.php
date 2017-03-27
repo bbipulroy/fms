@@ -91,6 +91,13 @@ class Report_file_view extends Root_Controller
             {
                 $data=array();
                 $this->get_file_info($data,$item['id_name'],System_helper::get_time($item['date_from_start_page']),System_helper::get_time($item['date_to_start_page']));
+                $data['file_items']=$this->get_file_items($item['id_name']);
+                $data['item_files']=array();
+                foreach($data['stored_files'] as $file)
+                {
+                    $data['item_files'][$file['id_file_item']][]=$file;
+                }
+                unset($data['stored_files']);
                 $ajax['system_content'][]=array('id'=>'#system_report_container','html'=>$this->load->view($this->controller_url.'/details',$data,true));
             }
             else
@@ -128,6 +135,13 @@ class Report_file_view extends Root_Controller
 
         $data=array();
         $this->get_file_info($data,$id,$date_from_start_page,$date_to_start_page);
+        $data['file_items']=$this->get_file_items($id);
+        $data['item_files']=array();
+        foreach($data['stored_files'] as $file)
+        {
+            $data['item_files'][$file['id_file_item']][]=$file;
+        }
+        unset($data['stored_files']);
         $ajax['system_content'][]=array('id'=>$html_id,'html'=>$this->load->view($this->controller_url.'/details',$data,true));
         if($this->message)
         {
@@ -136,9 +150,20 @@ class Report_file_view extends Root_Controller
         $ajax['status']=true;
         $this->json_return($ajax);
     }
+    private function get_file_items($file_id)
+    {
+        $this->db->select('i.id,i.name,i.status');
+        $this->db->from($this->config->item('table_fms_setup_file_item').' i');
+        $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=i.id_type');
+        $this->db->join($this->config->item('table_fms_setup_file_name').' n','n.id_type=t.id');
+        $this->db->where('n.id',$file_id);
+        $this->db->order_by('i.ordering');
+        $results=$this->db->get()->result_array();
+        return $results;
+    }
     private function get_file_info(&$data,$id_file_name,$date_from_start_page,$date_to_start_page)
     {
-        $this->db->select('n.id,n.name,n.date_start');
+        $this->db->select('n.id,n.name,n.date_start,n.status_file');
         $this->db->select('ctg.name category_name');
         $this->db->select('sctg.name sub_category_name');
         $this->db->select('cls.name class_name');
@@ -166,7 +191,7 @@ class Report_file_view extends Root_Controller
         $this->db->where('n.status',$this->config->item('system_status_active'));
         $data['item']=$this->db->get()->row_array();
 
-        $this->db->select('name,date_entry,remarks,mime_type,file_path');
+        $this->db->select('*');
         $this->db->from($this->config->item('table_fms_tasks_digital_file'));
         $this->db->where('id_file_name',$id_file_name);
         $this->db->where('status',$this->config->item('system_status_active'));

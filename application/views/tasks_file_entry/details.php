@@ -57,6 +57,14 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
     </div>
     <div class="row show-grid">
         <div class="col-xs-4">
+            <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_STATUS'); ?></label>
+        </div>
+        <div class="col-sm-4 col-xs-8">
+            <label><?php echo $item['status_file']; ?></label>
+        </div>
+    </div>
+    <div class="row show-grid">
+        <div class="col-xs-4">
             <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>:</label>
         </div>
         <div class="col-sm-4 col-xs-8">
@@ -113,51 +121,87 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
     </div>
 </div>
 
-<table class="table table-bordered table-responsive">
-    <thead>
-        <tr>
-            <th>File Name</th>
-            <th>Picture/Thumbnail</th>
-            <th>Entry Date</th>
-            <th><?php echo $CI->lang->line('LABEL_REMARKS'); ?></th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        $location=$this->config->item('system_image_base_url');
-        foreach($stored_files as $file)
+<div class="panel-group" id="accordion">
+    <?php
+    $location=$this->config->item('system_image_base_url');
+    foreach($file_items as $file_item)
+    {
+        $show_item=true;
+        if(!isset($item_files[$file_item['id']]) && $file_item['status']!=$this->config->item('system_status_active'))
+        {
+            $show_item=false;
+        }
+        if($show_item)
         {
             ?>
-            <tr>
-                <td><?php echo $file['name']; ?></td>
-            <?php
-            if(substr($file['mime_type'],0,5)=='image')
-            {
-                ?>
-                <td><img src="<?php echo $location.$file['file_path']; ?>" style="max-width: 250px;max-height:150px"></td>
-                <?php
-            }
-            else
-            {
-                $extension=pathinfo($file['name'],PATHINFO_EXTENSION);
-                if(strtolower($extension)=='pdf')
-                {
-                    $href_text='Read the PDF File';
-                }
-                else
-                {
-                    $href_text='Download the '.strtoupper($extension).' File';
-                }
-                ?>
-                <td><a href="<?php echo $location.$file['file_path']; ?>" class="btn btn-success external" target="_blank"><?php echo $href_text; ?></a></td>
-                <?php
-            }
-            ?>
-            <td><?php echo System_helper::display_date($file['date_entry']); ?></td>
-            <td><?php echo $file['remarks']; ?></td>
-            </tr>
-            <?php
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a class="external" data-toggle="collapse" data-parent="#accordion" href="#collapse_<?php echo $file_item['id']; ?>"><?php echo $file_item['name']; ?></a>
+                    </h4>
+                </div>
+                <div id="collapse_<?php echo $file_item['id']; ?>" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div style="overflow-x: auto;" class="row show-grid">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>Picture/Thumbnail</th>
+                                    <th>Entry Date</th>
+                                    <th><?php echo $CI->lang->line('LABEL_REMARKS'); ?></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <?php
+                                if(!isset($item_files[$file_item['id']]))
+                                {
+                                    $item_files[$file_item['id']]=array();
+                                }
+                                foreach($item_files[$file_item['id']] as $file)
+                                {
+                                    ?>
+                                    <tr>
+                                        <td><?php echo $file['name']; ?></td>
+                                        <td>
+                                            <?php
+                                            if(substr($file['mime_type'],0,5)=='image')
+                                            {
+                                                ?>
+                                                <img src="<?php echo $location.$file['file_path']; ?>" style="max-width: 250px;max-height:150px">
+                                            <?php
+                                            }
+                                            else
+                                            {
+                                                $extension=pathinfo($file['name'],PATHINFO_EXTENSION);
+                                                if(strtolower($extension)=='pdf')
+                                                {
+                                                    $href_text='Read the PDF File';
+                                                }
+                                                else
+                                                {
+                                                    $href_text='Download the '.strtoupper($extension).' File';
+                                                }
+                                                ?>
+                                                <a href="<?php echo $location.$file['file_path']; ?>" class="btn btn-success external" target="_blank"><?php echo $href_text; ?></a>
+                                            <?php
+                                            }
+                                            ?>
+                                        </td>
+                                        <td><?php echo System_helper::display_date($file['date_entry']); ?></td>
+                                        <td><?php echo $file['remarks']; ?></td>
+                                    </tr>
+                                <?php
+                                }
+                                ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php
         }
-        ?>
-    </tbody>
-</table>
+    }
+    ?>
+</div>

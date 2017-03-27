@@ -23,6 +23,10 @@ class Tasks_file_entry extends Root_Controller
         {
             $this->system_get_items();
         }
+        elseif($action=='add')
+        {
+            $this->system_add();
+        }
         elseif($action=='edit')
         {
             $this->system_edit($id);
@@ -34,6 +38,10 @@ class Tasks_file_entry extends Root_Controller
         elseif($action=='save')
         {
             $this->system_save();
+        }
+        elseif($action=='save_new_file')
+        {
+            $this->system_save_new_file();
         }
         else
         {
@@ -61,6 +69,104 @@ class Tasks_file_entry extends Root_Controller
             $this->json_return($ajax);
         }
     }
+    private function system_add()
+    {
+        if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
+        {
+            $user=User_helper::get_user();
+            $data=array();
+
+            $this->db->select('t.id type_id,t.name type_name');
+            $this->db->select('cls.id class_id,cls.name class_name');
+            $this->db->select('sctg.id sub_category_id,sctg.name sub_category_name');
+            $this->db->select('ctg.id category_id,ctg.name category_name');
+            $this->db->from($this->config->item('table_fms_setup_file_name').' n');
+            $this->db->join($this->config->item('table_fms_setup_assign_file_user_group').' afug','afug.id_file=n.id');
+            $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=n.id_type');
+            $this->db->join($this->config->item('table_fms_setup_file_class').' cls','cls.id=t.id_class');
+            $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','sctg.id=cls.id_sub_category');
+            $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=sctg.id_category');
+            $this->db->where('afug.user_group_id',$user->user_group);
+            $this->db->where('afug.action0',1);
+            $this->db->where('afug.revision',1);
+            $this->db->order_by('ctg.ordering');
+            $this->db->order_by('sctg.ordering');
+            $this->db->order_by('cls.ordering');
+            $this->db->order_by('t.ordering');
+            $this->db->group_by('t.id');
+            $results=$this->db->get()->result_array();
+            if(sizeof($results)<1)
+            {
+                $ajax['status']=false;
+                $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
+                $this->json_return($ajax);
+            }
+            $data['categories']=array();
+            $data['sub_categories']=array();
+            $data['classes']=array();
+            $data['types']=array();
+            $data['sub_category_counter']=0;
+            $data['class_counter']=0;
+            $data['type_counter']=count($results);
+            foreach($results as $result)
+            {
+                $data['categories'][$result['category_id']]=array('value'=>$result['category_id'],'text'=>$result['category_name']);
+                if(!isset($data['sub_categories'][$result['category_id']][$result['sub_category_id']]))
+                {
+                    $data['sub_categories'][$result['category_id']][$result['sub_category_id']]=array('value'=>$result['sub_category_id'],'text'=>$result['sub_category_name']);
+                    ++$data['sub_category_counter'];
+                }
+                if(!isset($data['classes'][$result['sub_category_id']][$result['class_id']]))
+                {
+                    $data['classes'][$result['sub_category_id']][$result['class_id']]=array('value'=>$result['class_id'],'text'=>$result['class_name']);
+                    ++$data['class_counter'];
+                }
+                $data['types'][$result['class_id']][$result['type_id']]=array('value'=>$result['type_id'],'text'=>$result['type_name']);
+            }
+            unset($results);
+
+            $this->db->select('com.id value,com.full_name text');
+            $this->db->from($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_company').' com');
+            $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_users_company').' ucom','ucom.company_id=com.id');
+            $this->db->where('com.status',$this->config->item('system_status_active'));
+            $this->db->where('ucom.revision',1);
+            $this->db->where('ucom.user_id',$user->user_id);
+            $this->db->order_by('com.ordering');
+            $data['companies']=$this->db->get()->result_array();
+
+            $result=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'),'name',array('id='.$user->department_id),1,0);
+            $data['department']=array('value'=>$user->department_id,'text'=>$result['name']);
+            $data['employee']=array('value'=>$user->user_id,'text'=>$user->name);
+            $data['hc_locations']=Query_helper::get_info($this->config->item('table_fms_setup_file_hc_location'),'id value,name text',array(),0,0,'ordering');
+
+            $data['title']='Create New '.$this->lang->line('LABEL_FILE_NAME');
+            $ajax['system_page_url']=site_url($this->controller_url.'/index/add');
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/add',$data,true));
+            if($this->message)
+            {
+                $ajax['system_message']=$this->message;
+            }
+            $ajax['status']=true;
+            $this->json_return($ajax);
+        }
+        else
+        {
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
+            $this->json_return($ajax);
+        }
+    }
+    private function get_file_items($file_id)
+    {
+        $this->db->select('i.id,i.name,i.status');
+        $this->db->from($this->config->item('table_fms_setup_file_item').' i');
+        $this->db->join($this->config->item('table_fms_setup_file_type').' t','t.id=i.id_type');
+        $this->db->join($this->config->item('table_fms_setup_file_name').' n','n.id_type=t.id');
+        $this->db->where('n.id',$file_id);
+        $this->db->order_by('i.ordering');
+        $results=$this->db->get()->result_array();
+        return $results;
+    }
     private function system_edit($id)
     {
         if(($this->input->post('id')))
@@ -76,7 +182,17 @@ class Tasks_file_entry extends Root_Controller
         {
             $data['item']=$this->get_file_info($item_id);
             $data['file_permissions']=$file_permissions;
-            $data['stored_files']=Query_helper::get_info($this->config->item('table_fms_tasks_digital_file'),'*',array('id_file_name ='.$item_id,'status ="'.$this->config->item('system_status_active').'"'));
+            $data['file_items']=$this->get_file_items($item_id);
+            $stored_files=Query_helper::get_info($this->config->item('table_fms_tasks_digital_file'),'*',array('id_file_name ='.$item_id,'status ="'.$this->config->item('system_status_active').'"'));
+            $data['item_files']=array();
+            foreach($stored_files as $file)
+            {
+                $data['item_files'][$file['id_file_item']][]=$file;
+            }
+            if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
+            {
+                $data['hc_locations']=Query_helper::get_info($this->config->item('table_fms_setup_file_hc_location'),'id value,name text',array(),0,0,array('ordering'));
+            }
             $ajax['system_page_url']=site_url($this->controller_url.'/index/edit/'.$item_id);
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/edit',$data,true));
             if($this->message)
@@ -108,24 +224,21 @@ class Tasks_file_entry extends Root_Controller
         {
             $data['file_permissions']=$file_permissions;
             $data['item']=$this->get_file_info($item_id);
-            if($data['item']['file_total']<1)
+            $data['file_items']=$this->get_file_items($item_id);
+            $stored_files=Query_helper::get_info($this->config->item('table_fms_tasks_digital_file'),'*',array('id_file_name ='.$item_id,'status ="'.$this->config->item('system_status_active').'"'));
+            $data['item_files']=array();
+            foreach($stored_files as $file)
             {
-                $ajax['system_message']='Your selected File is empty.';
-                $ajax['status']=false;
-                $this->json_return($ajax);
+                $data['item_files'][$file['id_file_item']][]=$file;
             }
-            else
+            $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/details',$data,true));
+            $ajax['system_page_url']=site_url($this->controller_url.'/index/details/'.$item_id);
+            $ajax['status']=true;
+            if($this->message)
             {
-                $data['stored_files']=Query_helper::get_info($this->config->item('table_fms_tasks_digital_file'),'*',array('id_file_name ='.$item_id,'status ="'.$this->config->item('system_status_active').'"'));
-                $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/details',$data,true));
-                $ajax['system_page_url']=site_url($this->controller_url.'/index/details/'.$item_id);
-                $ajax['status']=true;
-                if($this->message)
-                {
-                    $ajax['system_message']=$this->message;
-                }
-                $this->json_return($ajax);
+                $ajax['system_message']=$this->message;
             }
+            $this->json_return($ajax);
         }
         else
         {
@@ -136,7 +249,7 @@ class Tasks_file_entry extends Root_Controller
     }
     private function get_file_info($file_name_id)
     {
-        $this->db->select('n.id,n.name,n.date_start');
+        $this->db->select('n.*');
         $this->db->select('ctg.name category_name');
         $this->db->select('sctg.name sub_category_name');
         $this->db->select('cls.name class_name');
@@ -172,6 +285,32 @@ class Tasks_file_entry extends Root_Controller
         $allowed_types='gif|jpg|png|doc|docx|pdf|xls|xlsx|ppt|pptx|txt';
 
         $file_permissions=$this->get_file_permission($id);
+        if(!$file_permissions['editable'])
+        {
+            if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
+            {
+                if($this->input->post('id_hc_location'))
+                {
+                    $data=array();
+                    $data['id_hc_location']=$this->input->post('id_hc_location');
+                    $data['date_updated']=$time;
+                    $data['user_updated']=$user->user_id;
+                    $this->db->trans_start();
+                    Query_helper::update($this->config->item('table_fms_setup_file_name'),$data,array('id ='.$id));
+                    $this->db->trans_complete(); //DB Transaction Handle END
+                    if($this->db->trans_status()!==true)
+                    {
+                        $ajax['status']=false;
+                        $this->message=$this->lang->line('MSG_SAVED_FAIL');
+                        $this->system_edit($id);
+                        exit();
+                    }
+                }
+            }
+            $this->message=$this->lang->line('MSG_SAVED_SUCCESS');
+            $this->system_list();
+            exit();
+        }
         if($file_permissions['action1']==1 || $file_permissions['action2']==1 || $file_permissions['action3']==1)
         {
             //check if already saved
@@ -297,6 +436,17 @@ class Tasks_file_entry extends Root_Controller
             $data=array();
             $data['date_updated']=$time;
             $data['user_updated']=$user->user_id;
+            if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
+            {
+                if($this->input->post('id_hc_location'))
+                {
+                    $data['id_hc_location']=$this->input->post('id_hc_location');
+                }
+                if($this->input->post('status_file')==$this->config->item('system_status_file_open') || $this->input->post('status_file')==$this->config->item('system_status_file_close'))
+                {
+                    $data['status_file']=$this->input->post('status_file');
+                }
+            }
             Query_helper::update($this->config->item('table_fms_setup_file_name'),$data,array('id ='.$id));
 
 
@@ -341,13 +491,109 @@ class Tasks_file_entry extends Root_Controller
                 $actions['action'.$index]=0;
             }
         }
+        else
+        {
+            $result=Query_helper::get_info($this->config->item('table_fms_setup_file_name'),'status_file',array('id='.$file_name_id),1);
+            $actions['editable']=false;
+            if($result['status_file']==$this->config->item('system_status_file_open'))
+            {
+                $actions['editable']=true;
+            }
+        }
         return $actions;
     }
+    private function system_save_new_file()
+    {
+        $user=User_helper::get_user();
+        if(!(isset($this->permissions['action1']) && ($this->permissions['action1']==1)))
+        {
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
+            $this->json_return($ajax);
+        }
+        if(!$this->check_validation())
+        {
+            $ajax['status']=false;
+            $ajax['system_message']=$this->message;
+            $this->json_return($ajax);
+        }
+        else
+        {
+            $data=$this->input->post('item');
+            $time=time();
+            $data['date_start']=System_helper::get_time($data['date_start']);
 
+            $this->db->trans_begin(); //DB Transaction Handle START
+
+            $data['user_created']=$user->user_id;
+            $data['date_created']=$time;
+            $file_name_id=Query_helper::add($this->config->item('table_fms_setup_file_name'),$data);
+            if($file_name_id===false)
+            {
+                $this->db->trans_rollback();
+                $ajax['status']=false;
+                $ajax['desk_message']=$this->lang->line('MSG_SAVED_FAIL');
+                $this->json_return($ajax);
+            }
+            $data=array();
+            $data['user_created']=$user->user_id;
+            $data['date_created']=$time;
+            $data['user_group_id']=$user->user_group;
+            $data['id_file']=$file_name_id;
+            $data['revision']=1;
+            for($i=0;$i<$this->config->item('system_fms_max_actions');++$i)
+            {
+                $data['action'.$i]=0;
+            }
+            $data['action0']=1;
+            $data['action1']=1;
+            Query_helper::add($this->config->item('table_fms_setup_assign_file_user_group'),$data);
+
+            if($this->db->trans_status()===true)
+            {
+                $this->db->trans_commit();
+                $save_and_new=$this->input->post('system_save_new_status');
+                $this->message=$this->lang->line('MSG_SAVED_SUCCESS');
+                if($save_and_new==1)
+                {
+                    $this->system_add();
+                }
+                else
+                {
+                    $this->system_list();
+                }
+            }
+            else
+            {
+                $this->db->trans_rollback();
+                $ajax['status']=false;
+                $ajax['desk_message']=$this->lang->line('MSG_SAVED_FAIL');
+                $this->json_return($ajax);
+            }
+        }
+    }
+    private function check_validation()
+    {
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('item[name]',$this->lang->line('LABEL_NAME'),'required');
+        $this->form_validation->set_rules('item[id_type]',$this->lang->line('LABEL_FILE_TYPE'),'required');
+        $this->form_validation->set_rules('item[id_hc_location]',$this->lang->line('LABEL_HC_LOCATION'),'required');
+        $this->form_validation->set_rules('item[date_start]',$this->lang->line('LABEL_DATE_START'),'required');
+        $this->form_validation->set_rules('item[status_file]',$this->lang->line('LABEL_FILE_STATUS'),'required');
+        $this->form_validation->set_rules('item[employee_id]',$this->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'),'required');
+        $this->form_validation->set_rules('item[id_company]',$this->lang->line('LABEL_COMPANY_NAME'),'required');
+        $this->form_validation->set_rules('item[id_department]',$this->lang->line('LABEL_DEPARTMENT'),'required');
+        if($this->form_validation->run()==false)
+        {
+            $this->message=validation_errors();
+            return false;
+        }
+        return true;
+    }
     private function system_get_items()
     {
         $user=User_helper::get_user();
-        $this->db->select('n.id,n.name,n.date_start,n.ordering');
+        $this->db->select('n.*');
         $this->db->select('ctg.name category_name');
         $this->db->select('sctg.name sub_category_name');
         $this->db->select('cls.name class_name');

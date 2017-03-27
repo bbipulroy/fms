@@ -47,14 +47,6 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         </div>
         <div class="row show-grid">
             <div class="col-xs-4">
-                <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>:</label>
-            </div>
-            <div class="col-sm-4 col-xs-8">
-                <label><?php echo $item['hardcopy_location'] ?></label>
-            </div>
-        </div>
-        <div class="row show-grid">
-            <div class="col-xs-4">
                 <label class="control-label pull-right">Opening Date:</label>
             </div>
             <div class="col-sm-4 col-xs-8">
@@ -117,122 +109,240 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <label><?php echo $item['number_of_page'] ?></label>
             </div>
         </div>
+        <?php
+            if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
+            {
+                ?>
+                <div class="row show-grid">
+                    <div class="col-xs-4">
+                        <label class="control-label pull-right" for="id_hc_location"><?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>:</label>
+                    </div>
+                    <div class="col-sm-4 col-xs-8">
+                        <label><?php echo $item['hardcopy_location']; ?></label>
+                        <button type="button" class="btn btn-primary btn-sm fms_tasks_edit">Change</button>
+                        <div style="display: none;">
+                            <select data-name="id_hc_location" id="id_hc_location" class="form-control">
+                                <option value=""><?php echo $this->lang->line('SELECT'); ?></option>
+                                <?php
+                                    foreach($hc_locations as $hc_location)
+                                    {
+                                        ?>
+                                        <option value="<?php echo $hc_location['value']; ?>" <?php if($hc_location['value']==$item['id_hc_location']){echo ' selected';} ?>><?php echo $hc_location['text']; ?></option>
+                                        <?php
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row show-grid">
+                    <div class="col-xs-4">
+                        <label class="control-label pull-right" for="status_file"><?php echo $CI->lang->line('LABEL_FILE_STATUS'); ?>:</label>
+                    </div>
+                    <div class="col-sm-4 col-xs-8">
+                        <label><?php echo $item['status_file']; ?></label>
+                        <?php
+                            if($item['status_file']==$CI->config->item('system_status_file_open'))
+                            {
+                                ?>
+                                <button type="button" class="btn btn-primary btn-sm fms_tasks_edit">Change</button>
+                                <div style="display: none;">
+                                    <select data-name="status_file" id="status_file" class="form-control">
+                                        <option value="<?php echo $CI->config->item('system_status_file_open'); ?>" <?php if($CI->config->item('system_status_file_open')==$item['status_file']){echo ' selected';} ?>><?php echo $CI->lang->line('FILE_STATUS_OPEN'); ?></option>
+                                        <option value="<?php echo $CI->config->item('system_status_file_close'); ?>" <?php if($CI->config->item('system_status_file_close')==$item['status_file']){echo ' selected';} ?>><?php echo $CI->lang->line('FILE_STATUS_CLOSE'); ?></option>
+                                    </select>
+                                </div>
+                                <?php
+                            }
+                        ?>
+                    </div>
+                </div>
+                <?php
+            }
+            else
+            {
+                ?>
+                <div class="row show-grid">
+                    <div class="col-xs-4">
+                        <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>:</label>
+                    </div>
+                    <div class="col-sm-4 col-xs-8">
+                        <label><?php echo $item['hardcopy_location'] ?></label>
+                    </div>
+                </div>
+                <div class="row show-grid">
+                    <div class="col-xs-4">
+                        <label class="control-label pull-right"><?php echo $CI->lang->line('LABEL_FILE_STATUS'); ?></label>
+                    </div>
+                    <div class="col-sm-4 col-xs-8">
+                        <label><?php echo $item['status_file']; ?></label>
+                    </div>
+                </div>
+                <?php
+            }
+        ?>
 
-        <div id="files_container">
-            <div style="overflow-x: auto;" class="row show-grid">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th style="min-width: 250px;">File/Picture</th>
-                            <th style="min-width: 50px;">Upload</th>
-                            <th style="min-width: 50px;">Entry Date</th>
-                            <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_REMARKS'); ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                        $location=$this->config->item('system_image_base_url');
-                        foreach($stored_files as $index=>$file)
+        <div id="files_container" data-current-id="0">
+            <div class="panel-group" id="accordion">
+                <?php
+                    $location=$this->config->item('system_image_base_url');
+                    foreach($file_items as $file_item)
+                    {
+                        $show_item=true;
+                        $active_add_more=true;
+                        if($file_item['status']==$this->config->item('system_status_active'))
+                        {
+                            $show_item=true;
+                            $active_add_more=true;
+                        }
+                        elseif(isset($item_files[$file_item['id']]))
+                        {
+                            $show_item=true;
+                            $active_add_more=false;
+                        }
+                        else
+                        {
+                            $show_item=false;
+                            $active_add_more=false;
+                        }
+                        if($show_item)
                         {
                             ?>
-                            <tr>
-                                <td>
-                                    <div class="preview_container_file" id="preview_container_file_old_<?php echo $file['id']; ?>">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a class="external" data-toggle="collapse" data-parent="#accordion" href="#collapse_<?php echo $file_item['id']; ?>"><?php echo $file_item['name']; ?></a>
+                                    </h4>
+                                </div>
+                                <div id="collapse_<?php echo $file_item['id']; ?>" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <div style="overflow-x: auto;" class="row show-grid">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="min-width: 250px;">File/Picture</th>
+                                                        <th style="min-width: 50px;">Upload</th>
+                                                        <th style="min-width: 50px;">Entry Date</th>
+                                                        <th style="min-width: 100px;"><?php echo $CI->lang->line('LABEL_REMARKS'); ?></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                        if(!isset($item_files[$file_item['id']]))
+                                                        {
+                                                            $item_files[$file_item['id']]=array();
+                                                        }
+                                                        foreach($item_files[$file_item['id']] as $file)
+                                                        {
+                                                            ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="preview_container_file" id="preview_container_file_old_<?php echo $file['id']; ?>">
+                                                                        <?php
+                                                                        if(substr($file['mime_type'],0,5)=='image')
+                                                                        {
+                                                                            ?>
+                                                                            <img style="max-width: 250px;" src="<?php echo $location.$file['file_path']; ?>">
+                                                                            <?php
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            ?>
+                                                                            <a href="<?php echo $location.$file['file_path']; ?>" class="external" target="_blank"><?php echo $file['name']; ?></a>
+                                                                            <?php
+                                                                        }
+                                                                        ?>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <?php
+                                                                    if($file_permissions['action2']==1 && $file_permissions['editable'])
+                                                                    {
+                                                                        ?>
+                                                                        <input type="file" name="file_old_<?php echo $file['id']; ?>" data-current-id="<?php echo $file['id']; ?>" data-preview-container="#preview_container_file_old_<?php echo $file['id']; ?>" class="browse_button_old"><br>
+                                                                        <?php
+                                                                    }
+                                                                    if($file_permissions['action3']==1 && $file_permissions['editable'])
+                                                                    {
+                                                                        ?>
+                                                                        <button type="button" class="btn btn-danger system_button_add_delete"><?php echo $CI->lang->line('DELETE'); ?></button>
+                                                                        <?php
+                                                                    }
+                                                                    ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php
+                                                                    if($file_permissions['action2']==1 && $file_permissions['editable'])
+                                                                    {
+                                                                        ?>
+                                                                        <input type="text" name="items_old[<?php echo $file['id']; ?>][date_entry]" class="form-control datepicker_old" value="<?php echo System_helper::display_date($file['date_entry']); ?>">
+                                                                        <?php
+                                                                    }
+                                                                    elseif($file_permissions['action3']==1 && $file_permissions['editable'])
+                                                                    {
+                                                                        ?>
+                                                                        <input type="hidden" name="items_old[<?php echo $file['id']; ?>][date_entry]" value="<?php echo System_helper::display_date($file['date_entry']); ?>">
+                                                                        <?php
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        echo System_helper::display_date($file['date_entry']);
+                                                                    }
+                                                                    ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?php
+                                                                    if($file_permissions['action2']==1 && $file_permissions['editable'])
+                                                                    {
+                                                                        ?>
+                                                                        <textarea  name="items_old[<?php echo $file['id']; ?>][remarks]" class="form-control"><?php echo $file['remarks']; ?></textarea>
+                                                                        <?php
+                                                                    }
+                                                                    elseif($file_permissions['action3']==1 && $file_permissions['editable'])
+                                                                    {
+                                                                        ?>
+                                                                        <input type="hidden" name="items_old[<?php echo $file['id']; ?>][remarks]" value="<?php echo $file['remarks']; ?>">
+                                                                        <?php
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        echo $file['remarks'];
+                                                                    }
+                                                                    ?>
+                                                                </td>
+                                                            </tr>
+                                                            <?php
+                                                        }
+                                                    ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer">
                                         <?php
-                                        if(substr($file['mime_type'],0,5)=='image')
+                                        if($file_permissions['action1']==1 && $active_add_more && $file_permissions['editable'])
                                         {
                                             ?>
-                                            <img style="max-width: 250px;" src="<?php echo $location.$file['file_path']; ?>">
-                                            <?php
-                                        }
-                                        else
-                                        {
-                                            ?>
-                                            <a href="<?php echo $location.$file['file_path']; ?>" class="external" target="_blank"><?php echo $file['name']; ?></a>
+                                            <div class="row show-grid">
+                                                <div class="col-xs-4"></div>
+                                                <div class="col-xs-4">
+                                                    <button type="button" class="btn btn-warning system_button_add_more" data-file-item-id="<?php echo $file_item['id']; ?>">
+                                                        <?php echo $CI->lang->line('LABEL_ADD_MORE'); ?>
+                                                    </button>
+                                                </div>
+                                                <div class="col-xs-4"></div>
+                                            </div>
                                             <?php
                                         }
                                         ?>
                                     </div>
-                                </td>
-                                <td>
-                                    <?php
-                                        if($file_permissions['action2']==1)
-                                        {
-                                            ?>
-                                            <input type="file" name="file_old_<?php echo $file['id']; ?>" data-current-id="<?php echo $file['id']; ?>" data-preview-container="#preview_container_file_old_<?php echo $file['id']; ?>" class="browse_button_old"><br>
-                                            <?php
-                                        }
-                                        if($file_permissions['action3']==1)
-                                        {
-                                            ?>
-                                            <button type="button" class="btn btn-danger system_button_add_delete"><?php echo $CI->lang->line('DELETE'); ?></button>
-                                            <?php
-                                        }
-                                    ?>
-                                </td>
-                                <td>
-                                    <?php
-                                        if($file_permissions['action2']==1)
-                                        {
-                                            ?>
-                                            <input type="text" name="items_old[<?php echo $file['id']; ?>][date_entry]" class="form-control datepicker_old" value="<?php echo System_helper::display_date($file['date_entry']); ?>">
-                                            <?php
-                                        }
-                                        elseif($file_permissions['action3']==1)
-                                        {
-                                            ?>
-                                            <input type="hidden" name="items_old[<?php echo $file['id']; ?>][date_entry]" value="<?php echo System_helper::display_date($file['date_entry']); ?>">
-                                            <?php
-                                        }
-                                        else
-                                        {
-                                            echo System_helper::display_date($file['date_entry']);
-                                        }
-                                    ?>
-                                </td>
-                                <td>
-                                    <?php
-                                    if($file_permissions['action2']==1)
-                                    {
-                                        ?>
-                                        <textarea  name="items_old[<?php echo $file['id']; ?>][remarks]" class="form-control"><?php echo $file['remarks']; ?></textarea>
-                                        <?php
-                                    }
-                                    elseif($file_permissions['action3']==1)
-                                    {
-                                        ?>
-                                        <input type="hidden" name="items_old[<?php echo $file['id']; ?>][remarks]" value="<?php echo $file['remarks']; ?>">
-                                        <?php
-                                    }
-                                    else
-                                    {
-                                        echo $file['remarks'];
-                                    }
-                                    ?>
-                                </td>
-                            </tr>
+                                </div>
+                            </div>
                             <?php
                         }
-                    ?>
-                    </tbody>
-                </table>
+                    }
+                ?>
             </div>
-            <?php
-                if($file_permissions['action1']==1)
-                {
-                    ?>
-                    <div class="row show-grid">
-                        <div class="col-xs-4"></div>
-                        <div class="col-xs-4">
-                            <button type="button" class="btn btn-warning system_button_add_more" data-current-id="0">
-                                <?php echo $CI->lang->line('LABEL_ADD_MORE'); ?>
-                            </button>
-                        </div>
-                        <div class="col-xs-4"></div>
-                    </div>
-                    <?php
-                }
-            ?>
         </div>
     </div>
     <div class="clearfix"></div>
@@ -249,6 +359,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 <td>
                     <input type="file" class="browse_button_new"><br>
                     <button type="button" class="btn btn-danger system_button_add_delete"><?php echo $CI->lang->line('DELETE'); ?></button>
+                    <input type="hidden" class="file_item">
                 </td>
                 <td>
                     <input type="text" class="form-control date_entry" value="<?php echo System_helper::display_date(time()); ?>">
@@ -266,13 +377,14 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
     {
         $(document).off("click",".system_button_add_more");
         $(document).off("click",".system_button_add_delete");
-        
+        $(document).off("click",".fms_tasks_edit");
+
         $('.datepicker_old').datepicker({dateFormat : display_date_format});
         $('.browse_button_old').filestyle({input: false,icon: false,buttonText: "Edit",buttonName: "btn-primary"});
         $(document).on("click", ".system_button_add_more", function(event)
         {
-            var current_id=parseInt($('.system_button_add_more').attr('data-current-id'))+1;
-            $('.system_button_add_more').attr('data-current-id',current_id);
+            var current_id=parseInt($('#files_container').attr('data-current-id'))+1;
+            $('#files_container').attr('data-current-id',current_id);
             var content_id='#system_content_add_more table tbody';
 
             $(content_id+' .preview_container_file').attr('id','preview_container_file_'+current_id);
@@ -282,22 +394,25 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             $(content_id+' .browse_button_new').attr('id','file_new_'+current_id);
             $(content_id+' .browse_button_new').attr('data-current-id',current_id);
 
+            $(content_id+' .file_item').attr('name','items_new['+current_id+'][id_file_item]');
+            $(content_id+' .file_item').attr('value',$(this).attr("data-file-item-id"));
             $(content_id+' .date_entry').attr('name','items_new['+current_id+'][date_entry]');
             $(content_id+' .date_entry').attr('id','date_entry_'+current_id);
 
             $(content_id+' .remarks').attr('name','items_new['+current_id+'][remarks]');
 
             var html=$(content_id).html();
-            $('#files_container table tbody').append(html);
+            $(this).closest('.panel-collapse').find('tbody').append(html);
 
             $(content_id+' .preview_container_file').removeAttr('id');
-
 
             $(content_id+' .browse_button_new').removeAttr('data-preview-container');
             $(content_id+' .browse_button_new').removeAttr('name');
             $(content_id+' .browse_button_new').removeAttr('id');
             $(content_id+' .browse_button_new').removeAttr('data-current-id');
 
+            $(content_id+' .file_item').removeAttr('name');
+            $(content_id+' .file_item').removeAttr('value');
             $(content_id+' .date_entry').removeAttr('name');
             $(content_id+' .date_entry').removeAttr('id');
             $(content_id+' .remarks').removeAttr('name');
@@ -308,6 +423,13 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
         $(document).on("click", ".system_button_add_delete", function(event)
         {
             $(this).closest('tr').remove();
+        });
+        $(document).on("click",".fms_tasks_edit",function(event)
+        {
+            var div_to_change=$(this).closest("div");
+            div_to_change.html(div_to_change.find("div").html());
+            var select_to_change=div_to_change.find("select");
+            select_to_change.attr("name",select_to_change.attr("data-name"));
         });
     });
 </script>
