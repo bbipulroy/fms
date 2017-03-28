@@ -110,7 +110,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             </div>
         </div>
         <?php
-            if(isset($CI->permissions['action2']) && ($CI->permissions['action2']==1))
+            if($file_permissions['action1']==1 || $file_permissions['action2']==1 || $file_permissions['action3']==1)
             {
                 ?>
                 <div class="row show-grid">

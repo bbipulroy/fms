@@ -134,8 +134,15 @@ class Tasks_file_entry extends Root_Controller
             $this->db->order_by('com.ordering');
             $data['companies']=$this->db->get()->result_array();
 
-            $result=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'),'name',array('id='.$user->department_id),1,0);
-            $data['department']=array('value'=>$user->department_id,'text'=>$result['name']);
+            if($user->department_id>0)
+            {
+                $result=Query_helper::get_info($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department'),'name',array('id='.$user->department_id),1,0);
+                $data['department']=array('value'=>$user->department_id,'text'=>$result['name']);
+            }
+            else
+            {
+                $data['department']=array('value'=>'','text'=>'Not Assigned');
+            }
             $data['employee']=array('value'=>$user->user_id,'text'=>$user->name);
             $data['hc_locations']=Query_helper::get_info($this->config->item('table_fms_setup_file_hc_location'),'id value,name text',array(),0,0,'ordering');
 
@@ -169,6 +176,13 @@ class Tasks_file_entry extends Root_Controller
     }
     private function system_edit($id)
     {
+        if(!(isset($this->permissions['action2']) && ($this->permissions['action2']==1)))
+        {
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
+            $this->json_return($ajax);
+        }
+
         if(($this->input->post('id')))
         {
             $item_id=$this->input->post('id');
@@ -189,10 +203,7 @@ class Tasks_file_entry extends Root_Controller
             {
                 $data['item_files'][$file['id_file_item']][]=$file;
             }
-            if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
-            {
-                $data['hc_locations']=Query_helper::get_info($this->config->item('table_fms_setup_file_hc_location'),'id value,name text',array(),0,0,array('ordering'));
-            }
+            $data['hc_locations']=Query_helper::get_info($this->config->item('table_fms_setup_file_hc_location'),'id value,name text',array(),0,0,array('ordering'));
             $ajax['system_page_url']=site_url($this->controller_url.'/index/edit/'.$item_id);
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/edit',$data,true));
             if($this->message)
@@ -284,10 +295,16 @@ class Tasks_file_entry extends Root_Controller
         $file_open_time_for_edit=$this->input->post('file_open_time_for_edit');
         $allowed_types='gif|jpg|png|doc|docx|pdf|xls|xlsx|ppt|pptx|txt';
 
+        if(!(isset($this->permissions['action2']) && ($this->permissions['action2']==1)))
+        {
+            $ajax['status']=false;
+            $ajax['system_message']=$this->lang->line('YOU_DONT_HAVE_ACCESS');
+            $this->json_return($ajax);
+        }
         $file_permissions=$this->get_file_permission($id);
         if(!$file_permissions['editable'])
         {
-            if(isset($this->permissions['action2']) && ($this->permissions['action2']==1))
+            if($file_permissions['action1']==1 || $file_permissions['action2']==1 || $file_permissions['action3']==1)
             {
                 if($this->input->post('id_hc_location'))
                 {
@@ -301,9 +318,8 @@ class Tasks_file_entry extends Root_Controller
                     if($this->db->trans_status()!==true)
                     {
                         $ajax['status']=false;
-                        $this->message=$this->lang->line('MSG_SAVED_FAIL');
-                        $this->system_edit($id);
-                        exit();
+                        $ajax['system_message']=$this->lang->line('MSG_SAVED_FAIL');
+                        $this->json_return($ajax);
                     }
                 }
             }
