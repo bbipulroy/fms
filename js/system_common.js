@@ -199,14 +199,9 @@ $(document).ready(function()
                     {
                         preview_height=$(this).attr('data-preview-height');
                     }
-                    var reader = new FileReader();
-
-                    reader.onload = function (e)
-                    {
-                        var img_tag='<img height="'+preview_height+'" src="'+ e.target.result+'" >';
-                        $(container).html(img_tag);
-                    };
-                    reader.readAsDataURL(this.files[0]);
+                    var path=URL.createObjectURL(event.target.files[0]);
+                    var img_tag='<img height="'+preview_height+'" src="'+path+'" >';
+                    $(container).html(img_tag);
                 }
                 else
                 {
