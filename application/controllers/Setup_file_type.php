@@ -61,6 +61,27 @@ class Setup_file_type extends Root_Controller
             $this->json_return($ajax);
         }
     }
+    private function system_get_items()
+    {
+        $this->db->select('t.*');
+        $this->db->select('cls.name class_name');
+        $this->db->select('sctg.name sub_category_name');
+        $this->db->select('ctg.name category_name');
+        $this->db->from($this->config->item('table_fms_setup_file_type').' t');
+        $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
+        $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','sctg.id=cls.id_sub_category');
+        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=sctg.id_category');
+        $this->db->where('ctg.status=',$this->config->item('system_status_active'));
+        $this->db->where('sctg.status=',$this->config->item('system_status_active'));
+        $this->db->where('cls.status=',$this->config->item('system_status_active'));
+        $this->db->where('t.status=',$this->config->item('system_status_active'));
+        $this->db->order_by('ctg.ordering');
+        $this->db->order_by('sctg.ordering');
+        $this->db->order_by('cls.ordering');
+        $this->db->order_by('t.ordering');
+        $items=$this->db->get()->result_array();
+        $this->json_return($items);
+    }
     private function system_add()
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
@@ -213,23 +234,5 @@ class Setup_file_type extends Root_Controller
             return false;
         }
         return true;
-    }
-    private function system_get_items()
-    {
-        $this->db->select('t.*');
-        $this->db->select('cls.name class_name');
-        $this->db->select('sctg.name sub_category_name');
-        $this->db->select('ctg.name category_name');
-        $this->db->from($this->config->item('table_fms_setup_file_type').' t');
-        $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
-        $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','sctg.id=cls.id_sub_category');
-        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','ctg.id=sctg.id_category');
-        $this->db->where('t.status!=',$this->config->item('system_status_delete'));
-        $this->db->order_by('ctg.ordering');
-        $this->db->order_by('sctg.ordering');
-        $this->db->order_by('cls.ordering');
-        $this->db->order_by('t.ordering');
-        $items=$this->db->get()->result_array();
-        $this->json_return($items);
     }
 }

@@ -95,6 +95,9 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             id: 'id',
             url: url
         };
+        var tooltiprenderer = function (element) {
+            $(element).jqxTooltip({position: 'mouse', content: $(element).text() });
+        };
 
         var dataAdapter = new $.jqx.dataAdapter(source);
         // create jqxgrid.
@@ -107,6 +110,8 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 sortable: true,
                 showfilterrow: true,
                 columnsresize: true,
+                columnsreorder: true,
+                enabletooltips: true,
                 pagesize:50,
                 pagesizeoptions: ['20', '50', '100', '200','300','500'],
                 selectionmode: 'singlerow',
