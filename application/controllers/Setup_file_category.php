@@ -61,6 +61,11 @@ class Setup_file_category extends Root_Controller
             $this->json_return($ajax);
         }
     }
+    private function system_get_items()
+    {
+        $items=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id','name','status','ordering'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
+        $this->json_return($items);
+    }
     private function system_add()
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
@@ -196,10 +201,5 @@ class Setup_file_category extends Root_Controller
             return false;
         }
         return true;
-    }
-    private function system_get_items()
-    {
-        $items=Query_helper::get_info($this->config->item('table_fms_setup_file_category'),array('id','name','status','ordering'),array('status !="'.$this->config->item('system_status_delete').'"'),0,0,array('ordering ASC'));
-        $this->json_return($items);
     }
 }
