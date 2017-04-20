@@ -63,6 +63,20 @@ class Setup_file_type extends Root_Controller
     }
     private function system_get_items()
     {
+        $current_records = $this->input->post('total_records');
+        if(!$current_records)
+        {
+            $current_records=0;
+        }
+        $pagesize = $this->input->post('pagesize');
+        if(!$pagesize)
+        {
+            $pagesize=40;
+        }
+        else
+        {
+            $pagesize=$pagesize*2;
+        }
         $this->db->select('t.*');
         $this->db->select('cls.name class_name');
         $this->db->select('sctg.name sub_category_name');
@@ -79,6 +93,7 @@ class Setup_file_type extends Root_Controller
         $this->db->order_by('sctg.ordering');
         $this->db->order_by('cls.ordering');
         $this->db->order_by('t.ordering');
+        $this->db->limit($pagesize,$current_records);
         $items=$this->db->get()->result_array();
         $this->json_return($items);
     }
