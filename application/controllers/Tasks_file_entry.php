@@ -69,6 +69,67 @@ class Tasks_file_entry extends Root_Controller
             $this->json_return($ajax);
         }
     }
+    private function system_get_items()
+    {
+        $current_records = $this->input->post('total_records');
+        if(!$current_records)
+        {
+            $current_records=0;
+        }
+        $pagesize = $this->input->post('pagesize');
+        if(!$pagesize)
+        {
+            $pagesize=40;
+        }
+        else
+        {
+            $pagesize=$pagesize*2;
+        }
+        $user=User_helper::get_user();
+        $this->db->select('n.*');
+        $this->db->select('ctg.name category_name');
+        $this->db->select('sctg.name sub_category_name');
+        $this->db->select('cls.name class_name');
+        $this->db->select('t.name type_name');
+        $this->db->select('hl.name hardcopy_location');
+        $this->db->select('CONCAT(ui.name," - ",u.employee_id) employee_name');
+        $this->db->select('d.name department_name');
+        $this->db->select('comp.full_name company_name');
+        $this->db->select('SUM(CASE WHEN df.status="'.$this->config->item('system_status_active').'" AND SUBSTRING(df.mime_type,1,5)="image" THEN 1 ELSE 0 END) number_of_page');
+        $this->db->from($this->config->item('table_fms_setup_file_name').' n');
+        $this->db->join($this->config->item('table_fms_setup_assign_file_user_group').' fug','n.id=fug.id_file');
+        $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
+        $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
+        $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','cls.id_sub_category=sctg.id');
+        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','sctg.id_category=ctg.id');
+        $this->db->join($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_id','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
+        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_company').' comp','comp.id=n.id_company','left');
+        $this->db->join($this->config->item('table_fms_tasks_digital_file').' df','df.id_file_name=n.id','left');
+        $this->db->where('ctg.status',$this->config->item('system_status_active'));
+        $this->db->where('sctg.status',$this->config->item('system_status_active'));
+        $this->db->where('cls.status',$this->config->item('system_status_active'));
+        $this->db->where('t.status',$this->config->item('system_status_active'));
+        $this->db->where('n.status',$this->config->item('system_status_active'));
+        $this->db->where('ui.revision',1);
+        $this->db->where('fug.user_group_id',$user->user_group);
+        $this->db->where('fug.revision',1);
+        $this->db->order_by('ctg.ordering');
+        $this->db->order_by('sctg.ordering');
+        $this->db->order_by('cls.ordering');
+        $this->db->order_by('t.ordering');
+        $this->db->order_by('n.ordering');
+        $this->db->group_by('n.id');
+        $this->db->limit($pagesize,$current_records);
+        $items=$this->db->get()->result_array();
+        foreach($items as &$item)
+        {
+            $item['date_start']=System_helper::display_date($item['date_start']);
+        }
+        $this->json_return($items);
+    }
     private function system_add()
     {
         if(isset($this->permissions['action1']) && ($this->permissions['action1']==1))
@@ -89,6 +150,11 @@ class Tasks_file_entry extends Root_Controller
             $this->db->where('afug.user_group_id',$user->user_group);
             $this->db->where('afug.action0',1);
             $this->db->where('afug.revision',1);
+            $this->db->where('ctg.status',$this->config->item('system_status_active'));
+            $this->db->where('sctg.status',$this->config->item('system_status_active'));
+            $this->db->where('cls.status',$this->config->item('system_status_active'));
+            $this->db->where('t.status',$this->config->item('system_status_active'));
+            $this->db->where('n.status',$this->config->item('system_status_active'));
             $this->db->order_by('ctg.ordering');
             $this->db->order_by('sctg.ordering');
             $this->db->order_by('cls.ordering');
@@ -203,7 +269,7 @@ class Tasks_file_entry extends Root_Controller
             {
                 $data['item_files'][$file['id_file_item']][]=$file;
             }
-            $data['hc_locations']=Query_helper::get_info($this->config->item('table_fms_setup_file_hc_location'),'id value,name text',array(),0,0,array('ordering'));
+            $data['hc_locations']=Query_helper::get_info($this->config->item('table_fms_setup_file_hc_location'),array('id value','name text'),array('status ="'.$this->config->item('system_status_active').'"'),0,0,array('ordering ASC'));
             $ajax['system_page_url']=site_url($this->controller_url.'/index/edit/'.$item_id);
             $ajax['system_content'][]=array('id'=>'#system_content','html'=>$this->load->view($this->controller_url.'/edit',$data,true));
             if($this->message)
@@ -605,47 +671,5 @@ class Tasks_file_entry extends Root_Controller
             return false;
         }
         return true;
-    }
-    private function system_get_items()
-    {
-        $user=User_helper::get_user();
-        $this->db->select('n.*');
-        $this->db->select('ctg.name category_name');
-        $this->db->select('sctg.name sub_category_name');
-        $this->db->select('cls.name class_name');
-        $this->db->select('t.name type_name');
-        $this->db->select('hl.name hardcopy_location');
-        $this->db->select('CONCAT(ui.name," - ",u.employee_id) employee_name');
-        $this->db->select('d.name department_name');
-        $this->db->select('comp.full_name company_name');
-        $this->db->select('SUM(CASE WHEN df.status="'.$this->config->item('system_status_active').'" AND SUBSTRING(df.mime_type,1,5)="image" THEN 1 ELSE 0 END) number_of_page');
-        $this->db->from($this->config->item('table_fms_setup_file_name').' n');
-        $this->db->join($this->config->item('table_fms_setup_assign_file_user_group').' fug','n.id=fug.id_file');
-        $this->db->join($this->config->item('table_fms_setup_file_type').' t','n.id_type=t.id');
-        $this->db->join($this->config->item('table_fms_setup_file_class').' cls','t.id_class=cls.id');
-        $this->db->join($this->config->item('table_fms_setup_file_sub_category').' sctg','cls.id_sub_category=sctg.id');
-        $this->db->join($this->config->item('table_fms_setup_file_category').' ctg','sctg.id_category=ctg.id');
-        $this->db->join($this->config->item('table_fms_setup_file_hc_location').' hl','hl.id=n.id_hc_location');
-        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user_info').' ui','ui.user_id=n.employee_id','left');
-        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_user').' u','ui.user_id=u.id');
-        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_department').' d','d.id=n.id_department','left');
-        $this->db->join($this->config->item('system_db_login').'.'.$this->config->item('table_login_setup_company').' comp','comp.id=n.id_company','left');
-        $this->db->join($this->config->item('table_fms_tasks_digital_file').' df','df.id_file_name=n.id','left');
-        $this->db->where('n.status',$this->config->item('system_status_active'));
-        $this->db->where('ui.revision',1);
-        $this->db->where('fug.user_group_id',$user->user_group);
-        $this->db->where('fug.revision',1);
-        $this->db->order_by('ctg.ordering');
-        $this->db->order_by('sctg.ordering');
-        $this->db->order_by('cls.ordering');
-        $this->db->order_by('t.ordering');
-        $this->db->order_by('n.ordering');
-        $this->db->group_by('n.id');
-        $items=$this->db->get()->result_array();
-        foreach($items as &$item)
-        {
-            $item['date_start']=System_helper::display_date($item['date_start']);
-        }
-        $this->json_return($items);
     }
 }
