@@ -42,6 +42,11 @@ $action_buttons[]=array(
     'href'=>site_url($CI->controller_url.'/index/list')
 
 );
+$action_buttons[]=array(
+    'type'=>'button',
+    'label'=>$CI->lang->line("ACTION_LOAD_MORE"),
+    'id'=>'button_jqx_load_more'
+);
 $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 ?>
 <div class="row widget">
@@ -125,7 +130,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
                 filterable: true,
                 sortable: true,
                 showfilterrow: true,
-                pagesize:50,
+                pagesize:20,
                 pagesizeoptions: ['20', '50', '100', '200','300','500'],
                 selectionmode: 'singlerow',
                 altrows: true,

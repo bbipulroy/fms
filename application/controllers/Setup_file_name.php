@@ -63,6 +63,20 @@ class Setup_file_name extends Root_Controller
     }
     private function system_get_items()
     {
+        $current_records = $this->input->post('total_records');
+        if(!$current_records)
+        {
+            $current_records=0;
+        }
+        $pagesize = $this->input->post('pagesize');
+        if(!$pagesize)
+        {
+            $pagesize=40;
+        }
+        else
+        {
+            $pagesize=$pagesize*2;
+        }
         $this->db->select('n.*');
         $this->db->select('ctg.name category_name');
         $this->db->select('sctg.name sub_category_name');
@@ -96,6 +110,7 @@ class Setup_file_name extends Root_Controller
         $this->db->order_by('t.ordering');
         $this->db->order_by('n.ordering');
         $this->db->group_by('n.id');
+        $this->db->limit($pagesize,$current_records);
         $items=$this->db->get()->result_array();
         foreach($items as &$item)
         {
