@@ -58,6 +58,7 @@ $CI = & get_instance();
             var base_url = "<?php echo base_url(); ?>";
             var display_date_format = "dd-M-yy";
             var SELECT_ONE_ITEM = "<?php echo $CI->lang->line('SELECT_ONE_ITEM'); ?>";
+            var system_resized_image_files=[];
         </script>
         <header class="hidden-print">
 
