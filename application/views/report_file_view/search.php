@@ -17,11 +17,11 @@ $CI= & get_instance();
                     <div class="col-xs-6">
                         <label for="id_category" class="control-label pull-right">
                             <?php echo $CI->lang->line('LABEL_FILE_CATEGORY');?>
+                            <span style="color:#FF0000">*</span>
                         </label>
                     </div>
                     <div class="col-xs-6">
-                        <select name="item[id_category]" id="id_category" class="form-control" tabindex="-1">
-                            <option value=""><?php echo $this->lang->line('SELECT');?></option>
+                        <select name="item[id_category]" id="id_category" class="form-control system_report_empty" tabindex="-1">
                             <?php
                             foreach($categories as $category)
                             {?>
@@ -40,7 +40,7 @@ $CI= & get_instance();
                         </label>
                     </div>
                     <div class="col-xs-6">
-                        <select name="item[id_sub_category]" id="id_sub_category" class="form-control" tabindex="-1">
+                        <select name="item[id_sub_category]" id="id_sub_category" class="form-control system_report_empty" tabindex="-1">
                             <option value=""><?php echo $this->lang->line('SELECT');?></option>
                             <?php
                             foreach($sub_categories as $sub_category)
@@ -60,7 +60,7 @@ $CI= & get_instance();
                         </label>
                     </div>
                     <div class="col-xs-6">
-                        <select name="item[id_class]" id="id_class" class="form-control" tabindex="-1">
+                        <select name="item[id_class]" id="id_class" class="form-control system_report_empty" tabindex="-1">
                             <option value=""><?php echo $this->lang->line('SELECT');?></option>
                             <?php
                             foreach($classes as $class)
@@ -80,7 +80,7 @@ $CI= & get_instance();
                         </label>
                     </div>
                     <div class="col-xs-6">
-                        <select name="item[id_type]" id="id_type" class="form-control">
+                        <select name="item[id_type]" id="id_type" class="form-control system_report_empty">
                             <option value=""><?php echo $this->lang->line('SELECT');?></option>
                             <?php
                             foreach($types as $type)
@@ -100,7 +100,7 @@ $CI= & get_instance();
                         </label>
                     </div>
                     <div class="col-xs-6">
-                        <select name="item[id_name]" id="id_name" class="form-control">
+                        <select name="item[id_name]" id="id_name" class="form-control system_report_empty">
                             <option value=""><?php echo $this->lang->line('SELECT');?></option>
                             <?php
                             foreach($names as $name)
@@ -117,7 +117,22 @@ $CI= & get_instance();
             <div class="col-xs-6">
                 <div style="" class="row show-grid">
                     <div class="col-xs-6">
-                        <select name="item[id_company]" id="id_company" class="form-control" tabindex="-1">
+                        <select name="report_name" id="report_name" class="form-control system_report_empty" tabindex="-1">
+                            <option value="list_files">List Files Only Wise</option>
+                            <option value="list_with_files_info">List with Files Information Wise</option>
+                            <option value="list_file_items">List Files Item Wise</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-6">
+                        <label for="report_name" class="control-label pull-left">
+                            <span style="color:#FF0000">*</span>
+                            <?php echo 'Report Type'; ?>
+                        </label>
+                    </div>
+                </div>
+                <div style="" class="row show-grid">
+                    <div class="col-xs-6">
+                        <select name="item[id_company]" id="id_company" class="form-control system_report_empty" tabindex="-1">
                             <option value=""><?php echo $this->lang->line('SELECT');?></option>
                             <?php
                             foreach($companies as $company)
@@ -137,7 +152,7 @@ $CI= & get_instance();
 
                 <div style="" class="row show-grid">
                     <div class="col-xs-6">
-                        <select name="item[id_department]" id="id_department" class="form-control" tabindex="-1">
+                        <select name="item[id_department]" id="id_department" class="form-control system_report_empty" tabindex="-1">
                             <option value=""><?php echo $this->lang->line('SELECT');?></option>
                             <?php
                             foreach($departments as $department)
@@ -157,7 +172,7 @@ $CI= & get_instance();
 
                 <div style="<?php if(!($item['employee_id']>0)){echo 'display: none';} ?>" class="row show-grid" id="employee_id_container">
                     <div class="col-xs-6">
-                        <select name="item[employee_id]" id="employee_id" class="form-control" tabindex="-1">
+                        <select name="item[employee_id]" id="employee_id" class="form-control system_report_empty" tabindex="-1">
                             <option value=""><?php echo $this->lang->line('SELECT');?></option>
                             <?php
                             foreach($employees as $employee)
@@ -188,7 +203,7 @@ $CI= & get_instance();
                         <span class="input-group-addon" id="sizing-addon2">
                             <label for="date_from_start_file">From:</label>
                         </span>
-                        <input name="item[date_from_start_file]" type="text" id="date_from_start_file" class="form-control datepicker" value="<?php echo $item['date_from_start_file'] ?>" placeholder="File Opening From Date">
+                        <input name="item[date_from_start_file]" type="text" id="date_from_start_file" class="form-control datepicker system_report_empty" value="<?php echo $item['date_from_start_file'] ?>" placeholder="File Opening From Date">
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -196,7 +211,7 @@ $CI= & get_instance();
                         <span class="input-group-addon" id="sizing-addon2">
                             <label for="date_to_start_file">To:</label>
                         </span>
-                        <input name="item[date_to_start_file]" type="text" id="date_to_start_file" class="form-control datepicker" value="<?php echo $item['date_to_start_file'] ?>" placeholder="File Opening To Date">
+                        <input name="item[date_to_start_file]" type="text" id="date_to_start_file" class="form-control datepicker system_report_empty" value="<?php echo $item['date_to_start_file'] ?>" placeholder="File Opening To Date">
                     </div>
                 </div>
             </div>
@@ -257,8 +272,13 @@ $CI= & get_instance();
         $(document).off("change","#id_name");
         $(document).off("click","#button_action_report");
         $(document).off("click", ".pop_up");
+        $(document).off("change", ".system_report_empty");
 
         $(".datepicker").datepicker({dateFormat : display_date_format});
+        $(document).on("change",".system_report_empty",function(e)
+        {
+            $('#system_report_container').html('');
+        });
         $(document).on("change","#id_company,#id_department",function()
         {
             $("#employee_id").val("");

@@ -62,7 +62,7 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 <script type="text/javascript">
     $(document).ready(function()
     {
-        var url="<?php echo site_url($CI->controller_url.'/index/get_items'); ?>";
+        var url="<?php echo site_url($CI->controller_url.'/index/get_items_list_with_files_info'); ?>";
         var source =
         {
             dataType:"json",
@@ -96,10 +96,6 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             }
             return element[0].outerHTML;
         };
-        var tooltiprenderer = function (element) {
-            $(element).jqxTooltip({position: 'mouse', content: $(element).text() });
-        };
-
         var dataAdapter=new $.jqx.dataAdapter(source);
         $("#system_jqx_container").jqxGrid(
         {
@@ -120,17 +116,17 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             //showaggregates: true,
             rowsheight: 45,
             columns:[
-                { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'name',width:'300',pinned:true,rendered: tooltiprenderer},
-                { text: '<?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>', dataField: 'employee_name',width:'200',rendered: tooltiprenderer},
-                { text: 'Opening Date', dataField: 'date_start',width:'100',rendered: tooltiprenderer,hidden:true},
-                { text: '<?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>', dataField: 'hardcopy_location',width:'200',rendered: tooltiprenderer,filtertype:'list'},
-                { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
-                { text: '<?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?>', dataField: 'sub_category_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
-                { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
-                { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',width:'200',rendered: tooltiprenderer,filtertype:'list'},
-                { text: '<?php echo $CI->lang->line('LABEL_COMPANY_NAME'); ?>', dataField: 'company_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},
-                { text: '<?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>', dataField: 'department_name',width:'200',rendered: tooltiprenderer,filtertype:'list',hidden:true},
-                { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'60',rendered: tooltiprenderer,hidden:true},
+                { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'name',width:'300',pinned:true},
+                { text: '<?php echo $CI->lang->line('LABEL_RESPONSIBLE_EMPLOYEE'); ?>', dataField: 'employee_name',width:'200'},
+                { text: 'Opening Date', dataField: 'date_start',width:'100',hidden:true},
+                { text: '<?php echo $CI->lang->line('LABEL_HC_LOCATION'); ?>', dataField: 'hardcopy_location',width:'200',filtertype:'list'},
+                { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',width:'200',filtertype:'list'},
+                { text: '<?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?>', dataField: 'sub_category_name',width:'200',filtertype:'list'},
+                { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',width:'200',filtertype:'list'},
+                { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',width:'200',filtertype:'list'},
+                { text: '<?php echo $CI->lang->line('LABEL_COMPANY_NAME'); ?>', dataField: 'company_name',width:'200',filtertype:'list',hidden:true},
+                { text: '<?php echo $CI->lang->line('LABEL_DEPARTMENT'); ?>', dataField: 'department_name',width:'200',filtertype:'list',hidden:true},
+                { text: '<?php echo $CI->lang->line('LABEL_ORDER'); ?>', dataField: 'ordering',width:'60',hidden:true},
                 { text: '<?php echo $CI->lang->line('ACTION_DETAILS'); ?>', dataField: 'details_button',width:'85',cellsrenderer:cellsrenderer}
             ]
         });
