@@ -55,35 +55,22 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
 <script type="text/javascript">
     $(document).ready(function()
     {
-        var url="<?php echo site_url($CI->controller_url.'/index/get_items_list_files'); ?>";
+        var url="<?php echo site_url($CI->controller_url.'/index/files_list'); ?>";
         var source =
         {
             dataType:"json",
             dataFields:[
                 { name: 'id', type: 'int' },
-                { name: 'file_name', type: 'string' },
                 { name: 'category_name', type: 'string' },
                 { name: 'sub_category_name', type: 'string' },
                 { name: 'class_name', type: 'string' },
-                { name: 'type_name', type: 'string' }
+                { name: 'type_name', type: 'string' },
+                { name: 'file_name', type: 'string' }
             ],
             id: 'id',
             url: url,
             type: 'POST',
-            data:{<?php echo $ajax_post; ?>}
-        };
-        var cellsrenderer=function(row,column,value,defaultHtml,columnSettings,record)
-        {
-            var element=$(defaultHtml);
-            if(value=='' || value=='Not Assigned')
-            {
-                element.css({'background-color': 'red','margin': '0px','width': '100%', 'height': '100%',padding:'5px'});
-                if(column=='file_name')
-                {
-                    element.css({'background-color': 'red','color':'red','margin': '0px','width': '100%', 'height': '100%',padding:'5px'});
-                }
-            }
-            return element[0].outerHTML;
+            data:JSON.parse('<?php echo json_encode($ajax_post);?>')
         };
         var dataAdapter=new $.jqx.dataAdapter(source);
         $("#system_jqx_container").jqxGrid(
@@ -92,24 +79,24 @@ $CI->load->view('action_buttons',array('action_buttons'=>$action_buttons));
             autoheight: true,
             source: dataAdapter,
             columnsresize: true,
-            columnsreorder: true,
+            //columnsreorder: true,
             pageable: true,
             filterable: true,
             sortable: true,
-            showfilterrow: true,
+            showfilterrow: false,
             pagesize:50,
             pagesizeoptions: ['20', '50', '100', '200','300','500'],
             selectionmode: 'singlerow',
             altrows: true,
             enabletooltips: true,
             //showaggregates: true,
-            rowsheight: 35,
+            //rowsheight: 35,
             columns:[
-                { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',width:240,filtertype:'list'},
-                { text: '<?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?>', dataField: 'sub_category_name',width:240,filtertype:'list',cellsrenderer:cellsrenderer},
-                { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',width:240,filtertype:'list',cellsrenderer:cellsrenderer},
-                { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',width:240,filtertype:'list',cellsrenderer:cellsrenderer},
-                { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'file_name',width:'300',cellsrenderer:cellsrenderer}
+                { text: '<?php echo $CI->lang->line('LABEL_FILE_CATEGORY'); ?>', dataField: 'category_name',width:240},
+                { text: '<?php echo $CI->lang->line('LABEL_FILE_SUB_CATEGORY'); ?>', dataField: 'sub_category_name',width:240},
+                { text: '<?php echo $CI->lang->line('LABEL_FILE_CLASS'); ?>', dataField: 'class_name',width:240},
+                { text: '<?php echo $CI->lang->line('LABEL_FILE_TYPE'); ?>', dataField: 'type_name',width:240},
+                { text: '<?php echo $CI->lang->line('LABEL_FILE_NAME'); ?>', dataField: 'file_name',width:'300'}
             ]
         });
     });
