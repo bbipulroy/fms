@@ -8,7 +8,7 @@ $config['system_max_actions']=7;
 $config['system_fms_max_actions']=4;
 
 //dbs
-$config['system_db_login']='shaiful_arm_login';
+$config['system_db_login']='arm_login';
 $config['system_db_fms']='arm_fms';
 
 $config['system_status_active']='Active';
