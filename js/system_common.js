@@ -355,10 +355,7 @@ $(document).ready(function()
                 if(data.length>0)
                 {
                     $(jqx_grid_id).jqxGrid('beginupdate');
-                    for (var i = 0; i < data.length; i++) {
-
-                        $(jqx_grid_id).jqxGrid('addrow', id, data[i]);
-                    }
+                    $(jqx_grid_id).jqxGrid('addrow', null, data);
                     $(jqx_grid_id).jqxGrid('endupdate');
                     $(jqx_grid_id).jqxGrid('refreshfilterrow');
                 }
