@@ -6,7 +6,7 @@ $CI = & get_instance();
 <html lang="en">
     <head>
         <title>FMS</title>
-        <link rel="icon" type="image/ico" href="http://180.234.223.203/login/images/favicon.ico"/>
+        <link rel="icon" type="image/ico" href="http://malikseeds.com/favicon.ico"/>
         <meta charset="utf-8">
         <link rel="stylesheet" href="<?php echo base_url('css/bootstrap.min.css');?>">
         <link rel="stylesheet" href="<?php echo base_url('css/style.css');?>">
